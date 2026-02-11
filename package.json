@@ -1,0 +1,34 @@
+{
+  "name": "pemula-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "npx tsx ./src/index.ts",
+    "build": "tsup"
+  },
+  "keywords": [],
+  "author": "adwerygaming",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": ">=21"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.1.11",
+    "tsup": "^8.5.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.2.4",
+    "gradient-string": "^3.0.0",
+    "moment-timezone": "^0.6.0",
+    "quick.db": "^9.1.7",
+    "zod": "^4.3.6"
+  }
+}

@@ -1,0 +1,1 @@
+import "./sholatku/Index.js";
