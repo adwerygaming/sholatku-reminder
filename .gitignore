@@ -131,3 +131,6 @@ dist
 
 # This line was added by CommitAI.
 .commitai
+
+db/
+*.sqlite
