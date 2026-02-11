@@ -1,11 +1,9 @@
 import fs from "fs"
 import moment from "moment-timezone"
 import path from "path"
-import { QuickDB } from "quick.db"
 import { _dirname } from "../utils/Path.js"
 import tags from "../utils/Tags.js"
-
-const db = new QuickDB({ filePath: "db/prayerku.sqlite" })
+import SholatKuService from "./SholatKuService.js"
 
 const dataPath = path.join(_dirname, "..", "assets", "schedule.json")
 
@@ -75,26 +73,28 @@ for (let i = 0; i < prayerToday.length; i++) {
     const res = prayerToday[i];
     const next = prayerToday[i + 1]
 
-    const now = moment("11:51", "HH:mm") // manual setting for simulation
+    const now = moment("11:50", "HH:mm") // manual setting for simulation
     const prayerTime = res.time
     const nextPrayerTime: moment.Moment | undefined = next?.time
 
     console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
+    
     // current prayer time
-    if (now.isAfter(prayerTime) && now.isBefore(nextPrayerTime)) {
+    const currentPrayerCheck = SholatKuService.User(id).GetState(res.prayerName)
+
+    if (now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime) && !currentPrayerCheck) {
         console.log(`Time for ${res.prayerName}`)
 
     }
     
-    
     // next prayer in 5 minute
     const next5diff = nextPrayerTime?.diff(now, "minutes")
+    const next5diffCheck = SholatKuService.User(id).GetState(`${next?.prayerName}_5m`)
 
-    if (next5diff <= 5 && next5diff > 0) {
-        console.log(`5 Minutes into ${next.prayerName}`)
+    if (next5diff <= 5 && next5diff > 0 && !next5diffCheck) {
+        console.log(`5 Minutes into ${next?.prayerName}`)
     }
-}
 
-function name() {
-    
+    // ...
+    // add more if needed.
 }
