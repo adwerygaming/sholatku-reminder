@@ -23,6 +23,12 @@ interface GetPrayerTimeDataProps {
     city: string
 }
 
+interface UserInfo {
+    createdAt: string
+    province: string
+    city: string
+}
+
 function PrayerState(province: string, city: string) {
     province = SholatKuService.Helper.normalize(province)
     city = SholatKuService.Helper.normalize(city)
@@ -32,26 +38,73 @@ function PrayerState(province: string, city: string) {
     const db = DatabaseClient.table("prayer_state")
 
     const chain = {
-        async Get(prayerName: string): Promise<boolean> {
-            const res = await db.get(`${province}.${city}.${dayIdentifier}.${prayerName}`)
+        async Get(eventName: string): Promise<boolean> {
+            const res = await db.get(`${province}.${city}.${dayIdentifier}.${eventName}`)
 
             return res ? true : false
         },
-        async Set(prayerName: string, value: boolean): Promise<void> {
-            await db.set(`${province}.${city}.${dayIdentifier}.${prayerName}`, value)
+        async Set(eventName: string, value: boolean): Promise<void> {
+            await db.set(`${province}.${city}.${dayIdentifier}.${eventName}`, value)
         }
     }
 
     return chain
 }
 
-function UserPrayerState() {
+function UserPrayerState(userId: string) {
     const now = moment()
     const dayIdentifier = now.format("DD_MM") // 11_03
     const db = DatabaseClient.table("user_prayer_state")
 
     const chain = {
+        async Get(eventName: string): Promise<boolean> {
+            const res = await db.get(`${userId}.${dayIdentifier}.${eventName}`)
 
+            return res ? true : false
+        },
+        async Set(eventName: string, value: boolean): Promise<void> {
+            await db.set(`${userId}.${dayIdentifier}.${eventName}`, value)
+        }
+    }
+
+    return chain
+}
+
+function User(userId: string) {
+    const db = DatabaseClient.table("users")
+
+    const chain = {
+        PrayerState: UserPrayerState(userId),
+
+        async register(province: string, city: string): Promise<UserInfo> {
+            const obj: UserInfo = {
+                createdAt: moment().toISOString(),
+                province,
+                city
+            }
+
+            await db.set(`${userId}`, obj)
+            return obj
+        },
+
+        async unregister(): Promise<void> {
+            await db.delete(`${userId}`)
+        },
+
+        async getInfo(): Promise<UserInfo | null> {
+            const res: UserInfo | null = await db.get(`${userId}`)
+            return res
+        },
+
+        async updateInfo(province: string, city: string): Promise<UserInfo> {
+            const res = await this.register(province, city)
+            return res
+        },
+
+        async isRegistered(): Promise<boolean> {
+            const res = await db.get(`${userId}`)
+            return res ? true : false
+        }
     }
 
     return chain
@@ -94,7 +147,7 @@ function PrayerData(province: string, city: string) {
 const Database = {
     PrayerData,
     PrayerState,
-    UserPrayerState
+    User
 }
 
 const Helper = {
