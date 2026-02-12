@@ -4,16 +4,16 @@ import DatabaseClient from "../database/DatabaseClient.js"
 import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../types/PrayerTimeData.js"
 import tags from "../utils/Tags.js"
 
-interface UpdatePrayerProps {
+interface CheckPrayerProps {
     province: string
     city: string,
     debugTime?: moment.Moment
 }
 
-type UpdatePrayerEventName = "prayerTime" | "prayer_in_5m" | "prayer_in_15m" | "prayer_in_30m"
+type CheckPrayerEventName = "prayerTime" | "prayer_in_5m" | "prayer_in_15m" | "prayer_in_30m" | "nextPrayer"
 
-interface UpdatePrayerEvent {
-    type: UpdatePrayerEventName
+interface CheckPrayerEvent {
+    type: CheckPrayerEventName
     eventName: PrayerName
     time: moment.Moment
 }
@@ -23,20 +23,22 @@ interface GetPrayerTimeDataProps {
     city: string
 }
 
-function PrayerState() {
-    const now = moment()
-    const dayIdentifier = now.format("dd_mm") // 11_03
-    const db = DatabaseClient.table("prayer_state")
+function PrayerState(province: string, city: string) {
+    province = SholatKuService.Helper.normalize(province)
+    city = SholatKuService.Helper.normalize(city)
 
+    const now = moment()
+    const dayIdentifier = now.format("DD_MM") // 11_03
+    const db = DatabaseClient.table("prayer_state")
 
     const chain = {
         async Get(prayerName: string): Promise<boolean> {
-            const res = await db.get(`${dayIdentifier}_${prayerName}`)
+            const res = await db.get(`${province}.${city}.${dayIdentifier}.${prayerName}`)
 
             return res ? true : false
         },
         async Set(prayerName: string, value: boolean): Promise<void> {
-            await db.set(`${dayIdentifier}_${prayerName}`, value)
+            await db.set(`${province}.${city}.${dayIdentifier}.${prayerName}`, value)
         }
     }
 
@@ -45,38 +47,44 @@ function PrayerState() {
 
 function UserPrayerState() {
     const now = moment()
-    const dayIdentifier = now.format("dd_mm") // 11_03
+    const dayIdentifier = now.format("DD_MM") // 11_03
     const db = DatabaseClient.table("user_prayer_state")
 
     const chain = {
+
     }
 
     return chain
 }
 
-function PrayerData() {
+function PrayerData(province: string, city: string) {
     const db = DatabaseClient.table("prayer_data")
+    let originalProvince = province
+    let originalCity = city
+    province = SholatKuService.Helper.normalize(province)
+    city = SholatKuService.Helper.normalize(city)
 
     const chain = {
-        async get(province: string, city: string): Promise<Imsakiyah[] | null> {
-            const res: Imsakiyah[] | null = await db.get(`${province}_${city}`)
+        async get(): Promise<Imsakiyah[] | null> {
+            console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${city}, ${province}`)
+            const res: Imsakiyah[] | null = await db.get(`${province}.${city}`)
 
             // plus do fetching
             if (!res) {
-                const data = await SholatKuService.fetchPrayerData({ province, city })
+                const data = await SholatKuService.fetchPrayerData({ province: originalProvince, city: originalCity })
 
                 if (data.length === 0 || !data || typeof data === "undefined") {
                     return null
                 }
 
-                await this.set(province, city, data)
+                await SholatKuService.Database.PrayerData(province, city).set(data)
                 return data
             }
 
             return res
         },
-        async set(province: string, city: string, data: Imsakiyah[]): Promise<void> {
-            await db.set(`${province}_${city}`, data)
+        async set(data: Imsakiyah[]): Promise<void> {
+            await db.set(`${province}.${city}`, data)
         }
     }
 
@@ -89,14 +97,26 @@ const Database = {
     UserPrayerState
 }
 
+const Helper = {
+    normalize(input: string): string {
+        return input.replace(/[^a-zA-Z0-9]/g, "_")
+    },
+    convertTimeToMoment(time: string) {
+        const obj = moment(time, "HH:mm")
+        return obj
+    },
+}
+
 const SholatKuService = {
     Database: Database,
+    Helper: Helper,
 
     async fetchPrayerData({ city, province }: GetPrayerTimeDataProps): Promise<Imsakiyah[]> {
+        console.log(`[${tags.System}] Fetching prayer data for ${city}, ${province}`)
         const url = `https://equran.id/api/v2/imsakiyah`
         const body = {
-            province,
-            city
+            provinsi: province,
+            kabkota: city
         }
 
         const { data: res } = await axios.post<ImsakiyahResponse>(url, body, {
@@ -106,11 +126,6 @@ const SholatKuService = {
         const output = res?.data?.imsakiyah ?? []
 
         return output
-    },
-
-    convertTimeToMoment(time: string) {
-        const obj = moment(time, "HH:mm")
-        return obj
     },
 
     getPrayerTimesToday(prayerData: Imsakiyah[]): PrayerTime[] | null {
@@ -127,15 +142,17 @@ const SholatKuService = {
             .map(([key, value]) => {
                 return {
                     prayerName: key as PrayerName,
-                    time: this.convertTimeToMoment(value)
+                    time: this.Helper.convertTimeToMoment(value)
                 }
             })
 
         return formatted
     },
 
-    async updatePrayer({ city, province, debugTime }: UpdatePrayerProps): Promise<UpdatePrayerEvent[] | null> {
-        const prayerData = await this.Database.PrayerData().get(province, city)
+    async checkPrayer({ city, province, debugTime }: CheckPrayerProps): Promise<CheckPrayerEvent[] | null> {
+        const prayerData = await this.Database.PrayerData(province, city).get()
+
+        const now = debugTime ?? moment()
 
         if (!prayerData) {
             console.log(`[${tags.Error}] Failed to get prayer data for ${city}, ${province}`)
@@ -149,7 +166,16 @@ const SholatKuService = {
             return null
         }
 
-        let output: UpdatePrayerEvent[] = []
+        let output: CheckPrayerEvent[] = []
+
+        if (debugTime) {
+            console.log(`[${tags.Debug}] Using Debug Time.`)
+            console.log(`[${tags.Debug}] Current Time: ${debugTime.format("HH:mm")}`)
+        }
+
+        let currentIdx = -1
+
+        const PrayerState = this.Database.PrayerState(province, city)
 
         for (let i = 0; i < prayerToday.length; i++) {
             const res = prayerToday[i];
@@ -159,57 +185,85 @@ const SholatKuService = {
             const prayerTime = res.time
             const nextPrayerTime: moment.Moment | undefined = next?.time
 
+            if (!next) {
+                break;
+            }
+
             console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
 
             // current prayer time
-            const currentPrayerCheck = SholatKuService.Database.PrayerState().Get(res.prayerName)
+            const currentPrayerCheck = await PrayerState.Get(res.prayerName)
 
-            if (now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime) && !currentPrayerCheck) {
-                console.log(`Time for ${res.prayerName}`)
-                output.push({
-                    type: "prayerTime",
-                    eventName: res.prayerName,
-                    time: prayerTime
-                })
+            if (now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime)) {
+                if (!currentPrayerCheck) {
+                    console.log(`Time for ${res.prayerName}`)
+                    output.push({
+                        type: "prayerTime",
+                        eventName: res.prayerName,
+                        time: prayerTime
+                    })
+
+                    await PrayerState.Set(res.prayerName, true)
+                }
+
+                console.log(`[${tags.Debug}] <= You are here =>`)
+                currentIdx = i
             }
 
             const nextPrayerDiff = nextPrayerTime?.diff(now, "minutes")
-            
-            // next prayer in 5 minute
-            const nextPrayerIn5DiffCheck = SholatKuService.Database.PrayerState().Get(`${next?.prayerName}_5m`)
+            console.log(`[${tags.Debug}] Next Prayer ${next?.prayerName} is in ${nextPrayerDiff} minutes`)
 
-            if (nextPrayerDiff <= 5 && nextPrayerDiff > 0 && !nextPrayerIn5DiffCheck) {
+            // next prayer in 5 minute
+            const nextPrayerIn5DiffCheck = await PrayerState.Get(`${next?.prayerName}_5m`)
+
+            if (nextPrayerDiff > 0 && nextPrayerDiff <= 5 && !nextPrayerIn5DiffCheck) {
                 console.log(`5 Minutes into ${next?.prayerName}`)
                 output.push({
                     type: "prayer_in_5m",
                     eventName: next.prayerName,
                     time: next.time
                 })
+
+                await PrayerState.Set(res.prayerName, true)
             }
 
             // next prayer in 15 minute
-            const nextPrayerIn15DiffCheck = SholatKuService.Database.PrayerState().Get(`${next?.prayerName}_15m`)
+            const nextPrayerIn15DiffCheck = await PrayerState.Get(`${next?.prayerName}_15m`)
 
-            if (nextPrayerDiff <= 15 && nextPrayerDiff > 0 && !nextPrayerIn15DiffCheck) {
+            if (nextPrayerDiff > 5 && nextPrayerDiff <= 15 && !nextPrayerIn15DiffCheck) {
                 console.log(`15 Minutes into ${next?.prayerName}`)
                 output.push({
                     type: "prayer_in_15m",
                     eventName: next.prayerName,
                     time: next.time
                 })
+
+                await PrayerState.Set(res.prayerName, true)
             }
 
             // next prayer in 30 minute
-            const nextPrayerIn30DiffCheck = SholatKuService.Database.PrayerState().Get(`${next?.prayerName}_30m`)
+            const nextPrayerIn30DiffCheck = await PrayerState.Get(`${next?.prayerName}_30m`)
 
-            if (nextPrayerDiff <= 30 && nextPrayerDiff > 0 && !nextPrayerIn30DiffCheck) {
+            if (nextPrayerDiff > 15 && nextPrayerDiff <= 30 && !nextPrayerIn30DiffCheck) {
                 console.log(`30 Minutes into ${next?.prayerName}`)
                 output.push({
                     type: "prayer_in_30m",
                     eventName: next.prayerName,
                     time: next.time
                 })
+
+                await PrayerState.Set(res.prayerName, true)
             }
+        }
+
+        if ((currentIdx + 1) < prayerToday.length) {
+            const nextPrayer = prayerToday[currentIdx + 1]
+            console.log(`[${tags.Debug}] Next Prayer is ${nextPrayer.prayerName} at ${nextPrayer.time.from(now)}`)
+            output.push({
+                type: "nextPrayer",
+                eventName: nextPrayer.prayerName,
+                time: nextPrayer.time
+            })
         }
 
         return output
