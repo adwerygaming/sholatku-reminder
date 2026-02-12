@@ -27,8 +27,13 @@ interface UserInfo extends Location {
     createdAt: string
 }
 
+interface AllUsersInfo extends UserInfo {
+    id: string
+}
+
 interface UserNoId {
     getByLocation(location: Location): Promise<UserInfo | undefined>
+    getAll(): Promise<AllUsersInfo[]>
 }
 
 interface UserWithId {
@@ -130,6 +135,15 @@ function User(userId?: string) {
             )
 
             return user?.value
+        },
+        async getAll(): Promise<AllUsersInfo[]> {
+            const usersRaw = await db.all()
+
+            const users = usersRaw.map((x) => {
+                return { id: x.id, ...x.value }
+            })
+
+            return users
         }
     }
 }
@@ -294,12 +308,12 @@ const SholatKuService = {
                     await PrayerState.Set(res.prayerName, true)
                 }
 
-                console.log(`[${tags.Debug}] <= You are here =>`)
+                console.log(`[${tags.Debug}] <= You are in this range =>`)
                 currentIdx = i
             }
 
             const nextPrayerDiff = nextPrayerTime?.diff(now, "minutes")
-            console.log(`[${tags.Debug}] Next Prayer ${next?.prayerName} is in ${nextPrayerDiff} minutes`)
+            // console.log(`[${tags.Debug}] Next Prayer ${next?.prayerName} is in ${nextPrayerDiff} minutes`)
 
             // next prayer in 5 minute
             const nextPrayerIn5DiffCheck = await PrayerState.Get(`${next?.prayerName}_5m`)
