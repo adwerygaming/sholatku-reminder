@@ -224,7 +224,7 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(res.prayerName, true)
+                await PrayerState.Set(`${next.prayerName}_5m`, true)
             }
 
             // next prayer in 15 minute
@@ -238,7 +238,7 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(res.prayerName, true)
+                await PrayerState.Set(`${next.prayerName}_15m`, true)
             }
 
             // next prayer in 30 minute
@@ -252,7 +252,7 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(res.prayerName, true)
+                await PrayerState.Set(`${next.prayerName}_30m`, true)
             }
         }
 
