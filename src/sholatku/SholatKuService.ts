@@ -4,9 +4,12 @@ import DatabaseClient from "../database/DatabaseClient.js"
 import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../types/PrayerTimeData.js"
 import tags from "../utils/Tags.js"
 
-interface CheckPrayerProps {
+interface Location {
     province: string
-    city: string,
+    city: string
+}
+
+interface CheckPrayerProps extends Location {
     debugTime?: moment.Moment
 }
 
@@ -18,15 +21,10 @@ interface CheckPrayerEvent {
     time: moment.Moment
 }
 
-interface GetPrayerTimeDataProps {
-    province: string
-    city: string
-}
+interface GetPrayerTimeDataProps extends Location { }
 
-interface UserInfo {
+interface UserInfo extends Location {
     createdAt: string
-    province: string
-    city: string
 }
 
 function PrayerState(province: string, city: string) {
@@ -146,8 +144,7 @@ function PrayerData(province: string, city: string) {
 
 const Database = {
     PrayerData,
-    PrayerState,
-    User
+    PrayerState
 }
 
 const Helper = {
@@ -163,6 +160,18 @@ const Helper = {
 const SholatKuService = {
     Database: Database,
     Helper: Helper,
+    User: User,
+
+    async getAllLocations(): Promise<Location[]> {
+        let usersRaw = await DatabaseClient.table("users").all()
+
+        const locations: Location[] = usersRaw.map((x) => {
+            return { province: x.value.province, city: x.value.city }
+        })
+        .filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
+
+        return locations
+    },
 
     async fetchPrayerData({ city, province }: GetPrayerTimeDataProps): Promise<Imsakiyah[]> {
         console.log(`[${tags.System}] Fetching prayer data for ${city}, ${province}`)
