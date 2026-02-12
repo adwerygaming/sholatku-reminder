@@ -27,6 +27,19 @@ interface UserInfo extends Location {
     createdAt: string
 }
 
+interface UserNoId {
+    getByLocation(location: Location): Promise<UserInfo | undefined>
+}
+
+interface UserWithId {
+    PrayerState: ReturnType<typeof UserPrayerState>
+    register(province: string, city: string): Promise<UserInfo>
+    unregister(): Promise<void>
+    getInfo(): Promise<UserInfo | null>
+    updateInfo(province: string, city: string): Promise<UserInfo>
+    isRegistered(): Promise<boolean>
+}
+
 function PrayerState(province: string, city: string) {
     province = SholatKuService.Helper.normalize(province)
     city = SholatKuService.Helper.normalize(city)
@@ -68,44 +81,57 @@ function UserPrayerState(userId: string) {
     return chain
 }
 
-function User(userId: string) {
+function User(userId: string): UserWithId
+function User(): UserNoId
+
+function User(userId?: string) {
     const db = DatabaseClient.table("users")
 
-    const chain = {
-        PrayerState: UserPrayerState(userId),
+    if (userId) {
+        return {
+            PrayerState: UserPrayerState(userId),
 
-        async register(province: string, city: string): Promise<UserInfo> {
-            const obj: UserInfo = {
-                createdAt: moment().toISOString(),
-                province,
-                city
+            async register(province: string, city: string): Promise<UserInfo> {
+                const obj: UserInfo = {
+                    createdAt: moment().toISOString(),
+                    province,
+                    city
+                }
+
+                await db.set(`${userId}`, obj)
+                return obj
+            },
+
+            async unregister(): Promise<void> {
+                await db.delete(`${userId}`)
+            },
+
+            async getInfo(): Promise<UserInfo | null> {
+                return await db.get(`${userId}`)
+            },
+
+            async updateInfo(province: string, city: string): Promise<UserInfo> {
+                return this.register(province, city)
+            },
+
+            async isRegistered(): Promise<boolean> {
+                return !!(await db.get(`${userId}`))
             }
-
-            await db.set(`${userId}`, obj)
-            return obj
-        },
-
-        async unregister(): Promise<void> {
-            await db.delete(`${userId}`)
-        },
-
-        async getInfo(): Promise<UserInfo | null> {
-            const res: UserInfo | null = await db.get(`${userId}`)
-            return res
-        },
-
-        async updateInfo(province: string, city: string): Promise<UserInfo> {
-            const res = await this.register(province, city)
-            return res
-        },
-
-        async isRegistered(): Promise<boolean> {
-            const res = await db.get(`${userId}`)
-            return res ? true : false
         }
     }
 
-    return chain
+    return {
+        async getByLocation({ city, province }: Location): Promise<UserInfo | undefined> {
+            const usersRaw = await db.all()
+
+            const user = usersRaw.find(x =>
+                x.value.city === city &&
+                x.value.province === province
+            )
+
+            return user?.value
+        }
+    }
 }
 
 function PrayerData(province: string, city: string) {

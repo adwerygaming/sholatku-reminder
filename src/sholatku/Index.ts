@@ -24,8 +24,19 @@ for (let i = 0; i < locations.length; i++) {
     const location = locations[i];
     
     console.log(`[${tags.System}] Checking prayer time for ${location.province} - ${location.city}`)
-    const check = await SholatKuService.checkPrayer({ province: location.province, city: location.city, debugTime: now })
-    console.log(check)
+    const events = await SholatKuService.checkPrayer({ province: location.province, city: location.city, debugTime: now })
+    console.log(events)
+
+    if (!events) continue;
+
+    for (let k = 0; k < events.length; k++) {
+        const res = events[k];
+        
+        const user = await SholatKuService.User().getByLocation({ province: location.province, city: location.city })
+
+        const check = await SholatKuService.User(user.userId).isRegistered()
+        if (res.type == "")
+    }
 
     console.log("")
 }
