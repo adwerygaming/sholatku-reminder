@@ -1,206 +1,43 @@
 import axios from "axios"
 import moment from "moment-timezone"
-import DatabaseClient from "../database/DatabaseClient.js"
-import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../types/PrayerTimeData.js"
-import tags from "../utils/Tags.js"
+import DatabaseClient from "../../database/DatabaseClient.js"
+import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/PrayerTimeData.js"
+import tags from "../../utils/Tags.js"
+import SholatKuServiceDatabase from "./database/Database.js"
+import SholatKuServiceHelper from "./helper/Helper.js"
+import { SholatKuServiceUser } from "./user/User.js"
 
-interface Location {
+export interface Location {
     province: string
     city: string
 }
 
-interface CheckPrayerProps extends Location {
+export interface CheckPrayerProps extends Location {
     debugTime?: moment.Moment
 }
 
-type CheckPrayerEventName = "prayerTime" | "prayer_in_5m" | "prayer_in_15m" | "prayer_in_30m" | "nextPrayer"
+export type CheckPrayerEventName = "prayerTime" | "prayer_in_5m" | "prayer_in_15m" | "prayer_in_30m" | "nextPrayer"
 
-interface CheckPrayerEvent {
+export interface CheckPrayerEvent {
     type: CheckPrayerEventName
     eventName: PrayerName
     time: moment.Moment
 }
 
-interface GetPrayerTimeDataProps extends Location { }
+export interface GetPrayerTimeDataProps extends Location { }
 
-interface UserInfo extends Location {
+export interface UserInfo extends Location {
     createdAt: string
 }
 
-interface AllUsersInfo extends UserInfo {
+export interface AllUsersInfo extends UserInfo {
     id: string
 }
 
-interface UserNoId {
-    getByLocation(location: Location): Promise<UserInfo | undefined>
-    getAll(): Promise<AllUsersInfo[]>
-}
-
-interface UserWithId {
-    PrayerState: ReturnType<typeof UserPrayerState>
-    register(province: string, city: string): Promise<UserInfo>
-    unregister(): Promise<void>
-    getInfo(): Promise<UserInfo | null>
-    updateInfo(province: string, city: string): Promise<UserInfo>
-    isRegistered(): Promise<boolean>
-}
-
-function PrayerState(province: string, city: string) {
-    province = SholatKuService.Helper.normalize(province)
-    city = SholatKuService.Helper.normalize(city)
-
-    const now = moment()
-    const dayIdentifier = now.format("DD_MM") // 11_03
-    const db = DatabaseClient.table("prayer_state")
-
-    const chain = {
-        async Get(eventName: string): Promise<boolean> {
-            const res = await db.get(`${province}.${city}.${dayIdentifier}.${eventName}`)
-
-            return res ? true : false
-        },
-        async Set(eventName: string, value: boolean): Promise<void> {
-            await db.set(`${province}.${city}.${dayIdentifier}.${eventName}`, value)
-        }
-    }
-
-    return chain
-}
-
-function UserPrayerState(userId: string) {
-    const now = moment()
-    const dayIdentifier = now.format("DD_MM") // 11_03
-    const db = DatabaseClient.table("user_prayer_state")
-
-    const chain = {
-        async Get(eventName: string): Promise<boolean> {
-            const res = await db.get(`${userId}.${dayIdentifier}.${eventName}`)
-
-            return res ? true : false
-        },
-        async Set(eventName: string, value: boolean): Promise<void> {
-            await db.set(`${userId}.${dayIdentifier}.${eventName}`, value)
-        }
-    }
-
-    return chain
-}
-
-function User(userId: string): UserWithId
-function User(): UserNoId
-
-function User(userId?: string) {
-    const db = DatabaseClient.table("users")
-
-    if (userId) {
-        return {
-            PrayerState: UserPrayerState(userId),
-
-            async register(province: string, city: string): Promise<UserInfo> {
-                const obj: UserInfo = {
-                    createdAt: moment().toISOString(),
-                    province,
-                    city
-                }
-
-                await db.set(`${userId}`, obj)
-                return obj
-            },
-
-            async unregister(): Promise<void> {
-                await db.delete(`${userId}`)
-            },
-
-            async getInfo(): Promise<UserInfo | null> {
-                return await db.get(`${userId}`)
-            },
-
-            async updateInfo(province: string, city: string): Promise<UserInfo> {
-                return this.register(province, city)
-            },
-
-            async isRegistered(): Promise<boolean> {
-                return !!(await db.get(`${userId}`))
-            }
-        }
-    }
-
-    return {
-        async getByLocation({ city, province }: Location): Promise<UserInfo | undefined> {
-            const usersRaw = await db.all()
-
-            const user = usersRaw.find(x =>
-                x.value.city === city &&
-                x.value.province === province
-            )
-
-            return user?.value
-        },
-        async getAll(): Promise<AllUsersInfo[]> {
-            const usersRaw = await db.all()
-
-            const users = usersRaw.map((x) => {
-                return { id: x.id, ...x.value }
-            })
-
-            return users
-        }
-    }
-}
-
-function PrayerData(province: string, city: string) {
-    const db = DatabaseClient.table("prayer_data")
-    let originalProvince = province
-    let originalCity = city
-    province = SholatKuService.Helper.normalize(province)
-    city = SholatKuService.Helper.normalize(city)
-
-    const chain = {
-        async get(): Promise<Imsakiyah[] | null> {
-            console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${city}, ${province}`)
-            const res: Imsakiyah[] | null = await db.get(`${province}.${city}`)
-
-            // plus do fetching
-            if (!res) {
-                const data = await SholatKuService.fetchPrayerData({ province: originalProvince, city: originalCity })
-
-                if (data.length === 0 || !data || typeof data === "undefined") {
-                    return null
-                }
-
-                await SholatKuService.Database.PrayerData(province, city).set(data)
-                return data
-            }
-
-            return res
-        },
-        async set(data: Imsakiyah[]): Promise<void> {
-            await db.set(`${province}.${city}`, data)
-        }
-    }
-
-    return chain
-}
-
-const Database = {
-    PrayerData,
-    PrayerState
-}
-
-const Helper = {
-    normalize(input: string): string {
-        return input.replace(/[^a-zA-Z0-9]/g, "_")
-    },
-    convertTimeToMoment(time: string) {
-        const obj = moment(time, "HH:mm")
-        return obj
-    },
-}
-
 const SholatKuService = {
-    Database: Database,
-    Helper: Helper,
-    User: User,
+    Database: SholatKuServiceDatabase,
+    Helper: SholatKuServiceHelper,
+    User: SholatKuServiceUser,
 
     async getAllLocations(): Promise<Location[]> {
         let usersRaw = await DatabaseClient.table("users").all()
@@ -208,7 +45,7 @@ const SholatKuService = {
         const locations: Location[] = usersRaw.map((x) => {
             return { province: x.value.province, city: x.value.city }
         })
-        .filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
+            .filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
 
         return locations
     },
@@ -234,11 +71,11 @@ const SholatKuService = {
         const now = moment()
         const currentDay = now.format("d")
         const currentPrayerData = prayerData.find((x) => x.tanggal == Number(currentDay))
-    
+
         if (!currentPrayerData) {
             return null
         }
-    
+
         const formatted: PrayerTime[] = Object.entries(currentPrayerData)
             .filter((x) => x[0] !== "tanggal")
             .map(([key, value]) => {

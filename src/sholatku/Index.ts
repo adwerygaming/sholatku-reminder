@@ -2,11 +2,11 @@ import moment from "moment-timezone"
 import path from "path"
 import { _dirname } from "../utils/Path.js"
 import tags from "../utils/Tags.js"
-import SholatKuService from "./SholatKuService.js"
+import SholatKuService from "./service/SholatKu.js"
 
 const dataPath = path.join(_dirname, "..", "assets", "schedule.json")
 
-const now = moment("14:58", "HH:mm")
+const now = moment()
 const id = "12345"
 const province = "DKI Jakarta"
 const city = "Kota Jakarta"
@@ -79,7 +79,6 @@ for (let i = 0; i < thing.length; i++) {
             }
 
         }
-
     }
 }
 
