@@ -13,6 +13,7 @@ client.on(Events.ClientReady, async (bot: Client) => {
   await commandHandler.loadCommands();
   await commandHandler.loadDropdowns();
   await commandHandler.loadButtons();
+  await commandHandler.loadModals();
 
   // register commands to discord
   await commandHandler.registerCommands();

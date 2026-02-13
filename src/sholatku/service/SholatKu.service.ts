@@ -16,10 +16,16 @@ export interface CheckPrayerProps extends Location {
     debugTime?: moment.Moment
 }
 
-export type CheckPrayerEventName = "prayerTime" | "prayer_in_5m" | "prayer_in_15m" | "prayer_in_30m" | "nextPrayer"
+export enum PrayerEvent {
+  PrayerTime = "prayerTime",
+  PrayerIn5m = "prayer_in_5m",
+  PrayerIn15m = "prayer_in_15m",
+  PrayerIn30m = "prayer_in_30m",
+  NextPrayer = "nextPrayer",
+}
 
 export interface CheckPrayerEvent {
-    type: CheckPrayerEventName
+    type: PrayerEvent
     eventName: PrayerName
     time: moment.Moment
 }
@@ -27,7 +33,7 @@ export interface CheckPrayerEvent {
 export interface GetPrayerTimeDataProps extends Location { }
 
 export interface UserInfo extends Location {
-    createdAt: string
+    lastUpdatedAt: string
 }
 
 export interface AllUsersInfo extends UserInfo {
@@ -44,8 +50,7 @@ const SholatKuService = {
 
         const locations: Location[] = usersRaw.map((x) => {
             return { province: x.value.province, city: x.value.city }
-        })
-            .filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
+        }).filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
 
         return locations
     },
@@ -137,7 +142,7 @@ const SholatKuService = {
                 if (!currentPrayerCheck) {
                     console.log(`Time for ${res.prayerName}`)
                     output.push({
-                        type: "prayerTime",
+                        type: PrayerEvent.PrayerTime,
                         eventName: res.prayerName,
                         time: prayerTime
                     })
@@ -158,7 +163,7 @@ const SholatKuService = {
             if (nextPrayerDiff > 0 && nextPrayerDiff <= 5 && !nextPrayerIn5DiffCheck) {
                 console.log(`5 Minutes into ${next?.prayerName}`)
                 output.push({
-                    type: "prayer_in_5m",
+                    type: PrayerEvent.PrayerIn5m,
                     eventName: next.prayerName,
                     time: next.time
                 })
@@ -172,7 +177,7 @@ const SholatKuService = {
             if (nextPrayerDiff > 5 && nextPrayerDiff <= 15 && !nextPrayerIn15DiffCheck) {
                 console.log(`15 Minutes into ${next?.prayerName}`)
                 output.push({
-                    type: "prayer_in_15m",
+                    type: PrayerEvent.PrayerIn15m,
                     eventName: next.prayerName,
                     time: next.time
                 })
@@ -186,7 +191,7 @@ const SholatKuService = {
             if (nextPrayerDiff > 15 && nextPrayerDiff <= 30 && !nextPrayerIn30DiffCheck) {
                 console.log(`30 Minutes into ${next?.prayerName}`)
                 output.push({
-                    type: "prayer_in_30m",
+                    type: PrayerEvent.PrayerIn30m,
                     eventName: next.prayerName,
                     time: next.time
                 })
@@ -199,7 +204,7 @@ const SholatKuService = {
             const nextPrayer = prayerToday[currentIdx + 1]
             console.log(`[${tags.Debug}] Next Prayer is ${nextPrayer.prayerName} at ${nextPrayer.time.from(now)}`)
             output.push({
-                type: "nextPrayer",
+                type: PrayerEvent.NextPrayer,
                 eventName: nextPrayer.prayerName,
                 time: nextPrayer.time
             })

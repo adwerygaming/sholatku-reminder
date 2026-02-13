@@ -9,8 +9,8 @@ export default function PrayerData(province: string, city: string) {
     let originalProvince = province
     let originalCity = city
 
-    province = SholatKuService.Helper.normalize(province)
-    city = SholatKuService.Helper.normalize(city)
+    province = SholatKuService.Helper.normalizeInput(province)
+    city = SholatKuService.Helper.normalizeInput(city)
 
     const chain = {
         async get(): Promise<Imsakiyah[] | null> {

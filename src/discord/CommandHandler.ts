@@ -1,9 +1,9 @@
 
-import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
+import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, ModalSubmitInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import type { ButtonLayout, DropdownLayout, SlashCommandLayout } from '../types/Discord.types.js';
+import type { ButtonLayout, DropdownLayout, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
 import { env } from '../utils/EnvManager.js';
 import { _dirname } from '../utils/Path.js';
 import tags from '../utils/Tags.js';
@@ -27,6 +27,7 @@ interface LoadSlashCommandsGroupData {
 export class CommandHandler {
     private readonly commands = new Collection<string, SlashCommandLayout>();
     private readonly dropdowns = new Collection<string, DropdownLayout>();
+    private readonly modals = new Collection<string, ModalLayout>();
     private readonly buttons = new Collection<string, ButtonLayout>();
     private readonly commandData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
@@ -128,6 +129,33 @@ export class CommandHandler {
         }
     }
 
+    public async loadModals(dir = path.join(srcDir, "discord", "modals")): Promise<void> {
+        if (!fs.existsSync(dir)) {
+            console.log(`[${tags.CommandImporter}] Modals directory not found, skipping...`);
+            return;
+        }
+
+        for (const file of fs.readdirSync(dir)) {
+            const fullPath = path.join(dir, file);
+            const stat = fs.statSync(fullPath);
+            if (stat.isDirectory()) {
+                await this.loadModals(fullPath);
+            } else if (file.endsWith('.js') || (file.endsWith('.ts') && !file.endsWith('.d.ts'))) {
+                try {
+                    const { default: modal }: { default: ModalLayout } = await import(pathToFileURL(fullPath).href);
+                    if (!modal.id || !modal.execute) {
+                        console.warn(`[${tags.CommandImporter}] Modal at ${fullPath} missing id or execute`);
+                        continue;
+                    }
+                    this.modals.set(modal.id, modal);
+                    console.log(`[${tags.CommandImporter}] Loaded modal: ${modal.id}`);
+                } catch (err) {
+                    console.error(`[${tags.Error}] Error loading modal ${fullPath}:`, err);
+                }
+            }
+        }
+    }
+
     public async registerCommands(): Promise<void> {
         const startTime = Date.now()
         const rest = new REST({ version: '10' }).setToken(BotToken);
@@ -155,7 +183,7 @@ export class CommandHandler {
         } else if (interaction.isButton()) {
             await this.handleButton(interaction);
         } else if (interaction.isModalSubmit()) {
-            
+            await this.handleModal(interaction);
         }
     }
 
@@ -209,8 +237,9 @@ export class CommandHandler {
     private async handleDropdown(interaction: AnySelectMenuInteraction): Promise<void> {
         const [customId, originalUserId, ...rest] = interaction.customId.split('_');
 
-        console.log(`[${tags.Debug}] interaction userid: ${interaction.user.id}`)
-        console.log(`[${tags.Debug}] original userid: ${originalUserId}`)
+        console.log(`[${tags.Debug}] Interaction UserId: ${interaction.user.id}`)
+        console.log(`[${tags.Debug}] Original UserId: ${originalUserId}`)
+        console.log(`[${tags.Debug}] Same user? ${(interaction.user.id === originalUserId) ? "Yes" : "No"}`)
 
         if (interaction.user.id !== originalUserId) {
             await interaction.reply({content: 'Not your interaction.', flags: MessageFlags.Ephemeral});
@@ -263,6 +292,40 @@ export class CommandHandler {
                 interaction.replied || interaction.deferred
                     ? await interaction.followUp({content: msg, flags: MessageFlags.Ephemeral})
                     : await interaction.reply({content: msg, flags: MessageFlags.Ephemeral});
+            } catch (e) {
+                console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
+            }
+        }
+    }
+
+    private async handleModal(interaction: ModalSubmitInteraction): Promise<void> {
+        const [customId, originalUserId, ...rest] = interaction.customId.split('_');
+
+        console.log(`[${tags.Debug}] Interaction UserId: ${interaction.user.id}`)
+        console.log(`[${tags.Debug}] Original UserId: ${originalUserId}`)
+        console.log(`[${tags.Debug}] Same user? ${(interaction.user.id === originalUserId) ? "Yes" : "No"}`)
+
+        if (interaction.user.id !== originalUserId) {
+            await interaction.reply({ content: 'Not your interaction.', flags: MessageFlags.Ephemeral });
+            return;
+        }
+
+        const modal = this.modals.get(customId ?? '');
+        if (!modal) {
+            await interaction.reply({ content: 'Modal handler not found!', flags: MessageFlags.Ephemeral });
+            return;
+        }
+
+        try {
+            await modal.execute(client, interaction, rest);
+        } catch (err) {
+            console.error(`[${tags.CommandRegister}] Error handling modal ${customId}:`, err);
+            const msg = 'There was an error handling this modal.';
+
+            try {
+                interaction.replied || interaction.deferred
+                    ? await interaction.followUp({ content: msg, flags: MessageFlags.Ephemeral })
+                    : await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
             } catch (e) {
                 console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
             }

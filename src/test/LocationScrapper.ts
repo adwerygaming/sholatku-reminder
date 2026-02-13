@@ -24,7 +24,7 @@ await db.init()
 
 for (let i = 0; i < provinces.length; i++) {
     const province = provinces[i];
-    const provinceName = SholatKuServiceHelper.normalize(province)
+    const provinceName = SholatKuServiceHelper.normalizeInput(province)
     
     console.log(provinceName)
 

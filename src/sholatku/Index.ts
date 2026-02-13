@@ -1,85 +1,124 @@
-import moment from "moment-timezone"
-import path from "path"
-import { _dirname } from "../utils/Path.js"
-import tags from "../utils/Tags.js"
-import SholatKuService from "./service/SholatKu.service.js"
+import moment from "moment-timezone";
+import EventEmitter from "node:events";
+import SholatKuService, { CheckPrayerEvent, PrayerEvent } from "./service/SholatKu.service.js";
 
-const dataPath = path.join(_dirname, "..", "assets", "schedule.json")
+type PrayerEventPayload = {
+  event: CheckPrayerEvent;
+  province: string;
+  city: string;
+  userIds: string[];
+};
 
-const now = moment()
-const id = "12345"
-const province = "DKI Jakarta"
-const city = "Kota Jakarta"
+type EventMap = {
+  [K in PrayerEvent]: PrayerEventPayload;
+};
 
-// const check = await SholatKuService.checkPrayer({ province, city })
-// console.log(check)
+export class SholatKuEmitter extends EventEmitter {
+  emit<K extends keyof EventMap>(
+    event: K,
+    payload: EventMap[K]
+  ): boolean {
+    return super.emit(event, payload);
+  }
 
-// const reg = await SholatKuService.User(id).register(province, city)
-// console.log(reg)
+  on<K extends keyof EventMap>(
+    event: K,
+    listener: (payload: EventMap[K]) => void
+  ): this {
+    return super.on(event, listener);
+  }
+}
 
-const users = await SholatKuService.User().getAll()
+export const sholatKuEmitter = new SholatKuEmitter();
 
+sholatKuEmitter.on(PrayerEvent.PrayerTime, async (payload) => {
+    console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+});
+
+sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
+    console.log(`[Emitter] Prayer In 5 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+});
+
+sholatKuEmitter.on(PrayerEvent.PrayerIn15m, async (payload) => {
+    console.log(`[Emitter] Prayer In 15 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+});
+
+sholatKuEmitter.on(PrayerEvent.PrayerIn30m, async (payload) => {
+    console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+});
+
+// await DatabaseClient.table("users").deleteAll()
 // await DatabaseClient.table("prayer_state").deleteAll()
 // await DatabaseClient.table("user_prayer_state").deleteAll()
 
-const meong = new Map<string, string[]>()
+setInterval(async () => {
+    await check()
+}, 5000);
 
-for (let i = 0; i < users.length; i++) {
-    const user = users[i];
-    const userId = user.id
-    const location = { province: user.province, city: user.city }
-    const locationKey = `${location.province}-${location.city}`
+await check()
 
-    if (!meong.has(locationKey)) {
-        meong.set(locationKey, [])
+async function check() {
+    const debugTime = moment("11:50", "HH:mm")
+
+    const users = await SholatKuService.User().getAll()
+    const meong = new Map<string, string[]>()
+
+    for (let i = 0; i < users.length; i++) {
+        const user = users[i];
+        const userId = user.id
+        const location = { province: user.province, city: user.city }
+        const locationKey = `${location.province}-${location.city}`
+
+        if (!meong.has(locationKey)) {
+            meong.set(locationKey, [])
+        }
+
+        meong.get(locationKey)!.push(userId)
     }
 
-    meong.get(locationKey)!.push(userId)
-}
+    const thing = [...meong.entries()]
 
-const thing = [...meong.entries()]
+    for (let i = 0; i < thing.length; i++) {
+        const res = thing[i];
+        const locationKeyRaw = res[0]
+        const userIds = res[1]
 
-for (let i = 0; i < thing.length; i++) {
-    const res = thing[i];
-    const locationKeyRaw = res[0]
-    const userIds = res[1]
+        const [province, city] = locationKeyRaw.split("-")
 
-    const [province, city] = locationKeyRaw.split("-")
+        const check = await SholatKuService.checkPrayer({ province, city, debugTime })
 
-    const check = await SholatKuService.checkPrayer({ province, city, debugTime: now })
+        if (!check) continue;
 
-    if (!check) continue;
+        for (let k = 0; k < check.length; k++) {
+            const event = check[k];
 
-    for (let k = 0; k < check.length; k++) {
-        const event = check[k];
+            if (!event) continue;
 
-        if (!event) continue;
+            // do whatever with the event
+            await sholatKuEmitter.emit(event.type, {
+                event,
+                province,
+                city,
+                userIds
+            })
 
-        for (let j = 0; j < userIds.length; j++) {
-            const userId = userIds[j];
-            const user = SholatKuService.User(userId)
-            
-            const key = `${event.type}-${event.eventName}`
-            const stateCheck = await user.PrayerState.Get(key)
+            // leave to this thing to update the last state
+            for (let j = 0; j < userIds.length; j++) {
+                const userId = userIds[j];
+                const user = SholatKuService.User(userId)
 
-            if (event.type == "prayerTime" && !stateCheck) {
-                const message = `[${province} - ${city}] Right now is ${event.time.format("HH:mm")}, Time for ${event.eventName}`
-                sendToUser(userId, message)
-                await user.PrayerState.Set(key, true)
-            } else if (event.type == "prayer_in_15m" && !stateCheck) {
-                const message = `[${province} - ${city}] In 15 minutes, ${event.eventName} will start.`
-                sendToUser(userId, message)
-                await user.PrayerState.Set(key, true)
-            } else if (event.type == "prayer_in_30m" && !stateCheck) {
-                const message = `[${province} - ${city}] In 30 minutes, ${event.eventName} will start.`
-                sendToUser(userId, message)
-                await user.PrayerState.Set(key, true)
+                const key = `${event.type}-${event.eventName}`
+                const stateCheck = await user.PrayerState.Get(key)
+
+                if (event.type == "prayerTime" && !stateCheck) {
+                    await user.PrayerState.Set(key, true)
+                } else if (event.type == "prayer_in_15m" && !stateCheck) {
+                    await user.PrayerState.Set(key, true)
+                } else if (event.type == "prayer_in_30m" && !stateCheck) {
+                    await user.PrayerState.Set(key, true)
+                }
+
             }
-
         }
     }
-}
-
-function sendToUser(userId: string, message: string) {
-    console.log(`[${tags.System}] Sending message to user ${userId}: ${message}`)
 }

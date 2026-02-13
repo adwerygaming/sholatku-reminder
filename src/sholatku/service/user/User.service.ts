@@ -1,5 +1,6 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
+import SholatKuServiceHelper from "../helper/Helper.service.js"
 import { AllUsersInfo, Location, UserInfo } from "../SholatKu.service.js"
 import UserPrayerState from "./UserPrayerState.service.js"
 
@@ -10,10 +11,16 @@ interface UserNoId {
 
 interface UserWithId {
     PrayerState: ReturnType<typeof UserPrayerState>
-    register(province: string, city: string): Promise<UserInfo>
+    Province: {
+        get(): Promise<string | null>
+        set(value: string): Promise<void>
+    }
+    City: {
+        get(): Promise<string | null>
+        set(value: string): Promise<void>
+    }
     unregister(): Promise<void>
     getInfo(): Promise<UserInfo | null>
-    updateInfo(province: string, city: string): Promise<UserInfo>
     isRegistered(): Promise<boolean>
 }
 
@@ -27,15 +34,30 @@ export function SholatKuServiceUser(userId?: string) {
         return {
             PrayerState: UserPrayerState(userId),
 
-            async register(province: string, city: string): Promise<UserInfo> {
-                const obj: UserInfo = {
-                    createdAt: moment().toISOString(),
-                    province,
-                    city
-                }
+            Province: {
+                async get(): Promise<string | null> {
+                    const res = await db.get<string>(`${userId}.province`)
+                    return res || null
+                },
+                async set(value: string): Promise<void> {
+                    value = SholatKuServiceHelper.normalizeInput(value)
 
-                await db.set(`${userId}`, obj)
-                return obj
+                    await db.set(`${userId}.province`, value)
+                    await db.set(`${userId}.lastUpdatedAt`, moment().toISOString())
+                }
+            },
+
+            City: {
+                async get(): Promise<string | null> {
+                    const res = await db.get<string>(`${userId}.city`)
+                    return res || null
+                },
+                async set(value: string): Promise<void> {
+                    value = SholatKuServiceHelper.normalizeInput(value)
+
+                    await db.set(`${userId}.city`, value)
+                    await db.set(`${userId}.lastUpdatedAt`, moment().toISOString())
+                }
             },
 
             async unregister(): Promise<void> {
@@ -44,10 +66,6 @@ export function SholatKuServiceUser(userId?: string) {
 
             async getInfo(): Promise<UserInfo | null> {
                 return await db.get(`${userId}`)
-            },
-
-            async updateInfo(province: string, city: string): Promise<UserInfo> {
-                return this.register(province, city)
             },
 
             async isRegistered(): Promise<boolean> {

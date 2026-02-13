@@ -3,8 +3,8 @@ import DatabaseClient from "../../../database/DatabaseClient.js"
 import SholatKuService from "../SholatKu.service.js"
 
 export default function PrayerState(province: string, city: string) {
-    province = SholatKuService.Helper.normalize(province)
-    city = SholatKuService.Helper.normalize(city)
+    province = SholatKuService.Helper.normalizeInput(province)
+    city = SholatKuService.Helper.normalizeInput(city)
 
     const now = moment()
     const dayIdentifier = now.format("DD_MM") // 11_03
