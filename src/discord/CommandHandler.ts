@@ -16,7 +16,7 @@ if (!BotToken || !ClientID) {
     throw new Error('⚠️ DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment');
 }
 
-const srcDir = path.join(_dirname, "..");
+const srcDir = path.join(_dirname);
 
 interface LoadSlashCommandsGroupData {
     name: string,

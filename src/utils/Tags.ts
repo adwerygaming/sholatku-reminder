@@ -12,6 +12,7 @@ const RawTags = {
   CommandImporter: { colors: ['#66FF66', '#00CC66'] },
   CommandRegister: { colors: ['#66FF66', '#00CC66'] },
   Discord: { colors: ['#647eff', '#3398DB'] },
+  PrayerService: { colors: ['#ffb866', '#ff8033'] },
 };
 
 type TagConfig = {colors: string[]};

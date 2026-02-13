@@ -1,2 +1,3 @@
-import "./sholatku/Index.js";
 import "./discord/Index.js";
+import "./sholatku/Index.js";
+
