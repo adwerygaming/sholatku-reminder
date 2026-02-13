@@ -1,5 +1,5 @@
 import { Client, Events } from 'discord.js';
-import tags from '../../ts-discord-bot-starter/src/utils/Tags.js';
+import tags from '../utils/Tags.js';
 import client from './Client.js';
 
 console.log(`[${tags.System}] Loaded Discord Index Script.`)

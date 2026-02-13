@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, Client, SlashCommandBuilder } from "discord.js";
-import { SlashCommandLayout } from "../../../ts-discord-bot-starter/src/types/DiscordTypes.js";
+import { SlashCommandLayout } from "../../types/Discord.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()

@@ -9,6 +9,9 @@ const RawTags = {
   Express: { colors: ['#f9fd12ff', '#ffd000ff'] },
   ExpressLog: { colors: ['#a7aa00ff', '#ad8e00ff'] },
   Axios: { colors: ['#A463BF', '#8E43AD'] },
+  CommandImporter: { colors: ['#66FF66', '#00CC66'] },
+  CommandRegister: { colors: ['#66FF66', '#00CC66'] },
+  Discord: { colors: ['#647eff', '#3398DB'] },
 };
 
 type TagConfig = {colors: string[]};

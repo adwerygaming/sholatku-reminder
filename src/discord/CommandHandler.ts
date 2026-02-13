@@ -3,10 +3,10 @@ import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteractio
 import fs from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
-import type { ButtonLayout, DropdownLayout, SlashCommandLayout } from '../../ts-discord-bot-starter/src/types/DiscordTypes.js';
-import { env } from '../../ts-discord-bot-starter/src/utils/EnvManager.js';
-import { _dirname } from '../../ts-discord-bot-starter/src/utils/Path.js';
-import tags from '../../ts-discord-bot-starter/src/utils/Tags.js';
+import type { ButtonLayout, DropdownLayout, SlashCommandLayout } from '../types/Discord.types.js';
+import { env } from '../utils/EnvManager.js';
+import { _dirname } from '../utils/Path.js';
+import tags from '../utils/Tags.js';
 import client from './Client.js';
 
 const BotToken = env.DISCORD_TOKEN!;
