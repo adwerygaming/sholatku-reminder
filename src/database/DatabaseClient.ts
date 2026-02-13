@@ -1,4 +1,4 @@
 import { QuickDB } from "quick.db"
-const DatabaseClient = new QuickDB({ filePath: "db/prayerku.sqlite" })
+const DatabaseClient = new QuickDB({ filePath: "db/Prayerku.sqlite" })
 
 export default DatabaseClient

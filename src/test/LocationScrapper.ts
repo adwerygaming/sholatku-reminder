@@ -1,8 +1,10 @@
-import fs from "fs"
+import axios from "axios";
+import fs from "fs";
 import path from "path";
+import { QuickDB } from "quick.db";
+import SholatKuServiceHelper from "../sholatku/service/helper/Helper.service.js";
 import { _dirname } from "../utils/Path.js";
 import { sleep } from "../utils/Sleep.js";
-import axios from "axios";
 
 const locationPath = path.join(_dirname, "..", "assets", "locations")
 
@@ -16,9 +18,15 @@ function getProvincesList() {
 
 const provinces = getProvincesList()
 
+const db = new QuickDB({ filePath: "./locations.sqlite" })
+
+await db.init()
+
 for (let i = 0; i < provinces.length; i++) {
     const province = provinces[i];
-    console.log(province)
+    const provinceName = SholatKuServiceHelper.normalize(province)
+    
+    console.log(provinceName)
 
     const url = "https://equran.id/api/v2/imsakiyah/kabkota"
 
@@ -28,10 +36,8 @@ for (let i = 0; i < provinces.length; i++) {
         const data = res.data.data as string[]
         console.log(data)
 
-        await fs.appendFileSync(`${locationPath}/final.json`, `
-            "${province}": [${data.join(",")}]
-        `);
+        await db.set(provinceName, data)
     })
 
-    await sleep(5000)
+    await sleep(500)
 }

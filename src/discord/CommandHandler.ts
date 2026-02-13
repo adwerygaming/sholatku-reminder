@@ -154,6 +154,8 @@ export class CommandHandler {
             await this.handleDropdown(interaction);
         } else if (interaction.isButton()) {
             await this.handleButton(interaction);
+        } else if (interaction.isModalSubmit()) {
+            
         }
     }
 
@@ -205,30 +207,6 @@ export class CommandHandler {
     }
 
     private async handleDropdown(interaction: AnySelectMenuInteraction): Promise<void> {
-        // customId format is:
-        // 1. yourCustomId (required)
-        // 2. interaction.user.id (required)
-        // 3. additional data (if needed, optional)
-        // then combined with underscore (_)
-        //
-        // Correct customId: 
-        // - exampleButton_${interaction.user.id}
-        // - exampleButton_${interaction.user.id}_confirm
-        // - exampleButton_${interaction.user.id}_abort
-        // 
-        // Invalid customId:
-        // - exampleButton  (Missing UserID)
-        // - exampleButton_confirm (Missing UserID)
-        // - exampleButton_abort (Missing UserID)
-        // - exampleButton_abort_${interaction.user.id} (UserID Misplacement)
-        //
-        // [Quick F.A.Q]
-        // Q: Wait, so this interaction is can only executed by the one who executed?
-        // A: Yes.
-        //
-        // Q: But i dont want that, i want other user can also interact with it.
-        // A: Well, you have to figure out by youself then.
-        
         const [customId, originalUserId, ...rest] = interaction.customId.split('_');
 
         console.log(`[${tags.Debug}] interaction userid: ${interaction.user.id}`)
@@ -262,30 +240,6 @@ export class CommandHandler {
     }
 
     private async handleButton(interaction: ButtonInteraction): Promise<void> {
-        // customId format is:
-        // 1. yourCustomId (required)
-        // 2. interaction.user.id (required)
-        // 3. additional data (if needed, optional)
-        // then combined with underscore (_)
-        //
-        // Correct customId: 
-        // - exampleButton_${interaction.user.id}
-        // - exampleButton_${interaction.user.id}_confirm
-        // - exampleButton_${interaction.user.id}_abort
-        // 
-        // Invalid customId:
-        // - exampleButton  (Missing UserID)
-        // - exampleButton_confirm (Missing UserID)
-        // - exampleButton_abort (Missing UserID)
-        // - exampleButton_abort_${interaction.user.id} (UserID Misplacement)
-        //
-        // [Quick F.A.Q]
-        // Q: Wait, so this interaction is can only executed by the one who executed?
-        // A: Yes.
-        //
-        // Q: But i dont want that, i want other user can also interact with it.
-        // A: Well, you have to figure out by youself then.
-        
         const [customId, originalUserId, ...rest] = interaction.customId.split('_');
 
         if (interaction.user.id !== originalUserId) {
