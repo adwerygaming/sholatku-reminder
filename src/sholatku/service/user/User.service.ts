@@ -1,7 +1,7 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import { AllUsersInfo, Location, UserInfo } from "../SholatKu.js"
-import UserPrayerState from "./UserPrayerState.js"
+import { AllUsersInfo, Location, UserInfo } from "../SholatKu.service.js"
+import UserPrayerState from "./UserPrayerState.service.js"
 
 interface UserNoId {
     getByLocation(location: Location): Promise<UserInfo | undefined>

@@ -1,11 +1,11 @@
 import axios from "axios"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/PrayerTimeData.js"
+import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/PrayerTimeData.types.js"
 import tags from "../../utils/Tags.js"
-import SholatKuServiceDatabase from "./database/Database.js"
-import SholatKuServiceHelper from "./helper/Helper.js"
-import { SholatKuServiceUser } from "./user/User.js"
+import SholatKuServiceDatabase from "./database/Database.service.js"
+import SholatKuServiceHelper from "./helper/Helper.service.js"
+import { SholatKuServiceUser } from "./user/User.service.js"
 
 export interface Location {
     province: string
@@ -128,7 +128,7 @@ const SholatKuService = {
                 break;
             }
 
-            console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
+            // console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
 
             // current prayer time
             const currentPrayerCheck = await PrayerState.Get(res.prayerName)
@@ -145,7 +145,7 @@ const SholatKuService = {
                     await PrayerState.Set(res.prayerName, true)
                 }
 
-                console.log(`[${tags.Debug}] <= You are in this range =>`)
+                // console.log(`[${tags.Debug}] <= You are in this range =>`)
                 currentIdx = i
             }
 

@@ -2,7 +2,7 @@ import moment from "moment-timezone"
 import path from "path"
 import { _dirname } from "../utils/Path.js"
 import tags from "../utils/Tags.js"
-import SholatKuService from "./service/SholatKu.js"
+import SholatKuService from "./service/SholatKu.service.js"
 
 const dataPath = path.join(_dirname, "..", "assets", "schedule.json")
 
@@ -38,8 +38,6 @@ for (let i = 0; i < users.length; i++) {
 }
 
 const thing = [...meong.entries()]
-
-console.log(thing)
 
 for (let i = 0; i < thing.length; i++) {
     const res = thing[i];

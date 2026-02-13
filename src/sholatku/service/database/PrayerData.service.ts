@@ -1,7 +1,7 @@
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import { Imsakiyah } from "../../../types/PrayerTimeData.js"
+import { Imsakiyah } from "../../../types/PrayerTimeData.types.js"
 import tags from "../../../utils/Tags.js"
-import SholatKuService from "../SholatKu.js"
+import SholatKuService from "../SholatKu.service.js"
 
 export default function PrayerData(province: string, city: string) {
     const db = DatabaseClient.table("prayer_data")

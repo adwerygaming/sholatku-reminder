@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import SholatKuService from "../SholatKu.js"
+import SholatKuService from "../SholatKu.service.js"
 
 export default function PrayerState(province: string, city: string) {
     province = SholatKuService.Helper.normalize(province)
