@@ -141,7 +141,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
 
             return res || null
         },
-        
+
         /**
          * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SHolatkuUser object.
          * @param u Provider type & that platform user object.
@@ -153,6 +153,15 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
             let obj: SholatkuUser | null = null
 
             if (u.provider == SholatkuUserProvider.Discord) {
+                const check = await this.getAll()
+
+                const discordUsers = await check.filter((x) => x.provider === SholatkuUserProvider.Discord)
+                const exist = discordUsers.filter((x) => x.discordId == u.user.id)?.[0]
+
+                if (exist) {
+                    return exist
+                }
+
                 obj = {
                     id: SholatkuUserId,
                     discordId: u.user.id,
@@ -161,6 +170,15 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
                     username: u.user.username,
                 }
             } else if (u.provider == SholatkuUserProvider.WhatsApp) {
+                const check = await this.getAll()
+
+                const discordUsers = await check.filter((x) => x.provider === SholatkuUserProvider.WhatsApp)
+                const exist = discordUsers.filter((x) => x.phoneNumber == u.user.phoneNumber)?.[0]
+
+                if (exist) {
+                    return exist
+                }
+
                 obj = {
                     id: SholatkuUserId,
                     provider: SholatkuUserProvider.WhatsApp,
