@@ -24,7 +24,7 @@ const SholatKuService = {
     User: SholatKuServiceUser,
 
     async getAllLocations(): Promise<BaseLocation[]> {
-        let usersRaw = await DatabaseClient.table("users").all()
+        const usersRaw = await DatabaseClient.table("users").all()
 
         const locations: BaseLocation[] = usersRaw.map((x) => {
             return { province: x.value.province, city: x.value.city }
@@ -88,7 +88,7 @@ const SholatKuService = {
             return null
         }
 
-        let output: CheckPrayerEvent[] = []
+        const output: CheckPrayerEvent[] = []
 
         if (debugTime) {
             console.log(`[${tags.Debug}] Using Debug Time.`)

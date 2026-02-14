@@ -6,8 +6,8 @@ import SholatKuService from "../SholatKu.service.js"
 export default function PrayerData(province: string, city: string) {
     const db = DatabaseClient.table("prayer_data")
     
-    let originalProvince = province
-    let originalCity = city
+    const originalProvince = province
+    const originalCity = city
 
     province = SholatKuService.Helper.normalizeInput(province)
     city = SholatKuService.Helper.normalizeInput(city)

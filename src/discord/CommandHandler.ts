@@ -203,7 +203,7 @@ export class CommandHandler {
 
             try {
                 await interaction.reply({ embeds: [noCommandEmbed], flags: MessageFlags.Ephemeral  })
-            } catch (e) {
+            } catch {
                 console.log(`[${tags.Error}] Failed to send follow up error message.`)
             }
 
@@ -228,7 +228,7 @@ export class CommandHandler {
                 } else {
                     await interaction.reply({ embeds: [commandErrorEmbed], flags: MessageFlags.Ephemeral });
                 }
-            } catch (e) {
+            } catch {
                 console.log(`[${tags.Error}] Failed to send follow up error message.`)
             }
         }
