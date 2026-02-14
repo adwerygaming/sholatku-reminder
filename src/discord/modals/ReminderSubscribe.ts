@@ -2,6 +2,7 @@ import { ButtonBuilder, ButtonStyle, Colors, ContainerBuilder, MessageFlags } fr
 import SholatKuServiceHelper from "../../sholatku/service/helper/Helper.service.js";
 import SholatKuService from "../../sholatku/service/SholatKu.service.js";
 import { ModalLayout } from "../../types/Discord.types.js";
+import { SholatkuUserProvider } from "../../types/SholatKu.types.js";
 import tags from "../../utils/Tags.js";
 
 export default {
@@ -23,8 +24,13 @@ export default {
                     const provinceFinal = provinceResults?.[0];
                     const provinceFinalFormmated = SholatKuServiceHelper.normalizeOutput(provinceFinal);
 
+                    const user = await SholatKuService.User().resolveUser({
+                        provider: SholatkuUserProvider.Discord,
+                        user: interaction.user
+                    })
+
                     // await DiscordService.User(interaction.user.id).Preferences.Province.set(provinceFinal);
-                    await SholatKuService.User(interaction.user.id).Province.set(provinceFinal);
+                    await SholatKuService.User(user).Province.set(provinceFinal);
 
                     const cities = await SholatKuService.Database.Location.getCitiesByProvince(provinceFinal);
                     const formmatedCities = cities.map((city, i) => `[${i + 1}] **${SholatKuServiceHelper.normalizeOutput(city)}**`).join('\n');
@@ -66,8 +72,13 @@ export default {
                 } else if (action[2] == "city") {
                     const cityValue = interaction.fields.getTextInputValue("city");
 
+                    const user = await SholatKuService.User().resolveUser({
+                        provider: SholatkuUserProvider.Discord,
+                        user: interaction.user
+                    })
+
                     // const province = await DiscordService.User(interaction.user.id).Preferences.Province.get();
-                    const province = await SholatKuService.User(interaction.user.id).Province.get();
+                    const province = await SholatKuService.User(user).Province.get();
                     if (!province) {
                         // province not set
                         return
@@ -85,7 +96,7 @@ export default {
                     const cityFinalFormmated = SholatKuServiceHelper.normalizeOutput(cityFinal);
 
                     // await DiscordService.User(interaction.user.id).Preferences.City.set(cityFinal);
-                    await SholatKuService.User(interaction.user.id).City.set(cityFinal);
+                    await SholatKuService.User(user).City.set(cityFinal);
 
                     console.log(`[${tags.Debug}] User ID: ${interaction.user.id}`);
                     console.log(`[${tags.Debug}] Final Location Set: ${province} - ${cityFinal}`);

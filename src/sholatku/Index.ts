@@ -1,13 +1,13 @@
 import moment from "moment-timezone";
 import EventEmitter from "node:events";
-import { PrayerEvent, User } from "../types/SholatKu.types.js";
+import { PrayerEvent, SholatkuUser } from "../types/SholatKu.types.js";
 import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
 
 type PrayerEventPayload = {
   event: CheckPrayerEvent;
   province: string;
   city: string;
-  users: User[];
+  users: SholatkuUser[];
 };
 
 type EventMap = {
@@ -33,19 +33,19 @@ export class SholatKuEmitter extends EventEmitter {
 export const sholatKuEmitter = new SholatKuEmitter();
 
 sholatKuEmitter.on(PrayerEvent.PrayerTime, async (payload) => {
-    console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+    console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
-    console.log(`[Emitter] Prayer In 5 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+    console.log(`[Emitter] Prayer In 5 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn15m, async (payload) => {
-    console.log(`[Emitter] Prayer In 15 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+    console.log(`[Emitter] Prayer In 15 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn30m, async (payload) => {
-    console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.userIds.join(", ")}`);
+    console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
 // await DatabaseClient.table("users").deleteAll()
@@ -62,12 +62,16 @@ async function check() {
     const debugTime = moment("11:50", "HH:mm")
 
     const users = await SholatKuService.User().getAll()
-    const meong = new Map<string, User[]>()
+    const meong = new Map<string, SholatkuUser[]>()
 
     for (let i = 0; i < users.length; i++) {
         const user = users[i];
-        const location = user.location
-        const locationKey = `${location.province}-${location.city}`
+        const province = user.location?.province
+        const city = user.location?.city
+
+        if (!province && !city) continue;
+
+        const locationKey = `${province}-${city}`
 
         if (!meong.has(locationKey)) {
             meong.set(locationKey, [])

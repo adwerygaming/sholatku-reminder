@@ -12,9 +12,9 @@ export interface Location extends BaseLocation {
  */
 export interface BaseUser {
     id: string // universinal id ({provider}-{uniqueId})
-    lastUpdatedAt: string
+    lastUpdatedAt?: string
     provider: SholatkuUserProvider
-    location: Location
+    location?: Location
 }
 
 export type SholatkuUser = SholatkuDiscordUser | SholatkuWhatsAppUser
@@ -43,4 +43,10 @@ export enum PrayerEvent {
   PrayerIn15m = "prayer_in_15m",
   PrayerIn30m = "prayer_in_30m",
   NextPrayer = "nextPrayer",
+}
+
+// placeholder for whatsapp user, replace with user from baileys later
+export interface WhatsAppUser {
+    phoneNumber: string
+    displayName: string
 }

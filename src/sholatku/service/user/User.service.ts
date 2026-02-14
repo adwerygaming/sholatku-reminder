@@ -1,14 +1,25 @@
-import { User as DiscordUser } from "discord.js"
+import { User } from "discord.js"
 import moment from "moment-timezone"
+import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import { Location, SholatkuDiscordUser, SholatkuUser, SholatkuUserProvider } from "../../../types/SholatKu.types.js"
+import { Location, SholatkuUser, SholatkuUserProvider, WhatsAppUser } from "../../../types/SholatKu.types.js"
 import SholatKuServiceHelper from "../helper/Helper.service.js"
 import UserPrayerState from "./UserPrayerState.service.js"
 
+export type SholatkuUnionUser = {
+    provider: SholatkuUserProvider.Discord,
+    user: User
+} | {
+    provider: SholatkuUserProvider.WhatsApp,
+    user: WhatsAppUser
+}
+
 interface UserNoId {
+    register(user: SholatkuUser, location: Location): Promise<SholatkuUser>
     getByLocation(location: Location): Promise<SholatkuUser | undefined>
     getAll(): Promise<SholatkuUser[]>
-    ResolveUser(user: DiscordUser): Promise<Omit<SholatkuDiscordUser, "location" | "lastUpdatedAt">>
+    getUser(userId: string): Promise<SholatkuUser | null>
+    resolveUser(u: SholatkuUnionUser): Promise<SholatkuUser>
 }
 
 interface UserWithId {
@@ -33,19 +44,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
     const db = DatabaseClient.table("users")
 
     if (user) {
-        let userId = null
-
-        if (user.provider == SholatkuUserProvider.Discord) {
-            userId = `discord-${user.id}`
-        } else if (user.provider == SholatkuUserProvider.WhatsApp) {
-            // TODO: Take a look at the phone number formatting, if the formatting include @c.us or not
-            // TODO: Make a func that seperate the @ and . from the phone number formatting (ex: 62812341111@c.us)
-            userId = `whatsapp-${user.phoneNumber}`
-        }
-
-        if (!userId) {
-            throw new Error("Invalid user provider")
-        }
+        const userId = user.id
 
         return {
             PrayerState: UserPrayerState(userId),
@@ -91,12 +90,33 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
     }
 
     return {
+        /**
+         * Register in context of location. Resolve the user first using the resolveUser().
+         * @param user SholatkuUser object
+         * @param location LOcation object, containing province and city.
+         * @returns SholatkuUser object that has location property.
+         */
+        async register(user: SholatkuUser, location: Location): Promise<SholatkuUser> {
+            const userId = user.id
+
+            const obj: SholatkuUser = {
+                ...user,
+                location: {
+                    ...location,
+                    lastUpdatedAt: moment().toISOString()
+                }
+            }
+
+            await db.set(userId, obj)
+
+            return obj
+        },
         async getByLocation({ city, province }: Location): Promise<SholatkuUser | undefined> {
             const usersRaw = await db.all<SholatkuUser>()
 
             const user = usersRaw.find(x =>
-                x.value.location.city === city &&
-                x.value.location.province === province
+                x.value?.location?.city === city &&
+                x.value?.location?.province === province
             )
 
             return user?.value
@@ -104,26 +124,55 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
         async getAll(): Promise<SholatkuUser[]> {
             const usersRaw = await db.all<SholatkuUser>()
 
-            const users = usersRaw.map((x) => {
-                return { id: x.id, ...x.value }
+            const users: SholatkuUser[] = usersRaw.map((x) => {
+                return { ...x.value }
             })
 
             return users
         },
-        async ResolveUser(user: DiscordUser) {
-            // TODO: Add Whatsapp user later
 
-            const userId = `discord-${user.id}`
+        /**
+         * Get existing Sholatku User by id
+         * @param userId Id for SholatkuUser.
+         * @returns SholatkuUser object if found, null if not found.
+         */
+        async getUser(userId: string): Promise<SholatkuUser | null> {
+            const res = await db.get<SholatkuUser>(userId)
 
-            const resolved: Omit<SholatkuDiscordUser, "location" | "lastUpdatedAt"> = {
-                id: userId,
-                discordId: user.id,
-                provider: SholatkuUserProvider.Discord,
-                username: user.username,
-                displayName: user.displayName
+            return res || null
+        },
+        
+        /**
+         * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SHolatkuUser object.
+         * @param u Provider type & that platform user object.
+         * @returns Sholatku user object (without location property, use register() to register with locations
+         */
+        async resolveUser(u: SholatkuUnionUser): Promise<SholatkuUser> {
+            const SholatkuUserId = uuidv4()
+
+            let obj: SholatkuUser | null = null
+
+            if (u.provider == SholatkuUserProvider.Discord) {
+                obj = {
+                    id: SholatkuUserId,
+                    discordId: u.user.id,
+                    displayName: u.user.displayName,
+                    provider: SholatkuUserProvider.Discord,
+                    username: u.user.username,
+                }
+            } else if (u.provider == SholatkuUserProvider.WhatsApp) {
+                obj = {
+                    id: SholatkuUserId,
+                    provider: SholatkuUserProvider.WhatsApp,
+                    displayName: u.user.displayName,
+                    phoneNumber: u.user.phoneNumber
+                }
             }
+             
+            await db.set(SholatkuUserId, obj)
 
-            return resolved
+            // source: trust me bro
+            return obj!
         }
     }
 }
