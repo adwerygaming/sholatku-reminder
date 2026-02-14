@@ -1,12 +1,13 @@
 import moment from "moment-timezone";
 import EventEmitter from "node:events";
-import SholatKuService, { CheckPrayerEvent, PrayerEvent } from "./service/SholatKu.service.js";
+import { PrayerEvent, User } from "../types/SholatKu.types.js";
+import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
 
 type PrayerEventPayload = {
   event: CheckPrayerEvent;
   province: string;
   city: string;
-  userIds: string[];
+  users: User[];
 };
 
 type EventMap = {
@@ -61,19 +62,18 @@ async function check() {
     const debugTime = moment("11:50", "HH:mm")
 
     const users = await SholatKuService.User().getAll()
-    const meong = new Map<string, string[]>()
+    const meong = new Map<string, User[]>()
 
     for (let i = 0; i < users.length; i++) {
         const user = users[i];
-        const userId = user.id
-        const location = { province: user.province, city: user.city }
+        const location = user.location
         const locationKey = `${location.province}-${location.city}`
 
         if (!meong.has(locationKey)) {
             meong.set(locationKey, [])
         }
 
-        meong.get(locationKey)!.push(userId)
+        meong.get(locationKey)!.push(user)
     }
 
     const thing = [...meong.entries()]
@@ -81,7 +81,7 @@ async function check() {
     for (let i = 0; i < thing.length; i++) {
         const res = thing[i];
         const locationKeyRaw = res[0]
-        const userIds = res[1]
+        const users = res[1]
 
         const [province, city] = locationKeyRaw.split("-")
 
@@ -99,12 +99,12 @@ async function check() {
                 event,
                 province,
                 city,
-                userIds
+                users
             })
 
             // leave to this thing to update the last state
-            for (let j = 0; j < userIds.length; j++) {
-                const userId = userIds[j];
+            for (let j = 0; j < users.length; j++) {
+                const userId = users[j];
                 const user = SholatKuService.User(userId)
 
                 const key = `${event.type}-${event.eventName}`

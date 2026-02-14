@@ -2,26 +2,14 @@ import axios from "axios"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/PrayerTimeData.types.js"
+import { BaseLocation, PrayerEvent } from "../../types/SholatKu.types.js"
 import tags from "../../utils/Tags.js"
 import SholatKuServiceDatabase from "./database/Database.service.js"
 import SholatKuServiceHelper from "./helper/Helper.service.js"
 import { SholatKuServiceUser } from "./user/User.service.js"
 
-export interface Location {
-    province: string
-    city: string
-}
-
-export interface CheckPrayerProps extends Location {
+export interface CheckPrayerProps extends BaseLocation {
     debugTime?: moment.Moment
-}
-
-export enum PrayerEvent {
-  PrayerTime = "prayerTime",
-  PrayerIn5m = "prayer_in_5m",
-  PrayerIn15m = "prayer_in_15m",
-  PrayerIn30m = "prayer_in_30m",
-  NextPrayer = "nextPrayer",
 }
 
 export interface CheckPrayerEvent {
@@ -30,32 +18,22 @@ export interface CheckPrayerEvent {
     time: moment.Moment
 }
 
-export interface GetPrayerTimeDataProps extends Location { }
-
-export interface UserInfo extends Location {
-    lastUpdatedAt: string
-}
-
-export interface AllUsersInfo extends UserInfo {
-    id: string
-}
-
 const SholatKuService = {
     Database: SholatKuServiceDatabase,
     Helper: SholatKuServiceHelper,
     User: SholatKuServiceUser,
 
-    async getAllLocations(): Promise<Location[]> {
+    async getAllLocations(): Promise<BaseLocation[]> {
         let usersRaw = await DatabaseClient.table("users").all()
 
-        const locations: Location[] = usersRaw.map((x) => {
+        const locations: BaseLocation[] = usersRaw.map((x) => {
             return { province: x.value.province, city: x.value.city }
         }).filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
 
         return locations
     },
 
-    async fetchPrayerData({ city, province }: GetPrayerTimeDataProps): Promise<Imsakiyah[]> {
+    async fetchPrayerData({ city, province }: BaseLocation): Promise<Imsakiyah[]> {
         console.log(`[${tags.System}] Fetching prayer data for ${city}, ${province}`)
         const url = `https://equran.id/api/v2/imsakiyah`
         const body = {
