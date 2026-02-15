@@ -18,7 +18,6 @@ interface UserNoId {
     register(user: SholatkuUser, location: Location): Promise<SholatkuUser>
     getByLocation(location: Location): Promise<SholatkuUser[] | undefined>
     getAll(): Promise<SholatkuUser[]>
-    getUser(userId: string): Promise<SholatkuUser | null>
     resolveUser(u: SholatkuUnionUser): Promise<SholatkuUser>
 }
 
@@ -33,13 +32,18 @@ interface UserWithId {
         set(value: string): Promise<void>
     }
     unregister(): Promise<void>
-    getInfo(): Promise<SholatkuUser | null>
+    get(): Promise<SholatkuUser | null>
     isRegistered(): Promise<boolean>
 }
 
 export function SholatKuServiceUser(user: SholatkuUser): UserWithId
 export function SholatKuServiceUser(): UserNoId
 
+/**
+ * Service for managing SholatkuUser.
+ * @param user SholatkuUser object.
+ * @returns Bunch of functions.
+ */
 export function SholatKuServiceUser(user?: SholatkuUser) {
     const db = DatabaseClient.table("users")
 
@@ -50,10 +54,19 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
             PrayerState: UserPrayerState(userId),
 
             Province: {
+                /**
+                 * Fetch only the province of the user. If the user or province not found, return null.
+                 * @returns Province in database key format (with underscore, e.g. "DKI_Jakarta"). If not found, return null.
+                 */
                 async get(): Promise<string | null> {
                     const res = await db.get<string>(`${userId}.location.province`)
                     return res || null
                 },
+
+                /**
+                 * Set or update only the province of the user.
+                 * @param value Province name in any format (e.g. "DKI Jakarta", "DKI_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "DKI_Jakarta").
+                 */
                 async set(value: string): Promise<void> {
                     value = SholatKuServiceHelper.normalizeInput(value)
 
@@ -63,10 +76,19 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
             },
 
             City: {
+                /**
+                 * Fetch only the city of the user. If the user or city not found, return null.
+                 * @returns City in database key format (with underscore, e.g. "Kota_Jakarta"). If not found, return null.
+                 */
                 async get(): Promise<string | null> {
                     const res = await db.get<string>(`${userId}.location.city`)
                     return res || null
                 },
+
+                /**
+                 * Set or update only the city of the user.
+                 * @param value City name in any format (e.g. "Kota Jakarta", "Kota_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "Kota_Jakarta").
+                 */
                 async set(value: string): Promise<void> {
                     value = SholatKuServiceHelper.normalizeInput(value)
 
@@ -75,14 +97,25 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
                 }
             },
 
+            /**
+             * Delete the user from database.
+             */
             async unregister(): Promise<void> {
                 await db.delete(`${userId}`)
             },
 
-            async getInfo(): Promise<SholatkuUser | null> {
+            /**
+             * Get the user object from database. If the user not found, return null.
+             * @returns SholatkuUser object if found, or null if not found.
+             */
+            async get(): Promise<SholatkuUser | null> {
                 return await db.get<SholatkuUser>(`${userId}`)
             },
 
+            /**
+             * Quick check if the user is registered or not.
+             * @returns boolean. True if the user is registered, false if not.
+             */
             async isRegistered(): Promise<boolean> {
                 return !!(await db.get<SholatkuUser>(`${userId}`))
             }
@@ -141,18 +174,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
         },
 
         /**
-         * Get existing Sholatku User by id
-         * @param userId Id for SholatkuUser.
-         * @returns SholatkuUser object if found, null if not found.
-         */
-        async getUser(userId: string): Promise<SholatkuUser | null> {
-            const res = await db.get<SholatkuUser>(userId)
-
-            return res || null
-        },
-
-        /**
-         * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SHolatkuUser object. If the user already exist in database, it will return the existing user. If not, create new SholatkuUser in database and return it.
+         * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SholatkuUser object. If the user already exist in database, it will return the existing user. If not, create new SholatkuUser in database and return it.
          * @param u Provider type & that platform user object.
          * @returns Sholatku user object (without location property, use register() to register with locations
          */
