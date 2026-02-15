@@ -41,11 +41,13 @@ const SholatKuService = {
             kabkota: city
         }
 
-        const { data: res } = await axios.post<ImsakiyahResponse>(url, body, {
+        const { data: res, status, statusText } = await axios.post<ImsakiyahResponse>(url, body, {
             validateStatus: () => true
         })
 
         const output = res?.data?.imsakiyah ?? []
+
+        console.log(`[${tags.System}] Got response ${status} - ${statusText}: ${output?.length} prayer times.`)
 
         return output
     },
@@ -72,11 +74,11 @@ const SholatKuService = {
     },
 
     async checkPrayer({ city, province, debugTime }: CheckPrayerProps): Promise<CheckPrayerEvent[] | null> {
-        const prayerData = await this.Database.PrayerData(province, city).get()
+        const prayerData = await (await this.Database.PrayerData(province, city)).get()
 
         const now = debugTime ?? moment()
 
-        if (!prayerData) {
+        if (!prayerData || prayerData.length === 0) {
             console.log(`[${tags.Error}] Failed to get prayer data for ${city}, ${province}`)
             return null
         }

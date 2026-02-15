@@ -69,7 +69,7 @@ async function check() {
         const province = user.location?.province
         const city = user.location?.city
 
-        if (!province && !city) continue;
+        if (!province || !city) continue;
 
         const locationKey = `${province}-${city}`
 
@@ -88,6 +88,8 @@ async function check() {
         const users = res[1]
 
         const [province, city] = locationKeyRaw.split("-")
+
+        if (!province || !city) continue;
 
         const check = await SholatKuService.checkPrayer({ province, city, debugTime })
 
@@ -112,14 +114,14 @@ async function check() {
                 const user = SholatKuService.User(userId)
 
                 const key = `${event.type}-${event.eventName}`
-                const stateCheck = await user.PrayerState.Get(key)
+                const stateCheck = await user.PrayerState.get(key)
 
                 if (event.type == "prayerTime" && !stateCheck) {
-                    await user.PrayerState.Set(key, true)
+                    await user.PrayerState.set(key, true)
                 } else if (event.type == "prayer_in_15m" && !stateCheck) {
-                    await user.PrayerState.Set(key, true)
+                    await user.PrayerState.set(key, true)
                 } else if (event.type == "prayer_in_30m" && !stateCheck) {
-                    await user.PrayerState.Set(key, true)
+                    await user.PrayerState.set(key, true)
                 }
 
             }

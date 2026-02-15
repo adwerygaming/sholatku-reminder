@@ -14,7 +14,7 @@ const SholatKuServiceHelper = {
     normalizeInput(input: string): string {
         return input.replace(/[^a-zA-Z0-9]/g, "_")
     },
-
+    
     /**
      * Converts a time string in HH:mm format to a moment object.
      * The resulting moment object will have today's date with the specified time.
@@ -41,7 +41,8 @@ const SholatKuServiceHelper = {
      * normalizeOutput("Kota_Baru_123") // returns "Kota Baru 123"
      */
     normalizeOutput(input: string): string {
-        return input.replace(/_/g, ' ')
+        return input.toLowerCase()
+            .replace(/[.\s_]+/g, '')
     }
 }
 

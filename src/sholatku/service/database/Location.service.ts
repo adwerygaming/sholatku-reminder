@@ -1,5 +1,7 @@
-import FuzzySearch from 'fuzzy-search';
+import Fuse from 'fuse.js';
 import LocationDatabaseClient from "../../../database/LocationDatabaseClient.js";
+import tags from '../../../utils/Tags.js';
+import SholatKuServiceHelper from '../helper/Helper.service.js';
 
 const Location = {
     /**
@@ -39,19 +41,20 @@ const Location = {
     },
 
     /**
-     * Retrieves all cities within a specific province.
+     * Retrieves all cities within a specific province from the database.
      * @param {string} province - The name of the province to filter cities by
      * @returns {Promise<string[]>} A promise that resolves to an array of unique city names in the province
      */
-    async getCitiesByProvince(province: string): Promise<string[]> {
+    async getCitiesByProvince(provinceId: string): Promise<string[]> {
+        console.log(`[${tags.Debug}] Getting cities for province "${provinceId}"`)
+
         const allRaw = await this.getAllRaw()
 
-        const cities = allRaw
-            .filter(x => x.id === province)
-            .flatMap(x => x.value)
-            .filter((v, i, a) => a.indexOf(v) === i)
+        const match = allRaw.find(x => x.id === provinceId)
 
-        return cities
+        if (!match) return []
+
+        return [...new Set(match.value)]
     },
 
     /**
@@ -59,14 +62,30 @@ const Location = {
      * @param {string} query - The search query to match against province names
      * @returns {Promise<string[]>} A promise that resolves to an array of matching province names
      */
-    async searchProvince(query: string): Promise<string[]> {
-        const allProvinces = await this.getProvinces()
+    async searchProvince(query: string): Promise<{ original: string, normalized: string }[]> {
+        console.log(`[${tags.Debug}] Searching for province "${query}"`)
+        const provinces = await this.getProvinces()
 
-        const searcher = new FuzzySearch(allProvinces);
+        const fuse = new Fuse(
+            provinces.map(p => ({
+                original: p,
+                normalized: SholatKuServiceHelper.normalizeOutput(p)
+            })),
+            {
+                keys: ['normalized'],
+                threshold: 0.3,
+                ignoreLocation: true,
+                includeScore: true
+            }
+        )
 
-        const res = searcher.search(query)
+        const queryNormalized = SholatKuServiceHelper.normalizeOutput(query)
 
-        return res
+        const result = fuse.search(queryNormalized)
+
+        console.log(result)
+
+        return result.map(r => r.item)
     },
 
     /**
@@ -76,13 +95,29 @@ const Location = {
      * @returns {Promise<string[]>} A promise that resolves to an array of matching city names
      */
     async searchCity(province: string, query: string) {
+        console.log(`[${tags.Debug}] Searching for city "${query}" in province "${province}"`)
         const allCities = await this.getCitiesByProvince(province)
 
-        const searcher = new FuzzySearch(allCities);
+        const fuse = new Fuse(
+            allCities.map(p => ({
+                original: p,
+                normalized: SholatKuServiceHelper.normalizeOutput(p)
+            })),
+            {
+                keys: ['normalized'],
+                threshold: 0.3,
+                ignoreLocation: true,
+                includeScore: true
+            }
+        )
 
-        const res = searcher.search(query)
+        const queryNormalized = SholatKuServiceHelper.normalizeOutput(query)
 
-        return res
+        const result = fuse.search(queryNormalized)
+
+        console.log(result)
+
+        return result.map(r => r.item.original)
     }
 }
 
