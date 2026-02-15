@@ -69,7 +69,7 @@ async function check() {
         const province = user.location?.province
         const city = user.location?.city
 
-        if (!province || !city) continue;
+        if (!province && !city) continue;
 
         const locationKey = `${province}-${city}`
 
@@ -88,8 +88,6 @@ async function check() {
         const users = res[1]
 
         const [province, city] = locationKeyRaw.split("-")
-
-        if (!province || !city) continue;
 
         const check = await SholatKuService.checkPrayer({ province, city, debugTime })
 

@@ -17,20 +17,15 @@ import SholatKuService from "../SholatKu.service.js"
  * const prayerData = PrayerData('Jakarta', 'Jakarta Pusat');
  * const data = await prayerData.get();
  */
-export default async function PrayerData(province: string, city: string) {
+export default function PrayerData(province: string, city: string) {
     const db = DatabaseClient.table("prayer_data")
-        
+    
+    const originalProvince = province
+    const originalCity = city
+
     province = SholatKuService.Helper.normalizeInput(province)
     city = SholatKuService.Helper.normalizeInput(city)
-    
-    const searchProvince = await (await SholatKuService.Database.Location.searchProvince(province))
-    const theProvince = searchProvince[0]
-    const provinceNormalized = theProvince.normalized
-    const normalizedCity = (await SholatKuService.Database.Location.searchCity(provinceNormalized, city))
 
-    console.log(`[${tags.Debug}] Final format to send to api: ${theProvince.original} (length: ${originalProvince.length}), ${originalCity} (length: ${originalCity.length})`)
-    console.log(originalProvince, originalCity)
-    
     const chain = {
         /**
          * Retrieves prayer time data for the specified location.
@@ -51,17 +46,17 @@ export default async function PrayerData(province: string, city: string) {
          * }
          */
         async get(): Promise<Imsakiyah[] | null> {
-            console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${province}, ${city}`)
+            console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${city}, ${province}`)
             const res: Imsakiyah[] | null = await db.get(`${province}.${city}`)
 
             if (!res) {
-                const data = await SholatKuService.fetchPrayerData({ province: originalProvince?.[0], city: originalCity?.[0] })
+                const data = await SholatKuService.fetchPrayerData({ province: originalProvince, city: originalCity })
 
                 if (data.length === 0 || !data || typeof data === "undefined") {
                     return null
                 }
 
-                await (await SholatKuService.Database.PrayerData(province, city)).set(data)
+                await SholatKuService.Database.PrayerData(province, city).set(data)
                 return data
             }
 
