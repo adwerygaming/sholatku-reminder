@@ -24,11 +24,35 @@ interface UserNoId {
 interface UserWithId {
     PrayerState: ReturnType<typeof UserPrayerState>
     Province: {
+        /**
+         * Fetch only the province of the user. If the user or province not found, return null.
+         * @async
+         * @returns {Promise<string | null>} Province in database key format (with underscore, e.g. "DKI_Jakarta"). If not found, return null.
+         */
         get(): Promise<string | null>
+
+        /**
+         * Set or update only the province of the user.
+         * @async
+         * @param {string} value Province name in any format (e.g. "DKI Jakarta", "DKI_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "DKI_Jakarta").
+         * @returns {Promise<void>} Resolves when the province is stored
+         */
         set(value: string): Promise<void>
     }
     City: {
+        /**
+         * Fetch only the city of the user. If the user or city not found, return null.
+         * @async
+         * @returns {Promise<string | null>} City in database key format (with underscore, e.g. "Kota_Jakarta"). If not found, return null.
+         */
         get(): Promise<string | null>
+
+        /**
+         * Set or update only the city of the user.
+         * @async
+         * @param {string} value City name in any format (e.g. "Kota Jakarta", "Kota_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "Kota_Jakarta").
+         * @returns {Promise<void>} Resolves when the city is stored
+         */
         set(value: string): Promise<void>
     }
     unregister(): Promise<void>
@@ -54,22 +78,11 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
             PrayerState: UserPrayerState(user),
 
             Province: {
-                /**
-                 * Fetch only the province of the user. If the user or province not found, return null.
-                 * @async
-                 * @returns {Promise<string | null>} Province in database key format (with underscore, e.g. "DKI_Jakarta"). If not found, return null.
-                 */
                 async get(): Promise<string | null> {
                     const res = await db.get<string>(`${userId}.location.province`)
                     return res || null
                 },
 
-                /**
-                 * Set or update only the province of the user.
-                 * @async
-                 * @param {string} value Province name in any format (e.g. "DKI Jakarta", "DKI_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "DKI_Jakarta").
-                 * @returns {Promise<void>} Resolves when the province is stored
-                 */
                 async set(value: string): Promise<void> {
                     value = SholatKuServiceHelper.normalizeInput(value)
 
@@ -79,22 +92,11 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
             },
 
             City: {
-                /**
-                 * Fetch only the city of the user. If the user or city not found, return null.
-                 * @async
-                 * @returns {Promise<string | null>} City in database key format (with underscore, e.g. "Kota_Jakarta"). If not found, return null.
-                 */
                 async get(): Promise<string | null> {
                     const res = await db.get<string>(`${userId}.location.city`)
                     return res || null
                 },
 
-                /**
-                 * Set or update only the city of the user.
-                 * @async
-                 * @param {string} value City name in any format (e.g. "Kota Jakarta", "Kota_Jakarta"). The function will normalize the input and store it in database key format (with underscore, e.g. "Kota_Jakarta").
-                 * @returns {Promise<void>} Resolves when the city is stored
-                 */
                 async set(value: string): Promise<void> {
                     value = SholatKuServiceHelper.normalizeInput(value)
 

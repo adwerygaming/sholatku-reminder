@@ -114,7 +114,7 @@ const SholatKuService = {
             // console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
 
             // current prayer time
-            const currentPrayerCheck = await PrayerState.Get(res.prayerName)
+            const currentPrayerCheck = await PrayerState.get(res.prayerName)
 
             if (now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime)) {
                 if (!currentPrayerCheck) {
@@ -125,7 +125,7 @@ const SholatKuService = {
                         time: prayerTime
                     })
 
-                    await PrayerState.Set(res.prayerName, true)
+                    await PrayerState.set(res.prayerName, true)
                 }
 
                 // console.log(`[${tags.Debug}] <= You are in this range =>`)
@@ -136,7 +136,7 @@ const SholatKuService = {
             // console.log(`[${tags.Debug}] Next Prayer ${next?.prayerName} is in ${nextPrayerDiff} minutes`)
 
             // next prayer in 5 minute
-            const nextPrayerIn5DiffCheck = await PrayerState.Get(`${next?.prayerName}_5m`)
+            const nextPrayerIn5DiffCheck = await PrayerState.get(`${next?.prayerName}_5m`)
 
             if (nextPrayerDiff > 0 && nextPrayerDiff <= 5 && !nextPrayerIn5DiffCheck) {
                 console.log(`5 Minutes into ${next?.prayerName}`)
@@ -146,11 +146,11 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(`${next.prayerName}_5m`, true)
+                await PrayerState.set(`${next.prayerName}_5m`, true)
             }
 
             // next prayer in 15 minute
-            const nextPrayerIn15DiffCheck = await PrayerState.Get(`${next?.prayerName}_15m`)
+            const nextPrayerIn15DiffCheck = await PrayerState.get(`${next?.prayerName}_15m`)
 
             if (nextPrayerDiff > 5 && nextPrayerDiff <= 15 && !nextPrayerIn15DiffCheck) {
                 console.log(`15 Minutes into ${next?.prayerName}`)
@@ -160,11 +160,11 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(`${next.prayerName}_15m`, true)
+                await PrayerState.set(`${next.prayerName}_15m`, true)
             }
 
             // next prayer in 30 minute
-            const nextPrayerIn30DiffCheck = await PrayerState.Get(`${next?.prayerName}_30m`)
+            const nextPrayerIn30DiffCheck = await PrayerState.get(`${next?.prayerName}_30m`)
 
             if (nextPrayerDiff > 15 && nextPrayerDiff <= 30 && !nextPrayerIn30DiffCheck) {
                 console.log(`30 Minutes into ${next?.prayerName}`)
@@ -174,7 +174,7 @@ const SholatKuService = {
                     time: next.time
                 })
 
-                await PrayerState.Set(`${next.prayerName}_30m`, true)
+                await PrayerState.set(`${next.prayerName}_30m`, true)
             }
         }
 
