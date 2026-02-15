@@ -1,7 +1,16 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
+import { PrayerEvent } from "../../../types/SholatKu.types.js"
 import SholatKuService from "../SholatKu.service.js"
 
+/**
+ * Creates a prayer state service for a specific location.
+ * Provides helpers to read and update whether a prayer event for the day
+ * has already been processed or acknowledged.
+ *
+ * @param {string} province - Province name (normalized internally)
+ * @param {string} city - City name (normalized internally)
+ */
 export default function PrayerState(province: string, city: string) {
     province = SholatKuService.Helper.normalizeInput(province)
     city = SholatKuService.Helper.normalizeInput(city)
@@ -11,12 +20,28 @@ export default function PrayerState(province: string, city: string) {
     const db = DatabaseClient.table("prayer_state")
 
     const chain = {
-        async Get(eventName: string): Promise<boolean> {
+        /**
+         * Retrieves whether a given prayer event for today has been marked.
+         *
+         * @async
+         * @param {PrayerEvent} eventName - The prayer event identifier (e.g. subuh, zuhur)
+         * @returns {Promise<boolean>} True when the event is marked in the cache, otherwise false
+         */
+        async get(eventName: PrayerEvent): Promise<boolean> {
             const res = await db.get(`${province}.${city}.${dayIdentifier}.${eventName}`)
 
             return res ? true : false
         },
-        async Set(eventName: string, value: boolean): Promise<void> {
+        
+        /**
+         * Stores the prayer event state for today in the cache.
+         *
+         * @async
+         * @param {PrayerEvent} eventName - The prayer event identifier
+         * @param {boolean} value - State to set (true when processed/acknowledged)
+         * @returns {Promise<void>} Resolves when the state has been stored
+         */
+        async set(eventName: PrayerEvent, value: boolean): Promise<void> {
             await db.set(`${province}.${city}.${dayIdentifier}.${eventName}`, value)
         }
     }
