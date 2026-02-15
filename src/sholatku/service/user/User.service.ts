@@ -16,7 +16,7 @@ export type SholatkuUnionUser = {
 
 interface UserNoId {
     register(user: SholatkuUser, location: Location): Promise<SholatkuUser>
-    getByLocation(location: Location): Promise<SholatkuUser | undefined>
+    getByLocation(location: Location): Promise<SholatkuUser[] | undefined>
     getAll(): Promise<SholatkuUser[]>
     getUser(userId: string): Promise<SholatkuUser | null>
     resolveUser(u: SholatkuUnionUser): Promise<SholatkuUser>
@@ -111,16 +111,25 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
 
             return obj
         },
-        async getByLocation({ city, province }: Location): Promise<SholatkuUser | undefined> {
-            const usersRaw = await db.all<SholatkuUser>()
+        /**
+         * Find multiple SholatkuUser by their location (province & city).
+         * @param location Location object, containing province and city. 
+         * @returns Array of SholatkuUser that has location property that matches the parameter. If no user found, return empty array.
+         */
+        async getByLocation({ city, province }: Location): Promise<SholatkuUser[] | undefined> {
+            const usersRaw = await this.getAll()
 
-            const user = usersRaw.find(x =>
-                x.value?.location?.city === city &&
-                x.value?.location?.province === province
+            const user = usersRaw.filter(x =>
+                x.location?.city === city &&
+                x.location?.province === province
             )
 
-            return user?.value
+            return user
         },
+        /**
+         * Get all registered SholatkuUser from database.
+         * @returns Array of SholatkuUser objects.
+         */
         async getAll(): Promise<SholatkuUser[]> {
             const usersRaw = await db.all<SholatkuUser>()
 
@@ -143,7 +152,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
         },
 
         /**
-         * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SHolatkuUser object.
+         * Resolve user object from various platform, such as Discord & Whatsapp. Turning into SHolatkuUser object. If the user already exist in database, it will return the existing user. If not, create new SholatkuUser in database and return it.
          * @param u Provider type & that platform user object.
          * @returns Sholatku user object (without location property, use register() to register with locations
          */
