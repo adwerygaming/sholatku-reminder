@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "npx tsx ./src/index.ts",
+    "lint": "npx eslint .",
     "build": "tsup"
   },
   "keywords": [],
