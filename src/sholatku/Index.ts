@@ -1,7 +1,9 @@
 import moment from "moment-timezone";
 import EventEmitter from "node:events";
 import DatabaseClient from "../database/DatabaseClient.js";
-import { PrayerEvent, SholatkuUser } from "../types/SholatKu.types.js";
+import client from "../discord/Client.js";
+import { PrayerEvent, SholatkuUser, SholatkuUserProvider } from "../types/SholatKu.types.js";
+import tags from "../utils/Tags.js";
 import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
 
 type PrayerEventPayload = {
@@ -33,8 +35,40 @@ export class SholatKuEmitter extends EventEmitter {
 
 export const sholatKuEmitter = new SholatKuEmitter();
 
+async function annouce(payload: PrayerEventPayload) {
+    // const users: SholatkuUser[] = payload.users.map((u) => u)
+    const providerTYpe = payload.users[0].provider
+
+    if (providerTYpe == SholatkuUserProvider.Discord) {
+        // send discord message to user
+        const guilds = await client.guilds.fetch();
+        const guildId = "598412465750933504"
+        const guild = await guilds.get(guildId)?.fetch();
+
+        if (!guild) {
+            console.log(`[${tags.Debug}] Cannot find guild with ID ${guildId}`);
+            return
+        }
+
+        const channels = await guild.channels.fetch();
+        const channelId = "1471750280713601116"
+        const channel = await channels.get(channelId)?.fetch();
+
+        if (!channel || !channel.isTextBased()) {
+            console.log(`[${tags.Debug}] Cannot find text channel with ID ${channelId}`);
+            return
+        }
+
+        await channel.send({
+            content: `It's time for **${payload.event.eventName}** prayer in **${payload.city}, ${payload.province}**.`
+        })
+    }
+}
+
 sholatKuEmitter.on(PrayerEvent.PrayerTime, async (payload) => {
     console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+
+    annouce(payload)
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
