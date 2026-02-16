@@ -34,12 +34,16 @@ const SholatKuService = {
     },
 
     async fetchPrayerData({ city, province }: BaseLocation): Promise<Imsakiyah[]> {
-        console.log(`[${tags.System}] Fetching prayer data for ${city}, ${province}`)
+        const provinceFinal = await SholatKuService.Database.Location.searchProvince(province)
+        const cityFinal = await SholatKuService.Database.Location.searchCity(provinceFinal?.original, city)
+
         const url = `https://equran.id/api/v2/imsakiyah`
         const body = {
-            provinsi: province,
-            kabkota: city
+            provinsi: provinceFinal.original,
+            kabkota: cityFinal.original
         }
+
+        console.log(`[${tags.System}] Fetching prayer data for ${body.provinsi}, ${body.kabkota}`)
 
         const { data: res } = await axios.post<ImsakiyahResponse>(url, body, {
             validateStatus: () => true

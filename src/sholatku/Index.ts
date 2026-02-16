@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 import EventEmitter from "node:events";
+import DatabaseClient from "../database/DatabaseClient.js";
 import { PrayerEvent, SholatkuUser } from "../types/SholatKu.types.js";
 import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
 
@@ -48,9 +49,17 @@ sholatKuEmitter.on(PrayerEvent.PrayerIn30m, async (payload) => {
     console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
-// await DatabaseClient.table("users").deleteAll()
-// await DatabaseClient.table("prayer_state").deleteAll()
-// await DatabaseClient.table("user_prayer_state").deleteAll()
+await DatabaseClient.table("users").deleteAll()
+await DatabaseClient.table("prayer_state").deleteAll()
+await DatabaseClient.table("user_prayer_state").deleteAll()
+
+// const provTest = "yogya"
+// const cityTest = "gunung"
+
+// const provRes = await SholatKuService.Database.Location.searchProvince(provTest)
+// console.log("Province Search Result:", provRes)
+// const cityRes = await SholatKuService.Database.Location.searchCity(provRes?.original ?? provTest, cityTest)
+// console.log("City Search Result:", cityRes)
 
 setInterval(async () => {
     await check()
@@ -69,7 +78,7 @@ async function check() {
         const province = user.location?.province
         const city = user.location?.city
 
-        if (!province && !city) continue;
+        if (!province || !city) continue;
 
         const locationKey = `${province}-${city}`
 
@@ -88,6 +97,8 @@ async function check() {
         const users = res[1]
 
         const [province, city] = locationKeyRaw.split("-")
+
+        if (!province || !city) continue;
 
         const check = await SholatKuService.checkPrayer({ province, city, debugTime })
 

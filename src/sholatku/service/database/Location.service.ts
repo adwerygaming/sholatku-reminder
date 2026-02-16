@@ -1,5 +1,11 @@
 import FuzzySearch from 'fuzzy-search';
 import LocationDatabaseClient from "../../../database/LocationDatabaseClient.js";
+import SholatKuServiceHelper from '../helper/Helper.service.js';
+
+interface SearchObject {
+    searchKey: string;
+    original: string;
+}
 
 const Location = {
     /**
@@ -43,11 +49,11 @@ const Location = {
      * @param {string} province - The name of the province to filter cities by
      * @returns {Promise<string[]>} A promise that resolves to an array of unique city names in the province
      */
-    async getCitiesByProvince(province: string): Promise<string[]> {
+    async getCitiesByProvince(provinceSlug: string): Promise<string[]> {
         const allRaw = await this.getAllRaw()
 
         const cities = allRaw
-            .filter(x => x.id === province)
+            .filter(x => x.id === provinceSlug)
             .flatMap(x => x.value)
             .filter((v, i, a) => a.indexOf(v) === i)
 
@@ -59,14 +65,18 @@ const Location = {
      * @param {string} query - The search query to match against province names
      * @returns {Promise<string[]>} A promise that resolves to an array of matching province names
      */
-    async searchProvince(query: string): Promise<string[]> {
+    async searchProvince(query: string): Promise<SearchObject> {
         const allProvinces = await this.getProvinces()
 
-        const searcher = new FuzzySearch(allProvinces);
+        const searchObj: SearchObject[] = allProvinces.map(x => {
+            return { searchKey: SholatKuServiceHelper.slugify(x), original: x }
+        })
 
-        const res = searcher.search(query)
+        const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
-        return res
+        const res = searcher.search(SholatKuServiceHelper.slugify(query))
+
+        return res?.[0]
     },
 
     /**
@@ -75,14 +85,18 @@ const Location = {
      * @param {string} query - The search query to match against city names
      * @returns {Promise<string[]>} A promise that resolves to an array of matching city names
      */
-    async searchCity(province: string, query: string) {
+    async searchCity(province: string, query: string): Promise<SearchObject> {
         const allCities = await this.getCitiesByProvince(province)
 
-        const searcher = new FuzzySearch(allCities);
+        const searchObj: SearchObject[] = allCities.map(x => {
+            return { searchKey: SholatKuServiceHelper.slugify(x), original: x}
+        })
 
-        const res = searcher.search(query)
+        const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
-        return res
+        const res = searcher.search(SholatKuServiceHelper.slugify(query))
+
+        return res?.[0]
     }
 }
 

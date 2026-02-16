@@ -15,13 +15,14 @@ export default {
                 if (action[2] == "province") {
                     const provinceValue = interaction.fields.getTextInputValue("province");
 
-                    const provinceResults = await SholatKuService.Database.Location.searchProvince(provinceValue);
-                    if (provinceResults.length === 0) {
+                    const provinceResult = await SholatKuService.Database.Location.searchProvince(provinceValue);
+                    if (!provinceResult) {
+                        console.log(`[${tags.Debug}] Cannot find province matching user input: ${provinceValue}`);
                         // not found
                         return
                     }
 
-                    const provinceFinal = provinceResults?.[0];
+                    const provinceFinal = provinceResult.original
                     const provinceFinalFormmated = SholatKuServiceHelper.normalizeOutput(provinceFinal);
 
                     const user = await SholatKuService.User().resolveUser({
@@ -85,14 +86,14 @@ export default {
                     }
                     const provinceFormmated = SholatKuServiceHelper.normalizeOutput(province);
 
-                    const cityResults = await SholatKuService.Database.Location.searchCity(province, cityValue);
+                    const cityResult = await SholatKuService.Database.Location.searchCity(province, cityValue);
 
-                    if (cityResults.length === 0) {
+                    if (!cityResult) {
                         // not found
                         return
                     }
 
-                    const cityFinal = cityResults?.[0];
+                    const cityFinal = cityResult.original;
                     const cityFinalFormmated = SholatKuServiceHelper.normalizeOutput(cityFinal);
 
                     // await DiscordService.User(interaction.user.id).Preferences.City.set(cityFinal);

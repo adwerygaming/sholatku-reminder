@@ -42,6 +42,12 @@ const SholatKuServiceHelper = {
      */
     normalizeOutput(input: string): string {
         return input.replace(/_/g, ' ')
+    },
+
+    slugify(str: string) {
+        return str
+            .toLowerCase()
+            .replace(/[.\s_]+/g, '')
     }
 }
 
