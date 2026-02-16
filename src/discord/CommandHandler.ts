@@ -9,11 +9,11 @@ import { _dirname } from '../utils/Path.js';
 import tags from '../utils/Tags.js';
 import client from './Client.js';
 
-const BotToken = env.DISCORD_TOKEN!;
-const ClientID = env.DISCORD_CLIENT_ID!;
+const BotToken = env.DISCORD_TOKEN;
+const ClientID = env.DISCORD_CLIENT_ID;
 
 if (!BotToken || !ClientID) {
-    throw new Error('⚠️ DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment');
+    throw new Error('DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment');
 }
 
 const srcDir = path.join(_dirname);
@@ -21,6 +21,7 @@ const srcDir = path.join(_dirname);
 interface LoadSlashCommandsGroupData {
     name: string,
     description: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: any[]
 }
 
@@ -259,9 +260,11 @@ export class CommandHandler {
             const msg = 'There was an error handling this dropdown.';
 
             try {
-                interaction.replied || interaction.deferred
-                    ? await interaction.followUp({content: msg, flags: MessageFlags.Ephemeral})
-                    : await interaction.reply({content: msg, flags: MessageFlags.Ephemeral});
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: msg, flags: MessageFlags.Ephemeral })
+                } else {
+                    await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
+                }
             } catch (e) {
                 console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
             }
@@ -288,10 +291,13 @@ export class CommandHandler {
         } catch (err) {
             console.error(`[${tags.CommandRegister}] Error handling button ${interaction.customId}:`, err);
             const msg = 'There was an error handling this button.';
+
             try {
-                interaction.replied || interaction.deferred
-                    ? await interaction.followUp({content: msg, flags: MessageFlags.Ephemeral})
-                    : await interaction.reply({content: msg, flags: MessageFlags.Ephemeral});
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: msg, flags: MessageFlags.Ephemeral })
+                } else {
+                    await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
+                }
             } catch (e) {
                 console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
             }
@@ -323,9 +329,11 @@ export class CommandHandler {
             const msg = 'There was an error handling this modal.';
 
             try {
-                interaction.replied || interaction.deferred
-                    ? await interaction.followUp({ content: msg, flags: MessageFlags.Ephemeral })
-                    : await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({ content: msg, flags: MessageFlags.Ephemeral })
+                } else {
+                    await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
+                }
             } catch (e) {
                 console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
             }
