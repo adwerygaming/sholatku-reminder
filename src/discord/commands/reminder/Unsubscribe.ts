@@ -5,8 +5,8 @@ import { SholatkuUserProvider } from "../../../types/SholatKu.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()
-        .setName("subscribe")
-        .setDescription("Subsribe to prayer reminders."),
+        .setName("unsubscribe")
+        .setDescription("Unsubsribe from prayer reminders."),
     execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
         const user = await SholatKuService.User().resolveUser({
             provider: SholatkuUserProvider.Discord,
