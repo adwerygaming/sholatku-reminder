@@ -35,7 +35,7 @@ export class SholatKuEmitter extends EventEmitter {
 
 export const sholatKuEmitter = new SholatKuEmitter();
 
-async function annouce(payload: PrayerEventPayload) {
+async function annouce(payload: PrayerEventPayload, message: string) {
     // const users: SholatkuUser[] = payload.users.map((u) => u)
     const providerTYpe = payload.users[0].provider
 
@@ -60,7 +60,7 @@ async function annouce(payload: PrayerEventPayload) {
         }
 
         await channel.send({
-            content: `It's time for **${payload.event.eventName}** prayer in **${payload.city}, ${payload.province}**.`
+            content: `${message ?? "sample text"}`
         })
     }
 }
@@ -68,7 +68,20 @@ async function annouce(payload: PrayerEventPayload) {
 sholatKuEmitter.on(PrayerEvent.PrayerTime, async (payload) => {
     console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 
-    annouce(payload)
+    const eventName = payload.event.eventName
+    const timeNow = moment().format("HH:mm:ss")
+
+    if (eventName == "terbit") {
+        annouce(payload, `**The Sun has risen.**\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+        return
+    } else if (eventName == "imsak") {
+        annouce(payload, `Time for **Imsyakiyah**.\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+        return
+    } else if (eventName == "dhuha") {
+        annouce(payload, `**Dhuha** prayer has started.\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+    } else {
+        annouce(payload, `It's time for **${payload.event.eventName}**\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+    }
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
@@ -83,7 +96,7 @@ sholatKuEmitter.on(PrayerEvent.PrayerIn30m, async (payload) => {
     console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
-await DatabaseClient.table("users").deleteAll()
+// await DatabaseClient.table("users").deleteAll()
 await DatabaseClient.table("prayer_state").deleteAll()
 await DatabaseClient.table("user_prayer_state").deleteAll()
 
