@@ -48,7 +48,16 @@ const SholatKuServiceHelper = {
         return str
             .toLowerCase()
             .replace(/[.\s_]+/g, '')
+    },
+
+    capitalizeWords(str: string) {
+        return str
+            .toLowerCase()
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
     }
+
 }
 
 export default SholatKuServiceHelper

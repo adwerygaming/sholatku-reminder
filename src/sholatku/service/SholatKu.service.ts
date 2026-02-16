@@ -103,6 +103,8 @@ const SholatKuService = {
 
         const PrayerState = this.Database.PrayerState(province, city)
 
+        console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.mss")}`)
+
         for (let i = 0; i < prayerToday.length; i++) {
             const res = prayerToday[i];
             const next = prayerToday[i + 1]

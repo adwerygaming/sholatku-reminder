@@ -5,6 +5,7 @@ import SholatKuServiceHelper from '../helper/Helper.service.js';
 interface SearchObject {
     searchKey: string;
     original: string;
+    databaseKey: string;
 }
 
 const Location = {
@@ -69,7 +70,11 @@ const Location = {
         const allProvinces = await this.getProvinces()
 
         const searchObj: SearchObject[] = allProvinces.map(x => {
-            return { searchKey: SholatKuServiceHelper.slugify(x), original: x }
+            return { 
+                searchKey: SholatKuServiceHelper.slugify(x), 
+                databaseKey: x, 
+                original: SholatKuServiceHelper.normalizeOutput(x) 
+            }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
@@ -85,11 +90,11 @@ const Location = {
      * @param {string} query - The search query to match against city names
      * @returns {Promise<string[]>} A promise that resolves to an array of matching city names
      */
-    async searchCity(province: string, query: string): Promise<SearchObject> {
+    async searchCity(province: string, query: string): Promise<Omit<SearchObject, 'databaseKey'>> {
         const allCities = await this.getCitiesByProvince(province)
 
-        const searchObj: SearchObject[] = allCities.map(x => {
-            return { searchKey: SholatKuServiceHelper.slugify(x), original: x}
+        const searchObj: Omit<SearchObject, 'databaseKey'>[] = allCities.map(x => {
+            return { searchKey: SholatKuServiceHelper.slugify(x), original: x }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);

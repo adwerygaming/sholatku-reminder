@@ -1,16 +1,24 @@
-import moment from "moment-timezone";
+import moment, { Moment } from "moment-timezone";
 import EventEmitter from "node:events";
-import DatabaseClient from "../database/DatabaseClient.js";
 import client from "../discord/Client.js";
 import { PrayerEvent, SholatkuUser, SholatkuUserProvider } from "../types/SholatKu.types.js";
 import tags from "../utils/Tags.js";
 import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
+import SholatKuServiceHelper from "./service/helper/Helper.service.js";
 
 type PrayerEventPayload = {
-  event: CheckPrayerEvent;
-  province: string;
-  city: string;
-  users: SholatkuUser[];
+    event: CheckPrayerEvent;
+    province: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    city: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    users: SholatkuUser[];
 };
 
 type EventMap = {
@@ -66,39 +74,63 @@ async function annouce(payload: PrayerEventPayload, message: string) {
 }
 
 sholatKuEmitter.on(PrayerEvent.PrayerTime, async (payload) => {
-    console.log(`[Emitter] Prayer Time Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+    console.log(`[${tags.PrayerService}] Prayer Time Event for ${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 
     const eventName = payload.event.eventName
     const timeNow = moment().format("HH:mm:ss")
+    const provinceName = payload.province.original
+    const cityName = payload.city.original
 
     if (eventName == "terbit") {
-        annouce(payload, `**The Sun has risen.**\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
-        return
+        annouce(payload, `**The Sun has risen.**\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else if (eventName == "imsak") {
-        annouce(payload, `Time for **Imsyakiyah**.\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
-        return
+        annouce(payload, `Time for **Imsyakiyah**.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else if (eventName == "dhuha") {
-        annouce(payload, `**Dhuha** prayer has started.\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+        annouce(payload, `**Dhuha** prayer has started.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else {
-        annouce(payload, `It's time for **${payload.event.eventName}**\n-# ${payload.province}, ${payload.city} - ${timeNow}`)
+        annouce(payload, `It's time for **${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)}**\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     }
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
-    console.log(`[Emitter] Prayer In 5 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+    console.log(`[${tags.PrayerService}] Prayer In 5 Minutes Event for ${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+
+    const eventName = payload.event.eventName
+    const timeNow = moment().format("HH:mm:ss")
+    const provinceName = payload.province.original
+    const cityName = payload.city.original
+
+    if (eventName == "terbit") {
+        annouce(payload, `**The Sun will rise in 5 minutes at ${payload.event.time.format("HH:mm:ss")}.**\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    } else if (eventName == "imsak") {
+        annouce(payload, `**Imsyakiyah** will begin in 5 minutes at ${payload.event.time.format("HH:mm:ss")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    } else {
+        annouce(payload, `**${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)}** prayer will start in 5 minutes at ${payload.event.time.format("HH:mm:ss")}\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    }
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn15m, async (payload) => {
-    console.log(`[Emitter] Prayer In 15 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+    console.log(`[${tags.PrayerService}] Prayer In 15 Minutes Event for ${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+
+    const eventName = payload.event.eventName
+    const timeNow = moment().format("HH:mm:ss")
+    const provinceName = payload.province.original
+    const cityName = payload.city.original
+
+    if (eventName == "imsak") {
+        annouce(payload, `**Imsyakiyah** will begin in 15 minutes at ${payload.event.time.format("HH:mm:ss")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    } else {
+        annouce(payload, `**${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)}** prayer will start in 15 minutes at ${payload.event.time.format("HH:mm:ss")}\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    }
 });
 
 sholatKuEmitter.on(PrayerEvent.PrayerIn30m, async (payload) => {
-    console.log(`[Emitter] Prayer In 30 Minutes Event for ${payload.event.eventName} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
+    console.log(`[${tags.PrayerService}] Prayer In 30 Minutes Event for ${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)} in ${payload.city}, ${payload.province} for users: ${payload.users.map(u => u.id).join(", ")}`);
 });
 
 // await DatabaseClient.table("users").deleteAll()
-await DatabaseClient.table("prayer_state").deleteAll()
-await DatabaseClient.table("user_prayer_state").deleteAll()
+// await DatabaseClient.table("prayer_state").deleteAll()
+// await DatabaseClient.table("user_prayer_state").deleteAll()
 
 // const provTest = "yogya"
 // const cityTest = "gunung"
@@ -115,7 +147,12 @@ setInterval(async () => {
 await check()
 
 async function check() {
-    const debugTime = moment("11:50", "HH:mm")
+    let debugTime: Moment | undefined
+    const useDebugTime = false
+
+    if (useDebugTime) {
+        debugTime = moment("11:50", "HH:mm")
+    }
 
     const users = await SholatKuService.User().getAll()
     const meong = new Map<string, SholatkuUser[]>()
@@ -143,6 +180,7 @@ async function check() {
         const locationKeyRaw = res[0]
         const users = res[1]
 
+        // database key format
         const [province, city] = locationKeyRaw.split("-")
 
         if (!province || !city) continue;
@@ -150,6 +188,9 @@ async function check() {
         const check = await SholatKuService.checkPrayer({ province, city, debugTime })
 
         if (!check) continue;
+
+        const provinceFinal = await SholatKuService.Database.Location.searchProvince(province)
+        const cityFinal = await SholatKuService.Database.Location.searchCity(provinceFinal.databaseKey, city)
 
         for (let k = 0; k < check.length; k++) {
             const event = check[k];
@@ -159,8 +200,16 @@ async function check() {
             // do whatever with the event
             await sholatKuEmitter.emit(event.type, {
                 event,
-                province,
-                city,
+                province: {
+                    databaseKey: province,
+                    original: provinceFinal?.original,
+                    searchKey: provinceFinal.searchKey
+                },
+                city: {
+                    databaseKey: city,
+                    original: cityFinal.original,
+                    searchKey: cityFinal.searchKey
+                },
                 users
             })
 
