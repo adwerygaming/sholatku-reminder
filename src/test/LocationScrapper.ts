@@ -2,11 +2,14 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { QuickDB } from "quick.db";
+import { fileURLToPath } from "url";
 import SholatKuServiceHelper from "../sholatku/service/helper/Helper.service.js";
-import { _dirname } from "../utils/Path.js";
 import { sleep } from "../utils/Sleep.js";
 
-const locationPath = path.join(_dirname, "..", "assets", "locations")
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const locationPath = path.join(__dirname, "..", "assets", "locations")
 
 function getProvincesList() {
     const filePath = path.join(locationPath, "provinces.json")

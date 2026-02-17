@@ -2,10 +2,9 @@
 import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, ModalSubmitInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import type { ButtonLayout, DropdownLayout, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
 import { env } from '../utils/EnvManager.js';
-import { _dirname } from '../utils/Path.js';
 import tags from '../utils/Tags.js';
 import client from './Client.js';
 
@@ -16,7 +15,10 @@ if (!BotToken || !ClientID) {
     throw new Error('DISCORD_TOKEN and DISCORD_CLIENT_ID must be set in your environment');
 }
 
-const srcDir = path.join(_dirname);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const srcDir = path.join(__dirname);
 
 interface LoadSlashCommandsGroupData {
     name: string,
@@ -32,7 +34,7 @@ export class CommandHandler {
     private readonly buttons = new Collection<string, ButtonLayout>();
     private readonly commandData: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
-    public async loadCommands(dir = path.join(srcDir, "discord", "commands")): Promise<void> {
+    public async loadCommands(dir = path.join(srcDir, "commands")): Promise<void> {
         const commandFiles = fs.readdirSync(dir);
 
         for (const file of commandFiles) {
@@ -77,7 +79,7 @@ export class CommandHandler {
         }
     }
 
-    public async loadDropdowns(dir = path.join(srcDir, "discord", "dropdowns")): Promise<void> {
+    public async loadDropdowns(dir = path.join(srcDir, "dropdowns")): Promise<void> {
         if (!fs.existsSync(dir)) {
             console.log(`[${tags.CommandImporter}] Dropdowns directory not found, skipping...`);
             return;
@@ -104,7 +106,7 @@ export class CommandHandler {
         }
     }
 
-    public async loadButtons(dir = path.join(srcDir, "discord", "buttons")): Promise<void> {
+    public async loadButtons(dir = path.join(srcDir, "buttons")): Promise<void> {
         if (!fs.existsSync(dir)) {
             console.log(`[${tags.CommandImporter}] Buttons directory not found—skipping.`);
             return;
@@ -130,7 +132,7 @@ export class CommandHandler {
         }
     }
 
-    public async loadModals(dir = path.join(srcDir, "discord", "modals")): Promise<void> {
+    public async loadModals(dir = path.join(srcDir, "modals")): Promise<void> {
         if (!fs.existsSync(dir)) {
             console.log(`[${tags.CommandImporter}] Modals directory not found, skipping...`);
             return;
