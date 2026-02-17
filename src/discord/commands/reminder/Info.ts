@@ -1,18 +1,18 @@
-import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, Colors, ContainerBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, Client, Colors, ContainerBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import SholatKuService from "../../../sholatku/service/SholatKu.service.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
 import { SholatkuUserProvider } from "../../../types/SholatKu.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()
-        .setName("unsubscribe")
-        .setDescription("Unsubsribe from prayer reminders."),
+        .setName("info")
+        .setDescription("Check your prayer reminder configurations."),
     execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
         const user = await SholatKuService.User().resolveUser({
             provider: SholatkuUserProvider.Discord,
             user: interaction.user
         })
- 
+
         const check = await SholatKuService.User(user).isRegistered()
 
         if (!check) {
@@ -23,7 +23,10 @@ export default {
                 )
                 .addSeparatorComponents((sep) => sep)
                 .addTextDisplayComponents(
-                    (text) => text.setContent("**You don't have active subscription.**"),
+                    (text) => text.setContent("Currently, **You are not subscribed to prayer reminders.**"),
+                )
+                .addTextDisplayComponents(
+                    (text) => text.setContent("Start now by using `/reminder subscribe` command."),
                 )
 
             await interaction.reply({
@@ -34,29 +37,24 @@ export default {
             return
         }
 
-        const proceedBtn = new ButtonBuilder()
-            .setCustomId(`reminder_${interaction.user.id}_unsubscribe_yes`)
-            .setLabel("Yes, Unsubscribe")
-            .setStyle(ButtonStyle.Primary)
+        const provinceNormalized = await SholatKuService.Helper.normalizeOutput(user.location?.province || "Unknown Province");
+        const cityNormalized = await SholatKuService.Helper.normalizeOutput(user.location?.city || "Unknown City");
 
-        const cancelBtn = new ButtonBuilder()
-            .setCustomId(`reminder_${interaction.user.id}_unsubscribe_cancel`)
-            .setLabel("Abort")
-            .setStyle(ButtonStyle.Secondary)
-
-        const confirmationContainer = new ContainerBuilder()
-            .setAccentColor(Colors.Blurple)
+        const okContainer = new ContainerBuilder()
+            .setAccentColor(Colors.Green)
             .addTextDisplayComponents(
                 (text) => text.setContent("### Prayer Reminder Subscription"),
             )
             .addSeparatorComponents((sep) => sep)
             .addTextDisplayComponents(
-                (text) => text.setContent("Are you sure want to unsubscribe from prayer reminders? You can subscribe again anytime."),
+                (text) => text.setContent(`You are currently subscribed to prayer reminders for **${provinceNormalized}, ${cityNormalized}.**`),
             )
-            .addActionRowComponents((row) => row.addComponents(proceedBtn, cancelBtn))
+            .addTextDisplayComponents(
+                (text) => text.setContent("We will send you prayer reminders **every day** and **5 minutes**, **15 minutes**, **30 minutes** before each prayer time."),
+            )
 
         await interaction.reply({
-            components: [confirmationContainer],
+            components: [okContainer],
             flags: [MessageFlags.IsComponentsV2]
         })
     }
