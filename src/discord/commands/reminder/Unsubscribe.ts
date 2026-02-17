@@ -12,7 +12,8 @@ export default {
             provider: SholatkuUserProvider.Discord,
             user: interaction.user
         })
-        const check = SholatKuService.User(user).isRegistered()
+
+        const check = await SholatKuService.User(user).isRegistered()
 
         if (!check) {
             const noContainer = new ContainerBuilder()

@@ -7,7 +7,7 @@ import tags from "../../utils/Tags.js";
 
 export default {
     id: "reminder",
-    async execute(client, interaction, data) {
+    async execute(_client, interaction, data) {
         const action = data;
 
         if (action[0] == "subscribe") {

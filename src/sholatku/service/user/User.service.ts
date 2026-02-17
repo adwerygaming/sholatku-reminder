@@ -111,7 +111,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
              * @returns {Promise<void>} Resolves when the user is removed
              */
             async unregister(): Promise<void> {
-                await db.delete(`${userId}`)
+                await db.delete(`${userId}.location`)
             },
 
             /**
@@ -120,7 +120,8 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
              * @returns {Promise<SholatkuUser | null>} SholatkuUser object if found, or null if not found.
              */
             async get(): Promise<SholatkuUser | null> {
-                return await db.get<SholatkuUser>(`${userId}`)
+                const user = await db.get<SholatkuUser>(`${userId}`)
+                return user
             },
 
             /**
@@ -129,7 +130,8 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
              * @returns {Promise<boolean>} True if the user is registered, false if not.
              */
             async isRegistered(): Promise<boolean> {
-                return !!(await db.get<SholatkuUser>(`${userId}`))
+                const user = await db.get<SholatkuUser>(`${userId}`)
+                return user?.location ? true : false
             }
         }
     }

@@ -2,14 +2,20 @@ import { ButtonBuilder, LabelBuilder, ModalBuilder, TextInputBuilder } from "@di
 import { ButtonStyle, Colors, ContainerBuilder, MessageFlags, TextInputStyle } from "discord.js";
 import SholatKuService from "../../sholatku/service/SholatKu.service.js";
 import { ButtonLayout } from "../../types/Discord.types.js";
+import { SholatkuUserProvider } from "../../types/SholatKu.types.js";
+import tags from "../../utils/Tags.js";
 
 export default {
     id: "reminder",
-    async execute(client, interaction, data) {
+    async execute(_client, interaction, data) {
         const action = data;
+
+        console.log(action)
 
         if (action[0] == "subscribe") {
             if (action[1] == "start") {
+                await interaction.deferUpdate();
+
                 const provinces = await SholatKuService.Database.Location.getProvinces();
                 const formmatedProvinces = provinces.map((province, i) => `[${i + 1}] **${SholatKuService.Helper.normalizeOutput(province)}**`).join('\n');
 
@@ -38,7 +44,7 @@ export default {
                     .addSeparatorComponents((sep) => sep)
                     .addActionRowComponents((row) => row.addComponents(provinceAnswerModalBtn, cancelBtn))
 
-                await interaction.update({
+                await interaction.editReply({
                     components: [askProvince],
                     flags: [MessageFlags.IsComponentsV2]
                 });
@@ -81,6 +87,58 @@ export default {
                     modal.addLabelComponents(cityLabel);
 
                     await interaction.showModal(modal);
+                }
+            }
+        } else if (action[0] == "unsubscribe") {
+            if (action[1] == "yes") {
+                try {
+                    await interaction.deferUpdate();
+
+                    const user = await SholatKuService.User().resolveUser({
+                        provider: SholatkuUserProvider.Discord,
+                        user: interaction.user
+                    })
+
+                    await SholatKuService.User(user).unregister();
+
+                    const successContainer = new ContainerBuilder()
+                        .setAccentColor(Colors.Green)
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("### Prayer Reminder Subscription"),
+                        )
+                        .addSeparatorComponents((sep) => sep)
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("**You have successfully unsubscribed from prayer reminders.**"),
+                        )
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("We won't send you any prayer reminders anymore. You can subscribe again anytime."),
+                        )
+
+                    await interaction.editReply({
+                        components: [successContainer],
+                        flags: [MessageFlags.IsComponentsV2]
+                    })
+                } catch (e) {
+                    console.log(`[${tags.Error}] Failed to unsubscribe user ID: ${interaction.user.id} from prayer reminders.`)
+                    console.error(e);
+
+                    const errorContainer = new ContainerBuilder()
+                        .setAccentColor(Colors.DarkRed)
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("### Prayer Reminder Subscription"),
+                        )
+                        .addSeparatorComponents((sep) => sep)
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("**An error occurred while trying to unsubscribe you from prayer reminders.**"),
+                        )
+                        .addTextDisplayComponents(
+                            (text) => text.setContent("Please try again later."),
+                        )
+
+                    await interaction.editReply({
+                        components: [errorContainer],
+                        flags: [MessageFlags.IsComponentsV2]
+                    })
                 }
             }
         }
