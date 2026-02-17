@@ -101,9 +101,9 @@ sholatKuEmitter.on(PrayerEvent.PrayerIn5m, async (payload) => {
     const cityName = payload.city.original
 
     if (eventName == "terbit") {
-        annouce(payload, `**The Sun will rise in 5 minutes at ${payload.event.time.format("HH:mm:ss")}.**\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+        annouce(payload, `**The Sun will rise in 5 minutes at ${payload.event.time.format("HH:mm")}.**\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else if (eventName == "imsak") {
-        annouce(payload, `**Imsyakiyah** will begin in 5 minutes at ${payload.event.time.format("HH:mm:ss")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+        annouce(payload, `**Imsyakiyah** will begin in 5 minutes at ${payload.event.time.format("HH:mm")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else {
         annouce(payload, `**${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)}** prayer will start in 5 minutes at ${payload.event.time.format("HH:mm:ss")}\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     }
@@ -117,8 +117,10 @@ sholatKuEmitter.on(PrayerEvent.PrayerIn15m, async (payload) => {
     const provinceName = payload.province.original
     const cityName = payload.city.original
 
-    if (eventName == "imsak") {
-        annouce(payload, `**Imsyakiyah** will begin in 15 minutes at ${payload.event.time.format("HH:mm:ss")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
+    if (eventName == "terbit") {
+        return
+    } else if (eventName == "imsak") {
+        annouce(payload, `**Imsyakiyah** will begin in 15 minutes at ${payload.event.time.format("HH:mm")}.\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     } else {
         annouce(payload, `**${SholatKuServiceHelper.capitalizeWords(payload.event.eventName)}** prayer will start in 15 minutes at ${payload.event.time.format("HH:mm:ss")}\n-# ${provinceName}, ${cityName} - ${timeNow}`)
     }
