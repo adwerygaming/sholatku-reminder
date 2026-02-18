@@ -3,8 +3,8 @@ import DatabaseClient from "../../../database/DatabaseClient.js"
 import SholatKuService from "../SholatKu.service.js"
 
 export class PrayerState {
-    private readonly province: string | undefined
-    private readonly city: string | undefined
+    private readonly province: string
+    private readonly city: string
 
     constructor(
         province: string,

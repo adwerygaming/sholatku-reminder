@@ -4,7 +4,7 @@ import client from "../discord/Client.js";
 import { PrayerEvent, SholatkuUser, SholatkuUserProvider } from "../types/SholatKu.types.js";
 import tags from "../utils/Tags.js";
 import SholatKuService, { CheckPrayerEvent } from "./service/SholatKu.service.js";
-import SholatKuServiceHelper from "./service/helper/Helper.service.js";
+import SholatKuServiceHelper from "./service/helper/Helper.js";
 
 type PrayerEventPayload = {
     event: CheckPrayerEvent;

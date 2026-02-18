@@ -1,12 +1,12 @@
 import axios from "axios"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/PrayerTimeData.types.js"
+import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
 import { BaseLocation, PrayerEvent } from "../../types/SholatKu.types.js"
 import tags from "../../utils/Tags.js"
-import SholatKuServiceDatabase from "./database/Database.service.js"
-import SholatKuServiceHelper from "./helper/Helper.service.js"
-import { SholatKuServiceUser } from "./user/User.service.js"
+import SholatKuServiceDatabase from "./database/Database.js"
+import SholatKuServiceHelper from "./helper/Helper.js"
+import { SholatKuServiceUser } from "./user/UserAccount.js"
 
 export interface CheckPrayerProps extends BaseLocation {
     debugTime?: moment.Moment

@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { QuickDB } from "quick.db";
 import { fileURLToPath } from "url";
-import SholatKuServiceHelper from "../sholatku/service/helper/Helper.service.js";
+import SholatKuServiceHelper from "../sholatku/service/helper/Helper.js";
 import { sleep } from "../utils/Sleep.js";
 
 const __filename = fileURLToPath(import.meta.url);

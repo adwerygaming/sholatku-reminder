@@ -1,12 +1,14 @@
 import FuzzySearch from 'fuzzy-search';
 import LocationDatabaseClient from "../../../database/LocationDatabaseClient.js";
-import SholatKuServiceHelper from '../helper/Helper.service.js';
+import SholatKuServiceHelper from '../helper/Helper.js';
 
 interface SearchObject {
     searchKey: string;
     original: string;
     databaseKey: string;
 }
+
+
 
 const Location = {
     async getAllRaw() {
