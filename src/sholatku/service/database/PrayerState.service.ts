@@ -2,14 +2,6 @@ import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
 import SholatKuService from "../SholatKu.service.js"
 
-/**
- * Creates a prayer state service for a specific location.
- * Provides helpers to read and update whether a prayer event for the day
- * has already been processed or acknowledged.
- *
- * @param {string} province - Province name (normalized internally)
- * @param {string} city - City name (normalized internally)
- */
 export default function PrayerState(province: string, city: string) {
     province = SholatKuService.Helper.normalizeInput(province)
     city = SholatKuService.Helper.normalizeInput(city)

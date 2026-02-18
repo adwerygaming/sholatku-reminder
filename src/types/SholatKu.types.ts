@@ -1,3 +1,5 @@
+import { User } from "discord.js"
+
 export interface BaseLocation {
     province: string
     city: string
@@ -7,32 +9,29 @@ export interface Location extends BaseLocation {
     lastUpdatedAt: string
 }
 
-/**
- * Detailed user information 
- */
 export interface BaseUser {
     id: string // universinal id ({provider}-{uniqueId})
     lastUpdatedAt?: string
-    provider: SholatkuUserProvider
+    provider: UserProvider
     location?: Location
 }
 
-export type SholatkuUser = SholatkuDiscordUser | SholatkuWhatsAppUser
+export type SholatkuUser = DiscordUserAccount | WhatsAppUserAccount
 
-export interface SholatkuDiscordUser extends BaseUser {
-    provider: SholatkuUserProvider.Discord
-    discordId: string
-    displayName: string
-    username: string
+export interface DiscordUserAccount extends BaseUser {
+    provider: UserProvider.Discord
+    discordId: User["id"]
+    displayName: User["displayName"]
+    username: User["username"]
 }
 
-export interface SholatkuWhatsAppUser extends BaseUser {
-    provider: SholatkuUserProvider.WhatsApp
-    phoneNumber: string
-    displayName: string
+export interface WhatsAppUserAccount extends BaseUser {
+    provider: UserProvider.WhatsApp
+    phoneNumber: WhatsAppUser["phoneNumber"]
+    displayName: WhatsAppUser["displayName"]
 }
 
-export enum SholatkuUserProvider {
+export enum UserProvider {
     Discord = "discord",
     WhatsApp = "whatsapp"
 }
