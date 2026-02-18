@@ -8,8 +8,6 @@ interface SearchObject {
     databaseKey: string;
 }
 
-
-
 const Location = {
     async getAllRaw() {
         const allRaw = await LocationDatabaseClient.all<string[]>()

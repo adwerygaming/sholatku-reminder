@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import SholatKuService from "../SholatKu.service.js"
+import Helper from "../helper/Helper.js"
 
 export class PrayerState {
     private readonly province: string
@@ -11,8 +11,8 @@ export class PrayerState {
         city: string,
         private readonly db = DatabaseClient.table("prayer_state")
     ) {
-        this.province = SholatKuService.Helper.normalizeInput(province)
-        this.city = SholatKuService.Helper.normalizeInput(city)
+        this.province = Helper.normalizeInput(province)
+        this.city = Helper.normalizeInput(city)
     }
 
     private getDayIdentifier(): string {

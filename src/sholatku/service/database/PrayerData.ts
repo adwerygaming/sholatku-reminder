@@ -1,6 +1,7 @@
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import { Imsakiyah } from "../../../types/Prayer.types.js"
+import { PrayerTimeData } from "../../../types/Prayer.types.js"
 import tags from "../../../utils/Tags.js"
+import Helper from "../helper/Helper.js"
 import SholatKuService from "../SholatKu.service.js"
 
 export class PrayerData {
@@ -12,13 +13,13 @@ export class PrayerData {
         city: string,
         private readonly db = DatabaseClient.table("prayer_data")
     ) {
-        this.province = SholatKuService.Helper.normalizeInput(province)
-        this.city = SholatKuService.Helper.normalizeInput(city)
+        this.province = Helper.normalizeInput(province)
+        this.city = Helper.normalizeInput(city)
     }
 
-    async get(): Promise<Imsakiyah[] | null> {
+    async get(): Promise<PrayerTimeData[] | null> {
         console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
-        const res: Imsakiyah[] | null = await this.db.get(`${this.province}.${this.city}`)
+        const res: PrayerTimeData[] | null = await this.db.get(`${this.province}.${this.city}`)
 
         //! if get no data, try passing non normalize input for both province and city.
         if (!res) {
@@ -28,14 +29,14 @@ export class PrayerData {
                 return null
             }
 
-            await SholatKuService.Database.PrayerData(this.province, this.city).set(data)
+            await this.set(data)
             return data
         }
 
         return res
     }
 
-    async set(data: Imsakiyah[]): Promise<void> {
+    async set(data: PrayerTimeData[]): Promise<void> {
         await this.db.set(`${this.province}.${this.city}`, data)
     }
 }

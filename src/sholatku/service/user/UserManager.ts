@@ -1,16 +1,8 @@
-import { User } from "discord.js"
 import moment from "moment-timezone"
 import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../../database/DatabaseClient.js"
-import { Location, SholatkuUser, UserProvider, WhatsAppUser } from "../../../types/SholatKu.types.js"
-
-export type SholatkuUnionUser = {
-    provider: UserProvider.Discord,
-    user: User
-} | {
-    provider: UserProvider.WhatsApp,
-    user: WhatsAppUser
-}
+import { Location } from "../../../types/Location.types.js"
+import { SholatkuUnionUser, SholatkuUser, UserProvider } from "../../../types/Users.types.js"
 
 // has no user
 export class UserManager {

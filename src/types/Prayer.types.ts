@@ -11,9 +11,10 @@ export interface APIResponseData {
   kabkota: string
   hijriah: string
   masehi: string
-  imsakiyah: PrayerTimeData[]
+  imsakiyah: PrayerTimeData[] 
 }
 
+// previously Imsakiyah
 export interface PrayerTimeData {
   tanggal: number
   imsak: string

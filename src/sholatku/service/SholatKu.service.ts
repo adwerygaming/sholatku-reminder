@@ -1,12 +1,9 @@
 import axios from "axios"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { Imsakiyah, ImsakiyahResponse, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
-import { BaseLocation, PrayerEvent } from "../../types/SholatKu.types.js"
+import { BaseLocation } from "../../types/Location.types.js"
+import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
-import SholatKuServiceDatabase from "./database/Database.js"
-import SholatKuServiceHelper from "./helper/Helper.js"
-import { SholatKuServiceUser } from "./user/UserAccount.js"
 
 export interface CheckPrayerProps extends BaseLocation {
     debugTime?: moment.Moment
@@ -19,10 +16,6 @@ export interface CheckPrayerEvent {
 }
 
 const SholatKuService = {
-    Database: SholatKuServiceDatabase,
-    Helper: SholatKuServiceHelper,
-    User: SholatKuServiceUser,
-
     Prayer: {
         async getLocations(): Promise<BaseLocation[]> {
             const usersRaw = await DatabaseClient.table("users").all()

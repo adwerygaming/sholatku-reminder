@@ -1,4 +1,5 @@
 import { User } from "discord.js"
+import { Location } from "./Location.types.js"
 import { WhatsAppUser } from "./SholatKu.types.js"
 
 export interface BaseUser {
