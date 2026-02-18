@@ -159,6 +159,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
 
             return obj
         },
+
         /**
          * Find multiple SholatkuUser by their location (province & city).
          * @async
@@ -175,6 +176,7 @@ export function SholatKuServiceUser(user?: SholatkuUser) {
 
             return user
         },
+        
         /**
          * Get all registered SholatkuUser from database.
          * @async
