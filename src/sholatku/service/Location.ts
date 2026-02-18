@@ -1,20 +1,15 @@
 import FuzzySearch from 'fuzzy-search';
-import LocationDatabaseClient from "../../../database/LocationDatabaseClient.js";
-import SholatKuServiceHelper from '../helper/Helper.js';
+import LocationDatabaseClient from "../../database/LocationDatabaseClient.js";
+import { LocationSearchResult } from '../../types/Location.types.js';
+import SholatKuServiceHelper from './Helper.js';
 
-interface SearchObject {
-    searchKey: string;
-    original: string;
-    databaseKey: string;
-}
-
-const Location = {
-    async getAllRaw() {
+export class Location {
+    private async getAllRaw() {
         const allRaw = await LocationDatabaseClient.all<string[]>()
         return allRaw
-    },
+    }
 
-    async getAll() {
+    async fetch() {
         const allRaw = await this.getAllRaw()
         const all = allRaw.map(x => {
             return {
@@ -23,7 +18,7 @@ const Location = {
         })
 
         return all
-    },
+    }
 
     async getProvinces(): Promise<string[]> {
         const allRaw = await this.getAllRaw()
@@ -31,7 +26,7 @@ const Location = {
             .filter((v, i, a) => a.indexOf(v) === i)
 
         return provinces
-    },
+    }
 
     async getCitiesByProvince(provinceSlug: string): Promise<string[]> {
         const allRaw = await this.getAllRaw()
@@ -42,12 +37,12 @@ const Location = {
             .filter((v, i, a) => a.indexOf(v) === i)
 
         return cities
-    },
+    }
 
-    async searchProvince(query: string): Promise<SearchObject> {
+    async searchProvince(query: string): Promise<LocationSearchResult> {
         const allProvinces = await this.getProvinces()
 
-        const searchObj: SearchObject[] = allProvinces.map(x => {
+        const searchObj: LocationSearchResult[] = allProvinces.map(x => {
             return { 
                 searchKey: SholatKuServiceHelper.slugify(x), 
                 databaseKey: x, 
@@ -60,12 +55,12 @@ const Location = {
         const res = searcher.search(SholatKuServiceHelper.slugify(query))
 
         return res?.[0]
-    },
+    }
 
-    async searchCity(province: string, query: string): Promise<Omit<SearchObject, 'databaseKey'>> {
+    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'>> {
         const allCities = await this.getCitiesByProvince(province)
 
-        const searchObj: Omit<SearchObject, 'databaseKey'>[] = allCities.map(x => {
+        const searchObj: Omit<LocationSearchResult, 'databaseKey'>[] = allCities.map(x => {
             return { searchKey: SholatKuServiceHelper.slugify(x), original: x }
         })
 
@@ -76,5 +71,3 @@ const Location = {
         return res?.[0]
     }
 }
-
-export default Location

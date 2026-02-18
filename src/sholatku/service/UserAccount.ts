@@ -1,7 +1,7 @@
 import moment from "moment-timezone"
-import DatabaseClient from "../../../database/DatabaseClient.js"
-import { SholatkuUser } from "../../../types/Users.types.js"
-import SholatKuServiceHelper from "../helper/Helper.js"
+import DatabaseClient from "../../database/DatabaseClient.js"
+import { SholatkuUser } from "../../types/Users.types.js"
+import SholatKuServiceHelper from "./Helper.js"
 
 // has user
 export class UserAccount {

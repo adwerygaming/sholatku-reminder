@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, Colors, ContainerBuilder, MessageFlags } from "discord.js";
-import SholatKuServiceHelper from "../../sholatku/service/helper/Helper.js";
+import SholatKuServiceHelper from "../../sholatku/service/Helper.js";
 import SholatKuService from "../../sholatku/service/SholatKu.service.js";
 import { ModalLayout } from "../../types/Discord.types.js";
 import { SholatkuUserProvider } from "../../types/SholatKu.types.js";

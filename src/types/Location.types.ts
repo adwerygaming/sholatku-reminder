@@ -6,3 +6,9 @@ export interface BaseLocation {
 export interface Location extends BaseLocation {
     lastUpdatedAt: string
 }
+
+export interface LocationSearchResult {
+    searchKey: string;
+    original: string;
+    databaseKey: string;
+}
