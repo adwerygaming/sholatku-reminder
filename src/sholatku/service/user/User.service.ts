@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../../database/DatabaseClient.js"
 import { Location, SholatkuUser, UserProvider, WhatsAppUser } from "../../../types/SholatKu.types.js"
 import SholatKuServiceHelper from "../helper/Helper.service.js"
-import UserPrayerState from "./UserPrayerState.service.js"
 
 export type SholatkuUnionUser = {
     provider: UserProvider.Discord,
@@ -14,49 +13,30 @@ export type SholatkuUnionUser = {
     user: WhatsAppUser
 }
 
-interface UserNoId {
-    register(user: SholatkuUser, location: Location): Promise<SholatkuUser>
-    getByLocation(location: Location): Promise<SholatkuUser[] | undefined>
-    getAll(): Promise<SholatkuUser[]>
-    resolve(u: SholatkuUnionUser): Promise<SholatkuUser>
-}
-
-interface UserWithId {
-    PrayerState: ReturnType<typeof UserPrayerState>
-    getProvince(): Promise<string | null>
-    setProvince(value: string): Promise<void>
-    getCity(): Promise<string | null>
-    setCity(value: string): Promise<void>
-    unregister(): Promise<void>
-    fetch(): Promise<SholatkuUser | null>
-    isRegistered(): Promise<boolean>
-}
-
-export function SholatKuServiceUser(user: SholatkuUser): UserWithId
-export function SholatKuServiceUser(): UserNoId
-
-export function SholatKuServiceUser(user?: SholatkuUser) {
-    const db = DatabaseClient.table("users")
-
-    if (user) {
-        const userId = user.id
-
-        return {
-            PrayerState: UserPrayerState(user),
-
-            
-        }
-    }
-}
-
-export class UserPrayer
-
 // has user
 export class UserAccount {
     constructor(
         private readonly user: SholatkuUser,
-        private readonly db = DatabaseClient.table("users")
+        private readonly db = DatabaseClient.table("users"),
+        private readonly prayerStateDb = DatabaseClient.table("user_prayer_state")
     ) { }
+
+    async getPrayerState(eventName: string): Promise<boolean> {
+        const now = moment()
+        const dayIdentifier = now.format("DD_MM")
+
+        const res = await this.prayerStateDb.get(`${this.user.id}.${dayIdentifier}.${eventName}`)
+
+        return res ? true : false
+    }
+
+    async setPrayerState(eventName: string, value: boolean): Promise<void> {
+        const now = moment()
+        const dayIdentifier = now.format("DD_MM")
+        await this.prayerStateDb.set(`${this.user.id}.${dayIdentifier}.${eventName}`, value)
+    }
+
+    // =======
 
     async getProvince(): Promise<string | null> {
         const res = await this.db.get<string>(`${this.user.id}.location.province`)
