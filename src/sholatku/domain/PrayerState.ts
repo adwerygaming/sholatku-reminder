@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import Helper from "./Helper.js"
+import Helper from "../helper/Helper.js"
 
 export class PrayerState {
     private readonly province: string

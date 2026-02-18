@@ -1,9 +1,9 @@
 import axios from "axios"
 import moment from "moment-timezone"
-import DatabaseClient from "../../database/DatabaseClient.js"
-import { BaseLocation } from "../../types/Location.types.js"
-import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js"
-import tags from "../../utils/Tags.js"
+import DatabaseClient from "../database/DatabaseClient.js"
+import { BaseLocation } from "../types/Location.types.js"
+import { PrayerEvent, PrayerName } from "../types/Prayer.types.js"
+import tags from "../utils/Tags.js"
 
 export interface CheckPrayerProps extends BaseLocation {
     debugTime?: moment.Moment

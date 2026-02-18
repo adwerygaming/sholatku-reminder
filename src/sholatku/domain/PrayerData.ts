@@ -1,8 +1,8 @@
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { PrayerTimeData } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
-import Helper from "./Helper.js"
-import SholatKuService from "./SholatKu.service.js"
+import Helper from "../helper/Helper.js"
+import SholatKuService from "../SholatKu.service.js"
 
 export class PrayerData {
     private readonly province

@@ -1,7 +1,7 @@
 import FuzzySearch from 'fuzzy-search';
 import LocationDatabaseClient from "../../database/LocationDatabaseClient.js";
 import { LocationSearchResult } from '../../types/Location.types.js';
-import SholatKuServiceHelper from './Helper.js';
+import SholatKuServiceHelper from '../helper/Helper.js';
 
 export class Location {
     private async getAllRaw() {
