@@ -1,6 +1,8 @@
 import moment from "moment-timezone"
 /**
- * #### Converting user input into database key string. Use this for inserting into database as a key.
+ * #### Converting user input into database key string.
+ * ---
+ * Use this for inserting into database as a key.
  * @param input A string that looks like this. 
  * @returns ABC, 0-9 Only strings, That_Look_Like_This. 
  */
@@ -9,7 +11,7 @@ function normalizeInput(input: string): string {
 }
 
 /**
- * Converting time string like "18:30" into Moment object of today with that time.
+ * #### Converting time string like "18:30" into Moment object of today with that time.
  * @param time string Hour:Minute time format
  * @returns Moment object of that time for today.
  */
@@ -19,7 +21,9 @@ function convertTimeToMoment(time: string) {
 }
 
 /**
- * Converting database key into normal string. Use this for displaying to user from database key.
+ * #### Converting database key into normal string. 
+ * ---
+ * Use this for displaying to user from database key.
  * @param input A_string_that_looks_like_this. 
  * @returns A string that looks like this. For displaying to user.
  */
@@ -28,7 +32,7 @@ function normalizeOutput(input: string): string {
 }
 
 /**
- * 
+ * #### Turns input into slugified string. thatlooklikethis
  * @param input 
  * @returns 
  */
@@ -39,7 +43,7 @@ function slugify(input: string) {
 }
 
 /**
- * Capitalize each word in the input string. 
+ * #### Capitalize each word in the input string. 
  * @param input input that looks like this.
  * @returns Each word capitalzed string, Input That Looks Like This
  */
