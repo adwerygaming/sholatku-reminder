@@ -4,10 +4,11 @@ import client from "../discord/Client.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SholatkuUser, UserProvider } from "../types/Users.types.js";
 import tags from "../utils/Tags.js";
+import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
 import SholatKuServiceHelper from "./helper/Helper.js";
 
 type PrayerEventPayload = {
-    event: CheckPrayerEvent;
+    event: CycleCheckEvent;
     province: {
         searchKey: string;
         original: string;
