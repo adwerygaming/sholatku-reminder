@@ -1,20 +1,19 @@
 import moment from "moment-timezone"
-import { BaseLocation } from "../types/Location.types.js"
-import { PrayerEvent, PrayerName } from "../types/Prayer.types.js"
-import tags from "../utils/Tags.js"
-import { PrayerData } from "./domain/PrayerData.js"
-import { PrayerState } from "./domain/PrayerState.js"
+import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js"
+import tags from "../../utils/Tags.js"
+import { PrayerData } from "./PrayerData.js"
+import { PrayerState } from "./PrayerState.js"
 
-export interface CheckPrayerProps extends BaseLocation {
-    debugTime?: moment.Moment
-}
-
-export interface CheckPrayerEvent {
+export interface CycleCheckEvent {
     type: PrayerEvent
     eventName: PrayerName
     time: moment.Moment
 }
 
+/**
+ * PrayerScheduler.
+ * Also known as Root Sholatku Service 
+ */
 export class PrayerScheduler {
     private readonly prayerData: PrayerData
     private readonly prayerState: PrayerState
@@ -34,7 +33,7 @@ export class PrayerScheduler {
         this.debugTime = debugTime ?? moment()
     }
 
-    async cycleCheck(): Promise<CheckPrayerEvent[] | null> {
+    async cycleCheck(): Promise<CycleCheckEvent[] | null> {
         const prayerDataResult = await this.prayerData.get()
 
         const now = this.debugTime ?? moment()
@@ -51,7 +50,7 @@ export class PrayerScheduler {
             return null
         }
 
-        const output: CheckPrayerEvent[] = []
+        const output: CycleCheckEvent[] = []
 
         if (this.debugTime) {
             console.log(`[${tags.Debug}] Using Debug Time.`)

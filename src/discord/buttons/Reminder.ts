@@ -1,6 +1,6 @@
 import { ButtonBuilder, LabelBuilder, ModalBuilder, TextInputBuilder } from "@discordjs/builders";
 import { ButtonStyle, Colors, ContainerBuilder, MessageFlags, TextInputStyle } from "discord.js";
-import SholatKuService from "../../sholatku/SholatKu.service.js";
+import SholatKuService from "../../sholatku/domain/PrayerScheduler.js";
 import { ButtonLayout } from "../../types/Discord.types.js";
 import { SholatkuUserProvider } from "../../types/SholatKu.types.js";
 import tags from "../../utils/Tags.js";

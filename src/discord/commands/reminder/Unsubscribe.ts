@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, Colors, ContainerBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import SholatKuService from "../../../sholatku/SholatKu.service.js";
+import SholatKuService from "../../../sholatku/domain/PrayerScheduler.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
 import { SholatkuUserProvider } from "../../../types/SholatKu.types.js";
 

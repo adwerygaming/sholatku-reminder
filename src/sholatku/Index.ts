@@ -5,7 +5,6 @@ import { PrayerEvent } from "../types/Prayer.types.js";
 import { SholatkuUser, UserProvider } from "../types/Users.types.js";
 import tags from "../utils/Tags.js";
 import SholatKuServiceHelper from "./helper/Helper.js";
-import SholatKuService, { CheckPrayerEvent } from "./SholatKu.service.js";
 
 type PrayerEventPayload = {
     event: CheckPrayerEvent;

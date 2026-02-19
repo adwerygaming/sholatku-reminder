@@ -11,6 +11,10 @@ export class UserManager {
     ) { }
 
     //! get locations from all users & remote duplicate, resulting in base location (province, city) list
+    /**
+     * Get all registered users's location (BaseLocation) then removing same locations across all users.
+     * @returns Deduplicated array objects of BaseLocation
+     */
     async getLocations(): Promise<BaseLocation[]> {
         const usersRaw = await this.db.all()
 
@@ -28,6 +32,12 @@ export class UserManager {
         return locations
     }
 
+    /**
+     * 
+     * @param user 
+     * @param location 
+     * @returns 
+     */
     async register(user: SholatkuUser, location: Location): Promise<SholatkuUser> {
         const obj: SholatkuUser = {
             ...user,
