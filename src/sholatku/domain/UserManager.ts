@@ -69,8 +69,8 @@ export class UserManager {
     }
 
     /**
-     * 
-     * @returns 
+     * Gets All SholatkuUser from database
+     * @returns Array of SholatkuUser[]
      */
     async getAll(): Promise<SholatkuUser[]> {
         const usersRaw = await this.db.all<SholatkuUser>()
@@ -82,6 +82,11 @@ export class UserManager {
         return users
     }
 
+    /**
+     * Resolves Discord, WhatsApp Platform user into SholatkuUser. Creates new SholatkuUser if not exist, return existing one if already exist.
+     * @param user Union User of Discord, WhatsApp
+     * @returns SholatkuUser object.
+     */
     async resolve(user: SholatkuUnionUser): Promise<SholatkuUser> {
         const SholatkuUserId = uuidv4()
 
