@@ -158,7 +158,7 @@ setInterval(async () => {
 await check()
 
 async function check() {
-    let debugTime: Moment = moment()
+    let debugTime: Moment | undefined = undefined
     const useDebugTime = false
 
     if (useDebugTime) {
