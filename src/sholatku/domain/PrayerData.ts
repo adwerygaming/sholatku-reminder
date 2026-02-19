@@ -21,7 +21,17 @@ export class PrayerData {
     }
 
     //! from all prayer data (30 days), filter only today prayer times
-    getTodayPrayerTimes(prayerData: PrayerTimeData[]): PrayerTime[] | null {
+    /**
+     * Get today prayer times for this location.
+     * @returns PrayerTime[]
+    */
+    async getTodayPrayerTimes(): Promise<PrayerTime[] | null> {
+        const prayerData = await this.get()
+
+        if (!prayerData) {
+            return null
+        }
+
         const now = moment()
         const currentDay = now.format("d")
         const currentPrayerData = prayerData.find((x) => x.tanggal == Number(currentDay))
@@ -70,6 +80,10 @@ export class PrayerData {
         return output
     }
 
+    /**
+     * Get prayer data for a location. Fetch API if not exist, fetch database if already exist
+     * @returns 
+     */
     async get(): Promise<PrayerTimeData[] | null> {
         console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
         const res: PrayerTimeData[] | null = await this.db.get(`${this.province}.${this.city}`)
@@ -89,6 +103,10 @@ export class PrayerData {
         return res
     }
 
+    /**
+     * Write PrayerTimeData (30 days) to the database for this location.
+     * @param data PrayerTimeData for this locaton
+     */
     async set(data: PrayerTimeData[]): Promise<void> {
         await this.db.set(`${this.province}.${this.city}`, data)
     }
