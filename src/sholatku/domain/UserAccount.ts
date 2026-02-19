@@ -12,7 +12,7 @@ export class UserAccount {
     ) { }
 
     /**
-     * ### Get this user's prayer state of this eventName
+     * #### Get this user's prayer state of this eventName
      * @param eventName 
      * @returns boolean value of that user's prayer state
      */
@@ -26,7 +26,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Sets this user's prayer state of this eventName
+     * #### Sets this user's prayer state of this eventName
      * @param eventName 
      * @param value boolean value for that user's prayer state
      */
@@ -39,7 +39,7 @@ export class UserAccount {
     // =======
 
     /**
-     * ### Get this user's province from database
+     * #### Get this user's province from database
      * @returns Province value of that user. Could be string or null.
      */
     async getProvince(): Promise<string | null> {
@@ -48,7 +48,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Set this user's province to database
+     * #### Set this user's province to database
      * @param province Province value for that user
      */
     async setProvince(province: string): Promise<void> {
@@ -59,7 +59,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Get this user's city from database
+     * #### Get this user's city from database
      * @returns City value of hat user. Could be string or null.
      */
     async getCity(): Promise<string | null> {
@@ -68,7 +68,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Set this user's city to database
+     * #### Set this user's city to database
      * @param city City value for that user
      */
     async setCity(city: string): Promise<void> {
@@ -79,7 +79,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Unregister this user by deleting location data from database. 
+     * #### Unregister this user by deleting location data from database. 
      * ----
      * This will make the user not receive any prayer event notification, 
      * because the service doesn't know where this user is located.
@@ -89,7 +89,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Fetch this full user data (SholatkuUser) from database.
+     * #### Fetch this full user data (SholatkuUser) from database.
      * @returns SholatkuUser object. Could be null if user not exist in database.
      */
     async fetch(): Promise<SholatkuUser | null> {
@@ -98,7 +98,7 @@ export class UserAccount {
     }
 
     /**
-     * ### Check if this user is registered or not
+     * #### Check if this user is registered or not
      * ---
      * By checking the existence of location data in database.
      * @returns boolean value of that user is registered or nah.
