@@ -15,11 +15,20 @@ export class PrayerState {
         this.city = Helper.normalizeInput(city)
     }
 
+    /**
+     * Helper function to get current day identifier
+     * @returns string of DD_MM date format
+     */
     private getDayIdentifier(): string {
         const now = moment()
         return now.format("DD_MM") // 11_03
     }
 
+    /**
+     * Get prayer state for today on this province and city and this eventName
+     * @param eventName 
+     * @returns boolean value of that state
+     */
     async get(eventName: string): Promise<boolean> {
         const dayIdentifier = this.getDayIdentifier()
 
@@ -28,6 +37,11 @@ export class PrayerState {
         return res ? true : false
     }
 
+    /**
+     * Set prayer state for today on this province and this city and this eventName
+     * @param eventName 
+     * @param value boolean value for that state
+     */
     async set(eventName: string, value: boolean): Promise<void> {
         const dayIdentifier = this.getDayIdentifier()
 
