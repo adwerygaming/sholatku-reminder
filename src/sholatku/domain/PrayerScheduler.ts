@@ -43,7 +43,7 @@ export class PrayerScheduler {
             return null
         }
 
-        const prayerToday = await this.prayerData.getTodayPrayerTimes(prayerDataResult)
+        const prayerToday = await this.prayerData.getTodayPrayerTimes()
 
         if (!prayerToday) {
             console.log(`[${tags.Error}] Failed to get today's prayer times for ${this.city}, ${this.province}`)
