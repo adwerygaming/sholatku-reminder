@@ -50,7 +50,7 @@ export class Location {
     async getCitiesByProvince(province: string): Promise<string[]> {
         const allRaw = await this.getAllRaw()
 
-        const provinceSlug = Helper.slugify(province)
+        const provinceSlug = Helper.normalizeInput(province)
 
         const cities = allRaw
             .filter(x => x.id === provinceSlug)

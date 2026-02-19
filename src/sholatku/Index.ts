@@ -188,7 +188,6 @@ async function check() {
         const locationKeyRaw = res[0]
         const users = res[1]
 
-        // database key format
         const [province, city] = locationKeyRaw.split("-")
 
         if (!province || !city) continue;
@@ -201,19 +200,18 @@ async function check() {
         if (!check) continue;
 
         const provinceFinal = await location.searchProvince(province)
-        const cityFinal = await location.searchCity(provinceFinal.databaseKey, city)
+        const cityFinal = await location.searchCity(provinceFinal.original, city)
 
         for (let k = 0; k < check.length; k++) {
             const event = check[k];
 
             if (!event) continue;
 
-            // do whatever with the event
             await sholatKuEmitter.emit(event.type, {
                 event,
                 province: {
                     databaseKey: province,
-                    original: provinceFinal?.original,
+                    original: provinceFinal.original,
                     searchKey: provinceFinal.searchKey
                 },
                 city: {
@@ -223,7 +221,6 @@ async function check() {
                 },
                 users
             })
-
             // leave to this thing to update the last state
             for (let j = 0; j < users.length; j++) {
                 const user = users[j];
