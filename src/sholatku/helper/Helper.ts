@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 /**
- * Converting user input into database key string. Use this for inserting into database as a key.
+ * #### Converting user input into database key string. Use this for inserting into database as a key.
  * @param input A string that looks like this. 
  * @returns ABC, 0-9 Only strings, That_Look_Like_This. 
  */

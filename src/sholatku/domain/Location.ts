@@ -5,7 +5,8 @@ import { default as Helper, default as SholatKuServiceHelper } from '../helper/H
 
 export class Location {
     /**
-     * Retrieves all raw location data from the database.
+     * #### Retrieves all raw location data from the database.
+     * ---
      * Each entry contains a province key and an array of city strings.
      * @returns Raw location records from the database.
      */
@@ -15,7 +16,8 @@ export class Location {
     }
 
     /**
-     * Fetches all location data, structured with the province as the key
+     * #### Fetches all location data, structured with the province as the key
+     * ---
      * and an array of city strings as the value.
      * @returns An array of objects mapping province keys to their city arrays.
      */
@@ -31,7 +33,7 @@ export class Location {
     }
 
     /**
-     * Retrieves all available provinces as a deduplicated array of strings.
+     * #### Retrieves all available provinces as a deduplicated array of strings.
      * @returns A promise resolving to an array of province identifiers.
      */
     async getProvinces(): Promise<string[]> {
@@ -43,7 +45,7 @@ export class Location {
     }
 
     /**
-     * Retrieves all cities available within the specified province.
+     * #### Retrieves all cities available within the specified province.
      * @param province - The province name to filter cities by.
      * @returns A promise resolving to a deduplicated array of city names in that province.
      */
@@ -61,7 +63,8 @@ export class Location {
     }
 
     /**
-     * Searches for a province by a fuzzy query string, like a search engine.
+     * #### Searches for a province by a fuzzy query string, like a search engine.
+     * ---
      * The result provides three representations of the matched province:
      * - `searchKey` — slugified form, for use with {@link getCitiesByProvince}
      * - `databaseKey` — raw key used for database lookups
@@ -88,7 +91,8 @@ export class Location {
     }
 
     /**
-     * Searches for a city within a province by a fuzzy query string, like a search engine.
+     * #### Searches for a city within a province by a fuzzy query string, like a search engine.
+     * ---
      * The result provides two representations of the matched city:
      * - `searchKey` — slugified form, for use in further lookups
      * - `original` — human-readable form for display

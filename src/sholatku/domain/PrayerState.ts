@@ -16,7 +16,7 @@ export class PrayerState {
     }
 
     /**
-     * Helper function to get current day identifier
+     * #### Helper function to get current day identifier
      * @returns string of DD_MM date format
      */
     private getDayIdentifier(): string {
@@ -25,7 +25,7 @@ export class PrayerState {
     }
 
     /**
-     * Get prayer state for today on this province and city and this eventName
+     * #### Get prayer state for today on this province and city and this eventName
      * @param eventName 
      * @returns boolean value of that state
      */
@@ -38,7 +38,7 @@ export class PrayerState {
     }
 
     /**
-     * Set prayer state for today on this province and this city and this eventName
+     * #### Set prayer state for today on this province and this city and this eventName
      * @param eventName 
      * @param value boolean value for that state
      */
