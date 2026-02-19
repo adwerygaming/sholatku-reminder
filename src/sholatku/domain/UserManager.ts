@@ -33,10 +33,10 @@ export class UserManager {
     }
 
     /**
-     * 
-     * @param user 
-     * @param location 
-     * @returns 
+     * Registering existing SholatkuUser with new Location data.
+     * @param user SholatkuUser Object
+     * @param location Location Object containing province & city
+     * @returns Same SholatkuUser but with additional location data. how cool is that? 
      */
     async register(user: SholatkuUser, location: Location): Promise<SholatkuUser> {
         const obj: SholatkuUser = {
@@ -52,6 +52,11 @@ export class UserManager {
         return obj
     }
 
+    /**
+     * Get Sholatku users based on provided location param.
+     * @param Location 
+     * @returns Array of SholatkuUser[] that has Location matched to the param.
+     */
     async getByLocation({ city, province }: Location): Promise<SholatkuUser[] | undefined> {
         const usersRaw = await this.getAll()
 
@@ -63,6 +68,10 @@ export class UserManager {
         return user
     }
 
+    /**
+     * 
+     * @returns 
+     */
     async getAll(): Promise<SholatkuUser[]> {
         const usersRaw = await this.db.all<SholatkuUser>()
 
