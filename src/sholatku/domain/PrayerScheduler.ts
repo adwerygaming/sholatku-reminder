@@ -19,7 +19,7 @@ export class PrayerScheduler {
     private readonly prayerState: PrayerState
     private readonly province: string
     private readonly city: string
-    private readonly debugTime: moment.Moment
+    private readonly debugTime: moment.Moment = moment()
 
     constructor(
         province: string,
@@ -30,7 +30,7 @@ export class PrayerScheduler {
         this.prayerState = new PrayerState(province, city)
         this.province = province
         this.city = city
-        this.debugTime = debugTime ?? moment()
+        this.debugTime = debugTime
     }
 
     async cycleCheck(): Promise<CycleCheckEvent[] | null> {
@@ -45,6 +45,9 @@ export class PrayerScheduler {
 
         const prayerToday = await this.prayerData.getPrayerTimes(now)
 
+        // const tomorrow = now.add(1, "day").startOf("day")
+        // const prayerTomorrow = await this.prayerData.getPrayerTimes(tomorrow)
+
         if (!prayerToday) {
             console.log(`[${tags.Error}] Failed to get today's prayer times for ${this.city}, ${this.province}`)
             return null
@@ -54,7 +57,7 @@ export class PrayerScheduler {
 
         if (this.debugTime) {
             console.log(`[${tags.Debug}] Using Debug Time.`)
-            console.log(`[${tags.Debug}] Current Time: ${this.debugTime.format("HH:mm")}`)
+            console.log(`[${tags.Debug}] Current Time: ${now.format("HH:mm")}`)
         }
 
         let currentIdx = -1
@@ -65,13 +68,14 @@ export class PrayerScheduler {
             const res = prayerToday[i];
             const next = prayerToday[i + 1]
 
-            const now = this.debugTime ?? moment() // manual setting for simulation
+            const now = this.debugTime ?? moment()
             const prayerTime = res.time
             const nextPrayerTime: moment.Moment | undefined = next?.time
 
             if (!next) {
                 break;
             }
+
             // console.log(`[${tags.Debug}] Checking ${res.prayerName} - ${res.time.format("HH:mm")}`)
 
             // current prayer time
