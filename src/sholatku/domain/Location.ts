@@ -5,7 +5,9 @@ import { default as Helper, default as SholatKuServiceHelper } from '../helper/H
 
 export class Location {
     /**
-     * Retrieve every location row (province slug with its raw city array) from the database.
+     * Retrieves all raw location data from the database.
+     * Each entry contains a province key and an array of city strings.
+     * @returns Raw location records from the database.
      */
     private async getAllRaw() {
         const allRaw = await LocationDatabaseClient.all<string[]>()
@@ -13,7 +15,9 @@ export class Location {
     }
 
     /**
-     * Get locations grouped by province slug with cities as string arrays.
+     * Fetches all location data, structured with the province as the key
+     * and an array of city strings as the value.
+     * @returns An array of objects mapping province keys to their city arrays.
      */
     async fetch() {
         const allRaw = await this.getAllRaw()
@@ -27,7 +31,8 @@ export class Location {
     }
 
     /**
-     * List all available province slugs.
+     * Retrieves all available provinces as a deduplicated array of strings.
+     * @returns A promise resolving to an array of province identifiers.
      */
     async getProvinces(): Promise<string[]> {
         const allRaw = await this.getAllRaw()
@@ -38,8 +43,9 @@ export class Location {
     }
 
     /**
-     * List all unique cities for a given province slug.
-     * @param province Province name or slug.
+     * Retrieves all cities available within the specified province.
+     * @param province - The province name to filter cities by.
+     * @returns A promise resolving to a deduplicated array of city names in that province.
      */
     async getCitiesByProvince(province: string): Promise<string[]> {
         const allRaw = await this.getAllRaw()
@@ -55,8 +61,13 @@ export class Location {
     }
 
     /**
-     * Fuzzy-search province by query and return slug, database key, and display name.
-     * @param query Province query text.
+     * Searches for a province by a fuzzy query string, like a search engine.
+     * The result provides three representations of the matched province:
+     * - `searchKey` — slugified form, for use with {@link getCitiesByProvince}
+     * - `databaseKey` — raw key used for database lookups
+     * - `original` — normalized, human-readable form for display
+     * @param query - The search string to match against province names.
+     * @returns A promise resolving to the best-matching {@link LocationSearchResult}.
      */
     async searchProvince(query: string): Promise<LocationSearchResult> {
         const allProvinces = await this.getProvinces()
@@ -77,9 +88,13 @@ export class Location {
     }
 
     /**
-     * Fuzzy-search city within a province and return slug and display name.
-     * @param province Province name or slug.
-     * @param query City query text.
+     * Searches for a city within a province by a fuzzy query string, like a search engine.
+     * The result provides two representations of the matched city:
+     * - `searchKey` — slugified form, for use in further lookups
+     * - `original` — human-readable form for display
+     * @param province - The slugified province key to scope the city search.
+     * @param query - The search string to match against city names.
+     * @returns A promise resolving to the best-matching city result, omitting `databaseKey`.
      */
     async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'>> {
         const allCities = await this.getCitiesByProvince(province)
