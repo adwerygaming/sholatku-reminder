@@ -1,7 +1,8 @@
 import moment, { Moment } from "moment-timezone";
 import EventEmitter from "node:events";
 import client from "../discord/Client.js";
-import { PrayerEvent, SholatkuUser, SholatkuUserProvider } from "../types/SholatKu.types.js";
+import { PrayerEvent } from "../types/Prayer.types.js";
+import { SholatkuUser, UserProvider } from "../types/Users.types.js";
 import tags from "../utils/Tags.js";
 import SholatKuServiceHelper from "./helper/Helper.js";
 import SholatKuService, { CheckPrayerEvent } from "./SholatKu.service.js";
@@ -47,7 +48,7 @@ async function annouce(payload: PrayerEventPayload, message: string) {
     // const users: SholatkuUser[] = payload.users.map((u) => u)
     const providerTYpe = payload.users[0].provider
 
-    if (providerTYpe == SholatkuUserProvider.Discord) {
+    if (providerTYpe == UserProvider.Discord) {
         // send discord message to user
         const guilds = await client.guilds.fetch();
         const guildId = "598412465750933504"

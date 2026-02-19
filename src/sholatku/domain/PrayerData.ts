@@ -1,8 +1,11 @@
+import axios from "axios"
+import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { PrayerTimeData } from "../../types/Prayer.types.js"
+import { BaseLocation } from "../../types/Location.types.js"
+import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
 import Helper from "../helper/Helper.js"
-import SholatKuService from "../SholatKu.service.js"
+import { Location } from "./Location.js"
 
 export class PrayerData {
     private readonly province
@@ -17,13 +20,63 @@ export class PrayerData {
         this.city = Helper.normalizeInput(city)
     }
 
+    //! from all prayer data (30 days), filter only today prayer times
+    getTodayPrayerTimes(prayerData: PrayerTimeData[]): PrayerTime[] | null {
+        const now = moment()
+        const currentDay = now.format("d")
+        const currentPrayerData = prayerData.find((x) => x.tanggal == Number(currentDay))
+
+        if (!currentPrayerData) {
+            return null
+        }
+
+        const formatted: PrayerTime[] = Object.entries(currentPrayerData)
+            .filter((x) => x[0] !== "tanggal")
+            .map(([key, value]) => {
+                return {
+                    prayerName: key as PrayerName,
+                    time: Helper.convertTimeToMoment(value)
+                }
+            })
+
+        return formatted
+    }
+
+    /**
+     * Fetches prayer data from API, then return the data.
+     * @param BaseLocation - contains province and city
+     * @returns PrayerTimeData[] | null
+     */
+    async fetch({ city, province }: BaseLocation): Promise<PrayerTimeData[]> {
+        const location = new Location()
+
+        const provinceFinal = await location.searchProvince(province)
+        const cityFinal = await location.searchCity(provinceFinal?.original, city)
+
+        const url = `https://equran.id/api/v2/imsakiyah`
+        const body = {
+            provinsi: provinceFinal.original,
+            kabkota: cityFinal.original
+        }
+
+        console.log(`[${tags.System}] Fetching prayer data for ${body.provinsi}, ${body.kabkota}`)
+
+        const { data: res } = await axios.post<APIResponse>(url, body, {
+            validateStatus: () => true
+        })
+
+        const output = res?.data?.imsakiyah ?? []
+
+        return output
+    }
+
     async get(): Promise<PrayerTimeData[] | null> {
         console.log(`[${tags.System}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
         const res: PrayerTimeData[] | null = await this.db.get(`${this.province}.${this.city}`)
 
         //! if get no data, try passing non normalize input for both province and city.
         if (!res) {
-            const data = await SholatKuService.Prayer.fetchPrayerData({ province: this.province, city: this.city })
+            const data = await this.fetch({ province: this.province, city: this.city })
 
             if (data.length === 0 || !data || typeof data === "undefined") {
                 return null

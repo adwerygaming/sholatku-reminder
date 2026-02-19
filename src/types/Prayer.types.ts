@@ -1,11 +1,17 @@
 export type PrayerName = "imsak" | "subuh" | "terbit" | "dhuha" | "dzuhur" | "ashar" | "maghrib" | "isya"
 
+/**
+ * RAW Response from API, Still containing code, message and data.
+ */
 export interface APIResponse {
   code: number
   message: string
   data: APIResponseData
 }
 
+/**
+ * Data field from API response.
+ */
 export interface APIResponseData {
   provinsi: string
   kabkota: string
@@ -14,7 +20,10 @@ export interface APIResponseData {
   imsakiyah: PrayerTimeData[] 
 }
 
-// previously Imsakiyah
+/**
+ * Prayer time data for a single day, containing prayer times and date information.
+ * previously known as Imsakiyah
+ */
 export interface PrayerTimeData {
   tanggal: number
   imsak: string
@@ -32,6 +41,9 @@ export interface PrayerTime {
     time: moment.Moment
 }
 
+/**
+ * Known prayer events types, like prayerTime, in 5m, in 15m, in 30m, and next prayer.
+ */
 export enum PrayerEvent {
   PrayerTime = "prayerTime",
   PrayerIn5m = "prayer_in_5m",

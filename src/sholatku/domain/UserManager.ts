@@ -1,15 +1,33 @@
 import moment from "moment-timezone"
 import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { Location } from "../../types/Location.types.js"
+import { BaseLocation, Location } from "../../types/Location.types.js"
 import { SholatkuUnionUser, SholatkuUser, UserProvider } from "../../types/Users.types.js"
 
 // has no user
 export class UserManager {
     constructor(
         private readonly db = DatabaseClient.table<SholatkuUser>("users")
-    ) {}
-    
+    ) { }
+
+    //! get locations from all users & remote duplicate, resulting in base location (province, city) list
+    async getLocations(): Promise<BaseLocation[]> {
+        const usersRaw = await this.db.all()
+
+        const locations: BaseLocation[] = usersRaw.map((x) => {
+            const location = x.value?.location
+            if (!location) {
+                return null
+            }
+
+            return { province: location.province, city: location.city }
+        })
+        .filter((x): x is BaseLocation => x !== null)
+        .filter((v, i, a) => a.findIndex(t => (t.province === v.province && t.city === v.city)) === i)
+
+        return locations
+    }
+
     async register(user: SholatkuUser, location: Location): Promise<SholatkuUser> {
         const obj: SholatkuUser = {
             ...user,
