@@ -12,7 +12,9 @@ export class UserManager {
 
     //! get locations from all users & remote duplicate, resulting in base location (province, city) list
     /**
-     * Get all registered users's location (BaseLocation) then removing same locations across all users.
+     * #### Get all deduplicated locations from all registered users
+     * ---
+     * By Getting all registered users's location (BaseLocation) then removing same locations across all users.
      * @returns Deduplicated array objects of BaseLocation
      */
     async getLocations(): Promise<BaseLocation[]> {
@@ -33,7 +35,7 @@ export class UserManager {
     }
 
     /**
-     * Registering existing SholatkuUser with new Location data.
+     * #### Registering existing SholatkuUser with new Location data.
      * @param user SholatkuUser Object
      * @param location Location Object containing province & city
      * @returns Same SholatkuUser but with additional location data. how cool is that? 
@@ -53,7 +55,7 @@ export class UserManager {
     }
 
     /**
-     * Get Sholatku users based on provided location param.
+     * #### Get Sholatku users based on provided location param.
      * @param Location 
      * @returns Array of SholatkuUser[] that has Location matched to the param.
      */
@@ -69,7 +71,7 @@ export class UserManager {
     }
 
     /**
-     * Gets All SholatkuUser from database
+     * #### Gets All SholatkuUser from database
      * @returns Array of SholatkuUser[]
      */
     async getAll(): Promise<SholatkuUser[]> {
@@ -83,7 +85,9 @@ export class UserManager {
     }
 
     /**
-     * Resolves Discord, WhatsApp Platform user into SholatkuUser. Creates new SholatkuUser if not exist, return existing one if already exist.
+     * #### Resolves Discord, WhatsApp Platform user into SholatkuUser.
+     * ---
+     * Creates new SholatkuUser if not exist, return existing one if already exist.
      * @param user Union User of Discord, WhatsApp
      * @returns SholatkuUser object.
      */
