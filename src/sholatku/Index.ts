@@ -4,7 +4,10 @@ import client from "../discord/Client.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SholatkuUser, UserProvider } from "../types/Users.types.js";
 import tags from "../utils/Tags.js";
-import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
+import { Location } from "./domain/Location.js";
+import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
+import { UserAccount } from "./domain/UserAccount.js";
+import { UserManager } from "./domain/UserManager.js";
 import SholatKuServiceHelper from "./helper/Helper.js";
 
 type PrayerEventPayload = {
@@ -157,8 +160,10 @@ async function check() {
         debugTime = moment("11:50", "HH:mm")
     }
 
-    const users = await SholatKuService.User().getAll()
-    const meong = new Map<string, SholatkuUser[]>()
+    const user = new UserManager()
+
+    const users = await user.getAll()
+    const usersMap = new Map<string, SholatkuUser[]>()
 
     for (let i = 0; i < users.length; i++) {
         const user = users[i];
@@ -169,14 +174,14 @@ async function check() {
 
         const locationKey = `${province}-${city}`
 
-        if (!meong.has(locationKey)) {
-            meong.set(locationKey, [])
+        if (!usersMap.has(locationKey)) {
+            usersMap.set(locationKey, [])
         }
 
-        meong.get(locationKey)!.push(user)
+        usersMap.get(locationKey)!.push(user)
     }
 
-    const thing = [...meong.entries()]
+    const thing = [...usersMap.entries()]
 
     for (let i = 0; i < thing.length; i++) {
         const res = thing[i];
@@ -188,12 +193,15 @@ async function check() {
 
         if (!province || !city) continue;
 
-        const check = await SholatKuService.checkPrayer({ province, city, debugTime })
+        const prayerScheduler = new PrayerScheduler(province, city, debugTime)
+        const location = new Location()
+
+        const check = await prayerScheduler.cycleCheck()
 
         if (!check) continue;
 
-        const provinceFinal = await SholatKuService.Database.Location.searchProvince(province)
-        const cityFinal = await SholatKuService.Database.Location.searchCity(provinceFinal.databaseKey, city)
+        const provinceFinal = await location.searchProvince(province)
+        const cityFinal = await location.searchCity(provinceFinal.databaseKey, city)
 
         for (let k = 0; k < check.length; k++) {
             const event = check[k];
@@ -218,20 +226,19 @@ async function check() {
 
             // leave to this thing to update the last state
             for (let j = 0; j < users.length; j++) {
-                const userId = users[j];
-                const user = SholatKuService.User(userId)
+                const user = users[j];
+                const userAccount = new UserAccount(user)
 
                 const key = `${event.type}-${event.eventName}`
-                const stateCheck = await user.PrayerState.get(key)
+                const stateCheck = await userAccount.getPrayerState(key)
 
                 if (event.type == "prayerTime" && !stateCheck) {
-                    await user.PrayerState.set(key, true)
+                    await userAccount.setPrayerState(key, true)
                 } else if (event.type == "prayer_in_15m" && !stateCheck) {
-                    await user.PrayerState.set(key, true)
+                    await userAccount.setPrayerState(key, true)
                 } else if (event.type == "prayer_in_30m" && !stateCheck) {
-                    await user.PrayerState.set(key, true)
+                    await userAccount.setPrayerState(key, true)
                 }
-
             }
         }
     }
