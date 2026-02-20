@@ -34,7 +34,8 @@ export class PrayerData {
         }
 
         const now = time
-        const currentDay = now.format("d")
+        const currentDay = now.format("DD")
+
         const currentPrayerData = prayerData.find((x) => x.tanggal == Number(currentDay))
 
         if (!currentPrayerData) {

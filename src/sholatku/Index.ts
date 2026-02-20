@@ -1,10 +1,48 @@
 import moment from "moment-timezone";
 import client from "../discord/Client.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
-import { UserProvider } from "../types/Users.types.js";
+import { SholatkuUser, UserProvider } from "../types/Users.types.js";
 import tags from "../utils/Tags.js";
-import { PrayerEventPayload, sholatkuClient } from "./Client.js";
 import { capitalizeWords } from "./helper/Helper.js";
+import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
+import EventEmitter from "events";
+
+export type PrayerEventPayload = {
+    event: CycleCheckEvent;
+    province: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    city: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    users: SholatkuUser[];
+};
+
+type EventMap = {
+  [K in PrayerEvent]: PrayerEventPayload;
+};
+
+export class SholatKuEmitter extends EventEmitter {
+  emit<K extends keyof EventMap>(
+    event: K,
+    payload: EventMap[K]
+  ): boolean {
+    return super.emit(event, payload);
+  }
+
+  on<K extends keyof EventMap>(
+    event: K,
+    listener: (payload: EventMap[K]) => void
+  ): this {
+    return super.on(event, listener);
+  }
+}
+
+export const sholatkuClient = new SholatKuEmitter();
 
 async function annouce(payload: PrayerEventPayload, message: string): Promise<void> {
     // const users: SholatkuUser[] = payload.users.map((u) => u)

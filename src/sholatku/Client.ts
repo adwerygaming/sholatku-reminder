@@ -1,48 +1,10 @@
 import moment, { Moment } from "moment-timezone";
-import EventEmitter from "node:events";
-import { PrayerEvent } from "../types/Prayer.types.js";
 import { SholatkuUser } from "../types/Users.types.js";
 import { Location } from "./domain/Location.js";
-import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
+import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { UserAccount } from "./domain/UserAccount.js";
 import { UserManager } from "./domain/UserManager.js";
-
-export type PrayerEventPayload = {
-    event: CycleCheckEvent;
-    province: {
-        searchKey: string;
-        original: string;
-        databaseKey: string;
-    };
-    city: {
-        searchKey: string;
-        original: string;
-        databaseKey: string;
-    };
-    users: SholatkuUser[];
-};
-
-type EventMap = {
-  [K in PrayerEvent]: PrayerEventPayload;
-};
-
-export class SholatKuEmitter extends EventEmitter {
-  emit<K extends keyof EventMap>(
-    event: K,
-    payload: EventMap[K]
-  ): boolean {
-    return super.emit(event, payload);
-  }
-
-  on<K extends keyof EventMap>(
-    event: K,
-    listener: (payload: EventMap[K]) => void
-  ): this {
-    return super.on(event, listener);
-  }
-}
-
-export const sholatkuClient = new SholatKuEmitter();
+import { sholatkuClient } from "./Index.js";
 
 // await DatabaseClient.table("users").deleteAll()
 // await DatabaseClient.table("prayer_state").deleteAll()
@@ -132,6 +94,7 @@ async function check(): Promise<void> {
                 },
                 users
             })
+            
             // leave to this thing to update the last state
             for (let j = 0; j < users.length; j++) {
                 const user = users[j];
