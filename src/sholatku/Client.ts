@@ -4,7 +4,11 @@ import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { UserAccount } from "./domain/UserAccount.js";
 import { UserManager } from "./domain/UserManager.js";
-import { sholatkuClient } from "./Index.js";
+
+import EventEmitter from "events";
+import { PrayerEvent } from "../types/Prayer.types.js";
+import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
+import tags from "../utils/Tags.js";
 
 // await DatabaseClient.table("users").deleteAll()
 // await DatabaseClient.table("prayer_state").deleteAll()
@@ -17,6 +21,47 @@ import { sholatkuClient } from "./Index.js";
 // console.log("Province Search Result:", provRes)
 // const cityRes = await SholatKuService.Database.Location.searchCity(provRes?.original ?? provTest, cityTest)
 // console.log("City Search Result:", cityRes)
+
+export type PrayerEventPayload = {
+    event: CycleCheckEvent;
+    province: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    city: {
+        searchKey: string;
+        original: string;
+        databaseKey: string;
+    };
+    users: SholatkuUser[];
+};
+
+type EventMap = {
+  [K in PrayerEvent]: PrayerEventPayload;
+};
+
+export class SholatKuEmitter extends EventEmitter {
+  emit<K extends keyof EventMap>(
+    event: K,
+    payload: EventMap[K]
+  ): boolean {
+    return super.emit(event, payload);
+  }
+
+  on<K extends keyof EventMap>(
+    event: K,
+    listener: (payload: EventMap[K]) => void
+  ): this {
+    return super.on(event, listener);
+  }
+}
+
+const sholatkuClient = new SholatKuEmitter();
+
+console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
+
+export default sholatkuClient
 
 setInterval(async () => {
     await check()
