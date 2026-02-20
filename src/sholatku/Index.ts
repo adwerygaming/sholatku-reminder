@@ -6,7 +6,7 @@ import tags from "../utils/Tags.js";
 import { PrayerEventPayload, sholatkuClient } from "./Client.js";
 import SholatKuServiceHelper from "./helper/Helper.js";
 
-async function annouce(payload: PrayerEventPayload, message: string) {
+async function annouce(payload: PrayerEventPayload, message: string): Promise<void> {
     // const users: SholatkuUser[] = payload.users.map((u) => u)
     const providerTYpe = payload.users[0].provider
 
