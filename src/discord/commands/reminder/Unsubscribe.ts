@@ -1,19 +1,43 @@
 import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, Colors, ContainerBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
-import SholatKuService from "../../../sholatku/domain/PrayerScheduler.js";
+import { UserAccount } from "../../../sholatku/domain/UserAccount.js";
+import { UserManager } from "../../../sholatku/domain/UserManager.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
-import { SholatkuUserProvider } from "../../../types/SholatKu.types.js";
+import { UserProvider } from "../../../types/Users.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()
         .setName("unsubscribe")
         .setDescription("Unsubsribe from prayer reminders."),
     execute: async (_client: Client, interaction: ChatInputCommandInteraction) => {
-        const user = await SholatKuService.User().resolveUser({
-            provider: SholatkuUserProvider.Discord,
+        const userManager = new UserManager()
+
+        const user = await userManager.resolve({
+            provider: UserProvider.Discord,
             user: interaction.user
         })
- 
-        const check = await SholatKuService.User(user).isRegistered()
+
+        if (!user) {
+            const errorContainer = new ContainerBuilder()
+                .setAccentColor(Colors.DarkRed)
+                .addTextDisplayComponents(
+                    (text) => text.setContent("### Prayer Reminder Subscription"),
+                )
+                .addSeparatorComponents((sep) => sep)
+                .addTextDisplayComponents(
+                    (text) => text.setContent("An error occurred while trying to resolve your account. Please try again later."),
+                )
+
+            await interaction.reply({
+                components: [errorContainer],
+                flags: [MessageFlags.IsComponentsV2]
+            })
+
+            return
+        }
+
+        const userAccount = new UserAccount(user)
+
+        const check = userAccount.isRegistered()
 
         if (!check) {
             const noContainer = new ContainerBuilder()

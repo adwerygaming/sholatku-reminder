@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { QuickDB } from "quick.db";
 import { fileURLToPath } from "url";
-import SholatKuServiceHelper from "../sholatku/helper/Helper.js";
+import { normalizeInput } from "../sholatku/helper/Helper.js";
 import { sleep } from "../utils/Sleep.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const locationPath = path.join(__dirname, "..", "assets", "locations")
 
-function getProvincesList() {
+function getProvincesList(): string[] {
     const filePath = path.join(locationPath, "provinces.json")
     const file = fs.readFileSync(filePath, "utf-8")
     const res = JSON.parse(file) as string[]
@@ -27,7 +27,7 @@ await db.init()
 
 for (let i = 0; i < provinces.length; i++) {
     const province = provinces[i];
-    const provinceName = SholatKuServiceHelper.normalizeInput(province)
+    const provinceName = normalizeInput(province)
     
     console.log(provinceName)
 

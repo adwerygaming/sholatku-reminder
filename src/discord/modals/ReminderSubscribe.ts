@@ -1,8 +1,10 @@
 import { ButtonBuilder, ButtonStyle, Colors, ContainerBuilder, MessageFlags } from "discord.js";
-import SholatKuService from "../../sholatku/domain/PrayerScheduler.js";
-import SholatKuServiceHelper from "../../sholatku/helper/Helper.js";
+import { Location } from "../../sholatku/domain/Location.js";
+import { UserAccount } from "../../sholatku/domain/UserAccount.js";
+import { UserManager } from "../../sholatku/domain/UserManager.js";
+import { normalizeOutput } from "../../sholatku/helper/Helper.js";
 import { ModalLayout } from "../../types/Discord.types.js";
-import { SholatkuUserProvider } from "../../types/SholatKu.types.js";
+import { UserProvider } from "../../types/Users.types.js";
 import tags from "../../utils/Tags.js";
 
 export default {
@@ -13,9 +15,12 @@ export default {
         if (action[0] == "subscribe") {
             if (action[1] == "answer") {
                 if (action[2] == "province") {
+                    const location = new Location();
+                    const userManager = new UserManager();
+
                     const provinceValue = interaction.fields.getTextInputValue("province");
 
-                    const provinceResult = await SholatKuService.Database.Location.searchProvince(provinceValue);
+                    const provinceResult = await location.searchProvince(provinceValue);
                     if (!provinceResult) {
                         console.log(`[${tags.Debug}] Cannot find province matching user input: ${provinceValue}`);
                         // not found
@@ -23,18 +28,24 @@ export default {
                     }
 
                     const provinceFinal = provinceResult.original
-                    const provinceFinalFormmated = SholatKuServiceHelper.normalizeOutput(provinceFinal);
+                    const provinceFinalFormmated = normalizeOutput(provinceFinal);
 
-                    const user = await SholatKuService.User().resolveUser({
-                        provider: SholatkuUserProvider.Discord,
+                    const user = await userManager.resolve({
+                        provider: UserProvider.Discord,
                         user: interaction.user
                     })
 
-                    // await DiscordService.User(interaction.user.id).Preferences.Province.set(provinceFinal);
-                    await SholatKuService.User(user).Province.set(provinceFinal);
+                    if (!user) {
+                        return
+                    }
 
-                    const cities = await SholatKuService.Database.Location.getCitiesByProvince(provinceFinal);
-                    const formmatedCities = cities.map((city, i) => `[${i + 1}] **${SholatKuServiceHelper.normalizeOutput(city)}**`).join('\n');
+                    const userAccount = new UserAccount(user)
+
+                    // await DiscordService.User(interaction.user.id).Preferences.Province.set(provinceFinal);
+                    await userAccount.setProvince(provinceFinal);
+
+                    const cities = await location.getCitiesByProvince(provinceFinal);
+                    const formmatedCities = cities.map((city, i) => `[${i + 1}] **${normalizeOutput(city)}**`).join('\n');
 
                     const nextStepBtn = new ButtonBuilder()
                         .setCustomId(`reminder_${interaction.user.id}_subscribe_answer_city`)
@@ -73,20 +84,29 @@ export default {
                 } else if (action[2] == "city") {
                     const cityValue = interaction.fields.getTextInputValue("city");
 
-                    const user = await SholatKuService.User().resolveUser({
-                        provider: SholatkuUserProvider.Discord,
+                    const userManager = new UserManager();
+                    const location = new Location();
+
+                    const user = await userManager.resolve({
+                        provider: UserProvider.Discord,
                         user: interaction.user
                     })
 
+                    if (!user) {
+                        return
+                    }
+
+                    const userAccount = new UserAccount(user)
+
                     // const province = await DiscordService.User(interaction.user.id).Preferences.Province.get();
-                    const province = await SholatKuService.User(user).Province.get();
+                    const province = await userAccount.getProvince()
                     if (!province) {
                         // province not set
                         return
                     }
-                    const provinceFormmated = SholatKuServiceHelper.normalizeOutput(province);
+                    const provinceFormmated = normalizeOutput(province);
 
-                    const cityResult = await SholatKuService.Database.Location.searchCity(province, cityValue);
+                    const cityResult = await location.searchCity(province, cityValue);
 
                     if (!cityResult) {
                         // not found
@@ -94,10 +114,10 @@ export default {
                     }
 
                     const cityFinal = cityResult.original;
-                    const cityFinalFormmated = SholatKuServiceHelper.normalizeOutput(cityFinal);
+                    const cityFinalFormmated = normalizeOutput(cityFinal);
 
                     // await DiscordService.User(interaction.user.id).Preferences.City.set(cityFinal);
-                    await SholatKuService.User(user).City.set(cityFinal);
+                    userAccount.setCity(cityFinal);
 
                     console.log(`[${tags.Debug}] User ID: ${interaction.user.id}`);
                     console.log(`[${tags.Debug}] Final Location Set: ${province} - ${cityFinal}`);

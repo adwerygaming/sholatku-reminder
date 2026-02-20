@@ -1,10 +1,9 @@
 import { Client, Events } from 'discord.js';
 import tags from '../utils/Tags.js';
 import client from './Client.js';
+import { CommandHandler } from './CommandHandler.js';
 
 console.log(`[${tags.System}] Loaded Discord Index Script.`)
-
-import { CommandHandler } from './CommandHandler.js';
 
 const commandHandler = new CommandHandler();
 

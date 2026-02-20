@@ -1,8 +1,11 @@
 import { ButtonBuilder, LabelBuilder, ModalBuilder, TextInputBuilder } from "@discordjs/builders";
 import { ButtonStyle, Colors, ContainerBuilder, MessageFlags, TextInputStyle } from "discord.js";
-import SholatKuService from "../../sholatku/domain/PrayerScheduler.js";
+import { Location } from "../../sholatku/domain/Location.js";
+import { UserAccount } from "../../sholatku/domain/UserAccount.js";
+import { UserManager } from "../../sholatku/domain/UserManager.js";
+import { normalizeOutput } from "../../sholatku/helper/Helper.js";
 import { ButtonLayout } from "../../types/Discord.types.js";
-import { SholatkuUserProvider } from "../../types/SholatKu.types.js";
+import { UserProvider } from "../../types/Users.types.js";
 import tags from "../../utils/Tags.js";
 
 export default {
@@ -16,8 +19,10 @@ export default {
             if (action[1] == "start") {
                 await interaction.deferUpdate();
 
-                const provinces = await SholatKuService.Database.Location.getProvinces();
-                const formmatedProvinces = provinces.map((province, i) => `[${i + 1}] **${SholatKuService.Helper.normalizeOutput(province)}**`).join('\n');
+                const location = new Location();
+
+                const provinces = await location.getProvinces();
+                const formmatedProvinces = provinces.map((province, i) => `[${i + 1}] **${normalizeOutput(province)}**`).join('\n');
 
                 const provinceAnswerModalBtn = new ButtonBuilder()
                     .setCustomId(`reminder_${interaction.user.id}_subscribe_answer_province`)
@@ -94,12 +99,35 @@ export default {
                 try {
                     await interaction.deferUpdate();
 
-                    const user = await SholatKuService.User().resolveUser({
-                        provider: SholatkuUserProvider.Discord,
+                    const userManager = new UserManager()
+
+                    const user = await userManager.resolve({
+                        provider: UserProvider.Discord,
                         user: interaction.user
                     })
 
-                    await SholatKuService.User(user).unregister();
+                    if (!user) {
+                        const errorContainer = new ContainerBuilder()
+                            .setAccentColor(Colors.DarkRed)
+                            .addTextDisplayComponents(
+                                (text) => text.setContent("### Prayer Reminder Subscription"),
+                            )
+                            .addSeparatorComponents((sep) => sep)
+                            .addTextDisplayComponents(
+                                (text) => text.setContent("An error occurred while trying to resolve your account. Please try again later."),
+                            )
+
+                        await interaction.reply({
+                            components: [errorContainer],
+                            flags: [MessageFlags.IsComponentsV2]
+                        })
+
+                        return
+                    }
+
+                    const userAccount = new UserAccount(user)
+
+                    await userAccount.unregister();
 
                     const successContainer = new ContainerBuilder()
                         .setAccentColor(Colors.Green)
