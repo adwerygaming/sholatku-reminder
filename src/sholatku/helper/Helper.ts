@@ -15,7 +15,7 @@ function normalizeInput(input: string): string {
  * @param time string Hour:Minute time format
  * @returns Moment object of that time for today.
  */
-function convertTimeToMoment(time: string) {
+function convertTimeToMoment(time: string): moment.Moment {
     const obj = moment(time, "HH:mm")
     return obj
 }
@@ -36,7 +36,7 @@ function normalizeOutput(input: string): string {
  * @param input 
  * @returns 
  */
-function slugify(input: string) {
+function slugify(input: string): string {
     return input
         .toLowerCase()
         .replace(/[.\s_]+/g, '')
@@ -47,7 +47,7 @@ function slugify(input: string) {
  * @param input input that looks like this.
  * @returns Each word capitalzed string, Input That Looks Like This
  */
-function capitalizeWords(input: string) {
+function capitalizeWords(input: string): string {
     return input
         .toLowerCase()
         .split(' ')
@@ -55,4 +55,4 @@ function capitalizeWords(input: string) {
         .join(' ')
 }
 
-export default { capitalizeWords, normalizeInput, normalizeOutput, convertTimeToMoment, slugify }
+export { capitalizeWords, convertTimeToMoment, normalizeInput, normalizeOutput, slugify }

@@ -1,7 +1,12 @@
 import FuzzySearch from 'fuzzy-search';
 import LocationDatabaseClient from "../../database/LocationDatabaseClient.js";
 import { LocationSearchResult } from '../../types/Location.types.js';
-import { default as Helper, default as SholatKuServiceHelper } from '../helper/Helper.js';
+import { DatabaseRawSchema } from '../../types/SholatKu.types.js';
+import { normalizeInput, normalizeOutput, slugify } from '../helper/Helper.js';
+
+interface LocationFetchResult {
+    [province: string]: string[]
+}
 
 export class Location {
     /**
@@ -10,7 +15,7 @@ export class Location {
      * Each entry contains a province key and an array of city strings.
      * @returns Raw location records from the database.
      */
-    private async getAllRaw() {
+    private async getAllRaw(): Promise<DatabaseRawSchema<string[]>[]> {
         const allRaw = await LocationDatabaseClient.all<string[]>()
         return allRaw
     }
@@ -21,7 +26,7 @@ export class Location {
      * and an array of city strings as the value.
      * @returns An array of objects mapping province keys to their city arrays.
      */
-    async fetch() {
+    async fetch(): Promise<LocationFetchResult[]> {
         const allRaw = await this.getAllRaw()
         const all = allRaw.map(x => {
             return {
@@ -52,7 +57,7 @@ export class Location {
     async getCitiesByProvince(province: string): Promise<string[]> {
         const allRaw = await this.getAllRaw()
 
-        const provinceSlug = Helper.normalizeInput(province)
+        const provinceSlug = normalizeInput(province)
 
         const cities = allRaw
             .filter(x => x.id === provinceSlug)
@@ -77,15 +82,15 @@ export class Location {
 
         const searchObj: LocationSearchResult[] = allProvinces.map(x => {
             return { 
-                searchKey: SholatKuServiceHelper.slugify(x), 
+                searchKey: slugify(x), 
                 databaseKey: x, 
-                original: SholatKuServiceHelper.normalizeOutput(x) 
+                original: normalizeOutput(x) 
             }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
-        const res = searcher.search(SholatKuServiceHelper.slugify(query))
+        const res = searcher.search(slugify(query))
 
         return res?.[0]
     }
@@ -104,12 +109,12 @@ export class Location {
         const allCities = await this.getCitiesByProvince(province)
 
         const searchObj: Omit<LocationSearchResult, 'databaseKey'>[] = allCities.map(x => {
-            return { searchKey: SholatKuServiceHelper.slugify(x), original: x }
+            return { searchKey: slugify(x), original: x }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
-        const res = searcher.search(SholatKuServiceHelper.slugify(query))
+        const res = searcher.search(slugify(query))
 
         return res?.[0]
     }

@@ -62,7 +62,7 @@ setInterval(async () => {
 
 await check()
 
-async function check() {
+async function check(): Promise<void> {
     let debugTime: Moment | undefined = undefined
     const useDebugTime = false
 
@@ -88,6 +88,7 @@ async function check() {
             usersMap.set(locationKey, [])
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         usersMap.get(locationKey)!.push(user)
     }
 

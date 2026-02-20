@@ -1,8 +1,7 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { SholatkuUser } from "../../types/Users.types.js"
-import SholatKuServiceHelper from "../helper/Helper.js"
-
+import { normalizeInput } from "../helper/Helper.js"
 // has user
 export class UserAccount {
     constructor(
@@ -52,7 +51,7 @@ export class UserAccount {
      * @param province Province value for that user
      */
     async setProvince(province: string): Promise<void> {
-        province = SholatKuServiceHelper.normalizeInput(province)
+        province = normalizeInput(province)
 
         await this.db.set(`${this.user.id}.location.province`, province)
         await this.db.set(`${this.user.id}.location.lastUpdatedAt`, moment().toISOString())
@@ -72,7 +71,7 @@ export class UserAccount {
      * @param city City value for that user
      */
     async setCity(city: string): Promise<void> {
-        city = SholatKuServiceHelper.normalizeInput(city)
+        city = normalizeInput(city)
 
         await this.db.set(`${this.user.id}.location.city`, city)
         await this.db.set(`${this.user.id}.location.lastUpdatedAt`, moment().toISOString())

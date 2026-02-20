@@ -91,7 +91,7 @@ export class UserManager {
      * @param user Union User of Discord, WhatsApp
      * @returns SholatkuUser object.
      */
-    async resolve(user: SholatkuUnionUser): Promise<SholatkuUser> {
+    async resolve(user: SholatkuUnionUser): Promise<SholatkuUser | null> {
         const SholatkuUserId = uuidv4()
 
         let obj: SholatkuUser | null = null
@@ -133,7 +133,6 @@ export class UserManager {
 
         await this.db.set(SholatkuUserId, obj)
 
-        // source: trust me bro
-        return obj!
+        return obj
     }
 }

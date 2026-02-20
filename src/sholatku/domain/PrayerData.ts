@@ -4,7 +4,7 @@ import DatabaseClient from "../../database/DatabaseClient.js"
 import { BaseLocation } from "../../types/Location.types.js"
 import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
-import Helper from "../helper/Helper.js"
+import { convertTimeToMoment, normalizeInput } from "../helper/Helper.js"
 import { Location } from "./Location.js"
 
 export class PrayerData {
@@ -16,8 +16,8 @@ export class PrayerData {
         city: string,
         private readonly db = DatabaseClient.table("prayer_data")
     ) {
-        this.province = Helper.normalizeInput(province)
-        this.city = Helper.normalizeInput(city)
+        this.province = normalizeInput(province)
+        this.city = normalizeInput(city)
     }
 
     //! from all prayer data (30 days), filter only today prayer times
@@ -46,7 +46,7 @@ export class PrayerData {
             .map(([key, value]) => {
                 return {
                     prayerName: key as PrayerName,
-                    time: Helper.convertTimeToMoment(value)
+                    time: convertTimeToMoment(value)
                 }
             })
 
