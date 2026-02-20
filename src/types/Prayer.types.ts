@@ -1,4 +1,4 @@
-export type PrayerName = "imsak" | "subuh" | "terbit" | "dhuha" | "dzuhur" | "ashar" | "maghrib" | "isya"
+export type PrayerName = "imsak" | "subuh" | "terbit" | "dhuha" | "dzuhur" | "jummah" | "ashar" | "maghrib" | "isya"
 
 /**
  * RAW Response from API, Still containing code, message and data.
