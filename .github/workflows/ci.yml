@@ -18,9 +18,10 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 20
+            cache: npm
 
-        - name: "Install dependencies"
-          run: npm install
+        - name: "NPM CI Thingy"
+          run: npm ci
 
         - name: "Lint - Check for errors & unused vars"
           run: npm run lint
@@ -37,9 +38,10 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 20
+            cache: npm
 
-        - name: "NPM CI Test"
-          run: npm install
+        - name: "NPM CI Thingy"
+          run: npm ci
 
         - name: "Typescript Type Check"
           run: npx tsc --noEmit
