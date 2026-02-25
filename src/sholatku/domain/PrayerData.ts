@@ -89,7 +89,7 @@ export class PrayerData {
      * @returns 
      */
     async get(): Promise<PrayerTimeData[] | null> {
-        console.log(`[${tags.Debug}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
+        // console.log(`[${tags.Debug}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
         const res: PrayerTimeData[] | null = await this.db.get(`${this.province}.${this.city}`)
 
         //! if get no data, try passing non normalize input for both province and city.

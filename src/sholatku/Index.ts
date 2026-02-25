@@ -7,7 +7,6 @@ import { capitalizeWords } from "./helper/Helper.js";
 import sholatkuClient, { PrayerEventPayload } from "./Client.js";
 
 async function annouce(payload: PrayerEventPayload, message: string): Promise<void> {
-    // const users: SholatkuUser[] = payload.users.map((u) => u)
     const providerTYpe = payload.users[0].provider
 
     if (providerTYpe == UserProvider.Discord) {
@@ -78,7 +77,7 @@ sholatkuClient.on(PrayerEvent.PrayerIn5m, async (payload) => {
             eventName = "jummah"
         }
 
-        annouce(payload, `**${capitalizeWords(payload.event.eventName)}** prayer will start in 5 minutes at ${payload.event.time.format("HH:mm:ss")}`)
+        annouce(payload, `**${capitalizeWords(payload.event.eventName)}** prayer will start in 5 minutes at ${payload.event.time.format("HH:mm")}`)
     }
 });
 
@@ -97,7 +96,7 @@ sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
             eventName = "jummah"
         }
 
-        annouce(payload, `**${capitalizeWords(payload.event.eventName)}** prayer will start in 15 minutes at ${payload.event.time.format("HH:mm:ss")}`)
+        annouce(payload, `**${capitalizeWords(payload.event.eventName)}** prayer will start in 15 minutes at ${payload.event.time.format("HH:mm")}`)
     }
 });
 

@@ -7,20 +7,8 @@ import { UserManager } from "./domain/UserManager.js";
 
 import EventEmitter from "events";
 import { PrayerEvent } from "../types/Prayer.types.js";
-import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
 import tags from "../utils/Tags.js";
-
-// await DatabaseClient.table("users").deleteAll()
-// await DatabaseClient.table("prayer_state").deleteAll()
-// await DatabaseClient.table("user_prayer_state").deleteAll()
-
-// const provTest = "yogya"
-// const cityTest = "gunung"
-
-// const provRes = await SholatKuService.Database.Location.searchProvince(provTest)
-// console.log("Province Search Result:", provRes)
-// const cityRes = await SholatKuService.Database.Location.searchCity(provRes?.original ?? provTest, cityTest)
-// console.log("City Search Result:", cityRes)
+import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
 
 export type PrayerEventPayload = {
     event: CycleCheckEvent;

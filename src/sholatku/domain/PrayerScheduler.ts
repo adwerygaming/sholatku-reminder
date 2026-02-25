@@ -54,9 +54,9 @@ export class PrayerScheduler {
         const output: CycleCheckEvent[] = []
 
         if (this.debugTime) {
-            console.log(`[${tags.Debug}] Using Debug Time: ${this.debugTime.format("HH:mm")}`)
+            console.log(`[${tags.Debug}] Using Debug Time.`)
         }
-
+        
         console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.SSS")}`)
 
         let currentIdx = -1
@@ -93,7 +93,6 @@ export class PrayerScheduler {
             if (isCurrentPrayerTime) {
                 const currentPrayerCheck = await this.prayerState.get(current.prayerName)
                 if (!currentPrayerCheck) {
-                    console.log(`Time for ${current.prayerName}`)
                     output.push({
                         type: PrayerEvent.PrayerTime,
                         eventName: current.prayerName,
@@ -107,12 +106,11 @@ export class PrayerScheduler {
             // Calculate diff to next prayer (works for both today and tomorrow)
             const nextPrayerDiff = nextPrayerTime.diff(now, "minutes")
             const nextPrayerName = next.prayerName
-            const rolloverSuffix = nextInfo.isRollover ? ' (tomorrow)' : ''
+            // const rolloverSuffix = nextInfo.isRollover ? ' (tomorrow)' : ''
 
             // 5 minute reminder
             const nextPrayerIn5DiffCheck = await this.prayerState.get(`${nextPrayerName}_5m`)
             if (nextPrayerDiff > 0 && nextPrayerDiff <= 5 && !nextPrayerIn5DiffCheck) {
-                console.log(`5 Minutes into ${nextPrayerName}${rolloverSuffix}`)
                 output.push({
                     type: PrayerEvent.PrayerIn5m,
                     eventName: nextPrayerName,
@@ -124,7 +122,6 @@ export class PrayerScheduler {
             // 15 minute reminder
             const nextPrayerIn15DiffCheck = await this.prayerState.get(`${nextPrayerName}_15m`)
             if (nextPrayerDiff > 5 && nextPrayerDiff <= 15 && !nextPrayerIn15DiffCheck) {
-                console.log(`15 Minutes into ${nextPrayerName}${rolloverSuffix}`)
                 output.push({
                     type: PrayerEvent.PrayerIn15m,
                     eventName: nextPrayerName,
@@ -136,7 +133,6 @@ export class PrayerScheduler {
             // 30 minute reminder
             const nextPrayerIn30DiffCheck = await this.prayerState.get(`${nextPrayerName}_30m`)
             if (nextPrayerDiff > 15 && nextPrayerDiff <= 30 && !nextPrayerIn30DiffCheck) {
-                console.log(`30 Minutes into ${nextPrayerName}${rolloverSuffix}`)
                 output.push({
                     type: PrayerEvent.PrayerIn30m,
                     eventName: nextPrayerName,
@@ -150,7 +146,7 @@ export class PrayerScheduler {
             const nextInfo = getNextPrayer(currentIdx)
             const nextPrayer = nextInfo.prayer
 
-            console.log(`[${tags.Debug}] Next Prayer is ${nextPrayer.prayerName}${nextInfo.isRollover ? ' (tomorrow)' : ''} at ${nextPrayer.time.from(now)}`)
+            // console.log(`[${tags.Debug}] Next Prayer is ${nextPrayer.prayerName}${nextInfo.isRollover ? ' (tomorrow)' : ''} at ${nextPrayer.time.from(now)}`)
 
             output.push({
                 type: PrayerEvent.NextPrayer,
@@ -159,7 +155,7 @@ export class PrayerScheduler {
             })
         } else {
             const firstPrayer = prayerToday[0]
-            console.log(`[${tags.Debug}] Next Prayer is ${firstPrayer.prayerName} at ${firstPrayer.time.from(now)}`)
+            // console.log(`[${tags.Debug}] Next Prayer is ${firstPrayer.prayerName} at ${firstPrayer.time.from(now)}`)
 
             output.push({
                 type: PrayerEvent.NextPrayer,
