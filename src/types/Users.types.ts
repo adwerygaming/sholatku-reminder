@@ -2,37 +2,35 @@ import { User } from "discord.js"
 import { Location } from "./Location.types.js"
 import { WhatsAppUser } from "./SholatKu.types.js"
 
-export interface BaseUser {
+export interface BaseSubscription {
     id: string // universinal uuid
     lastUpdatedAt?: string
-    provider: UserProvider
+    provider: SubscriptionProvider
     location?: Location
 }
 
-export type SholatkuUnionUser = {
-    provider: UserProvider.Discord,
-    user: User
+export type SholatkuUnionSubsription = {
+    provider: SubscriptionProvider.Discord,
+    subscription: User
 } | {
-    provider: UserProvider.WhatsApp,
-    user: WhatsAppUser
+    provider: SubscriptionProvider.WhatsApp,
+    subscription: WhatsAppUser
 }
 
-export type SholatkuUser = DiscordUserAccount | WhatsAppUserAccount
+export type SholatkuSubscription = DiscordSubscription | WhatsAppSubscription
 
-export interface DiscordUserAccount extends BaseUser {
-    provider: UserProvider.Discord
-    discordId: User["id"]
-    displayName: User["displayName"]
-    username: User["username"]
+export interface DiscordSubscription extends BaseSubscription {
+    provider: SubscriptionProvider.Discord
+    guildId: string
+    channelId: string
 }
 
-export interface WhatsAppUserAccount extends BaseUser {
-    provider: UserProvider.WhatsApp
-    phoneNumber: WhatsAppUser["phoneNumber"]
-    displayName: WhatsAppUser["displayName"]
+export interface WhatsAppSubscription extends BaseSubscription {
+    provider: SubscriptionProvider.WhatsApp
+    chatId: string
 }
 
-export enum UserProvider {
+export enum SubscriptionProvider {
     Discord = "discord",
     WhatsApp = "whatsapp"
 }
