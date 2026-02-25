@@ -7,6 +7,12 @@
     <img alt="GitHub issue custom search in repo" src="https://img.shields.io/github/issues-search/adwerygaming/sholatku-reminder?query=is%3Aopen&style=for-the-badge&label=Open%20Issues">
 </div>
 
+## Showcase
+> [!NOTE]
+> This is an example of how the prayer reminder system can be used to send prayer time notifications to a Discord channel. The system will automatically fetch the prayer times for the specified location and send reminders at the appropriate times.
+
+<img alt="Showcase" src="/assets/images/example.png"></img>
+
 ## Usage
 There are <b>4 event available to use</b>, that includes `PrayerTime`, `PrayerIn5m`, `PrayerIn15m`, and `PrayerIn30m`. Each event will trigger at the specified time before the prayer time, allowing you to set up reminders or perform any necessary actions.
 ```ts
