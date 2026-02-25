@@ -3,7 +3,7 @@
   "compilerOptions": {
     "module": "nodenext",
     "target": "es2023",
-    "rootDir": "packages/core/src",
+    "rootDir": "src",
     "outDir": "dist",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -15,7 +15,7 @@
     "noUnusedParameters": true,
   },
   "include": [
-    "packages/core/src"
+    "src"
   ],
   "exclude": ["coverage", "dist", "docs", "node_modules"],
 }

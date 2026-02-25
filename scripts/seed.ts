@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { randomUUID } from 'crypto'
 import { readFileSync } from 'fs'
 import { dirname, resolve } from 'path'
@@ -30,12 +31,7 @@ type LocationRow = LocationEntry & {
 
 const raw: LocationEntry[] = JSON.parse(readFileSync(JSON_PATH, 'utf-8'))
 
-const locations: LocationRow[] = raw.map(entry => ({
-    id: randomUUID(),
-    province: entry.province,
-    city: entry.city,
-    created_at: new Date()
-}))
+const locations: LocationEntry[] = raw
 
 console.log(`📦  Read ${locations.length} location rows from locations.json.`)
 
@@ -47,32 +43,30 @@ await client.connect()
 try {
     await client.query('BEGIN')
 
-    // Insert in batches of 100
-    const batchSize = 100
-    let inserted = 0
-
-    for (let i = 0; i < locations.length; i += batchSize) {
-        const batch = locations.slice(i, i + batchSize)
-
-        const values = batch
-            .map((_, j) => {
-                const base = i + j
-                return `($${base * 4 + 1}, $${base * 4 + 2}, $${base * 4 + 3}, $${base * 4 + 4})`
-            })
-            .join(', ')
-
-        const params = batch.flatMap(r => [r.id, r.province, r.city, r.created_at])
-
-        await client.query(
-            `INSERT INTO locations (id, province, city, created_at)
-             VALUES ${values}
-             ON CONFLICT (province, city) DO NOTHING`,
-            params
+    // Drop and recreate to ensure correct schema
+    await client.query(`DROP TABLE IF EXISTS locations`)
+    await client.query(`
+        CREATE TABLE locations (
+            id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            province    TEXT NOT NULL,
+            city        TEXT NOT NULL,
+            created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            CONSTRAINT  locations_province_city_unique UNIQUE (province, city)
         )
+    `)
 
-        inserted += batch.length
-        console.log(`   ↳ Inserted ${inserted}/${locations.length}...`)
+    let inserted = 0
+    for (const loc of locations) {
+        await client.query(
+            `INSERT INTO locations (id, province, city)
+             VALUES ($1::uuid, $2, $3)
+             ON CONFLICT (province, city) DO NOTHING`,
+            [randomUUID(), loc.province, loc.city]
+        )
+        inserted++
     }
+
+    console.log(`   ↳ Inserted ${inserted} rows.`)
 
     await client.query('COMMIT')
     console.log(`✅  Seed complete. ${locations.length} locations seeded.`)

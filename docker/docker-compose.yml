@@ -1,6 +1,7 @@
 services:
 
   db:
+    container_name: sholatku-db
     image: postgres:18.2-alpine
     environment: 
       POSTGRES_DB: sholatku
@@ -9,7 +10,7 @@ services:
     volumes: 
       - db_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5443:5432"
 
 volumes: 
   db_data:

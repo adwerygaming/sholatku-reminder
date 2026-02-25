@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "start": "npx tsx ./src/index.ts",
+    "scrape": "npx tsx ./src/test/LocationScrapper.ts",
     "lint": "npx eslint .",
     "build": "tsup"
   },
@@ -37,7 +38,9 @@
     "fuse.js": "^7.1.0",
     "fuzzy-search": "^3.2.1",
     "gradient-string": "^3.0.0",
+    "knex": "^3.1.0",
     "moment-timezone": "^0.6.0",
+    "pg": "^8.18.0",
     "quick.db": "^9.1.7",
     "typescript-eslint": "^8.56.0",
     "uuid": "^13.0.0",

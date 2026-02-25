@@ -11,13 +11,15 @@ const __dirname = path.dirname(__filename);
 const locationPath = path.join(__dirname, "..", "assets", "locations")
 const outputPath = path.join(locationPath, "locations.json")
 
+const rootApiUrl = "https://equran.id/api/v2/imsakiyah"
+
 type LocationEntry = {
     province: string
     city: string
 }
 
 async function fetchProvinces(): Promise<string[]> {
-    const url = "https://equran.id/api/v2/imsakiyah/provinsi"
+    const url = `${rootApiUrl}/provinsi`
     const res = await axios.get(url)
     return res.data.data as string[]
 }
@@ -31,7 +33,7 @@ for (let i = 0; i < provinces.length; i++) {
 
     console.log(`[${i + 1}/${provinces.length}] Scraping: ${province}`)
 
-    const url = "https://equran.id/api/v2/imsakiyah/kabkota"
+    const url = `${rootApiUrl}/kabkota`
 
     await axios.post(url, {
         provinsi: province
@@ -47,10 +49,10 @@ for (let i = 0; i < provinces.length; i++) {
         console.error(`   ↳ Failed: ${err.message}`)
     })
 
-    await sleep(500)
+    await sleep(200)
 }
 
 fs.mkdirSync(locationPath, { recursive: true })
 fs.writeFileSync(outputPath, JSON.stringify(locations, null, 2), "utf-8")
 
-console.log(`\n✅  Done. ${locations.length} total locations written to assets/locations/locations.json`)
+console.log(`\nDone. ${locations.length} total locations written to assets/locations/locations.json`)
