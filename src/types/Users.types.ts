@@ -15,7 +15,7 @@ export type SholatkuUnionSubsription = {
 } | {
     provider: SubscriptionProvider.WhatsApp,
     subscription: WhatsAppUser
-}
+} 
 
 export type SholatkuSubscription = DiscordSubscription | WhatsAppSubscription
 
