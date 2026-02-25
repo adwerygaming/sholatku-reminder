@@ -21,12 +21,20 @@ export type SholatkuSubscription = DiscordSubscription | WhatsAppSubscription
 
 export interface DiscordSubscription extends BaseSubscription {
     provider: SubscriptionProvider.Discord
+    metadata: DiscordSubscriptionMetadata
+}
+
+export interface DiscordSubscriptionMetadata {
     guildId: string
     channelId: string
 }
 
 export interface WhatsAppSubscription extends BaseSubscription {
     provider: SubscriptionProvider.WhatsApp
+    metadata: WhatsAppSubscriptionMetadata
+}
+
+export interface WhatsAppSubscriptionMetadata {
     chatId: string
 }
 
