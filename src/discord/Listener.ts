@@ -7,14 +7,19 @@ import { Colors, ContainerBuilder, MessageFlags } from "discord.js";
 import { capitalizeWords } from "../sholatku/helper/Helper.js";
 import client from "./Client.js";
 
+interface DiscordListenerOptions {
+    guildId?: string;
+    channelId?: string;
+}
+
 export class DiscordListener {
     private readonly guildId: string | undefined
     private readonly channelId: string | undefined
 
-    constructor (
-        guildId: string,
-        channelId: string
-    ) {
+    constructor ({
+        guildId,
+        channelId
+    }: DiscordListenerOptions) {
         this.guildId = guildId
         this.channelId = channelId
         console.log(`[${tags.Discord}] Loaded Discord Listener Script.`)

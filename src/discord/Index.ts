@@ -2,10 +2,15 @@ import { Client, Events } from 'discord.js';
 import tags from '../utils/Tags.js';
 import client from './Client.js';
 import { CommandHandler } from './CommandHandler.js';
+import { DiscordListener } from './Listener.js';
 
 console.log(`[${tags.Discord}] Loaded Discord Index Script.`)
 
 const commandHandler = new CommandHandler();
+const listener = new DiscordListener({
+  guildId: "598412465750933504",
+  channelId: "1471750280713601116"
+})
 
 client.on(Events.ClientReady, async (bot: Client) => {
   // loads commands
@@ -27,6 +32,7 @@ client.on(Events.ClientReady, async (bot: Client) => {
   console.log(`[${tags.Discord}] Servers      : ${bot?.guilds.cache.size ?? '-'} Server${bot?.guilds?.cache?.size > 1 ? 's' : ''}`);
   console.log('');
 
+  await listener.listen()
 });
 
 client.on(Events.InteractionCreate, async interaction => {
