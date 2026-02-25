@@ -2,7 +2,7 @@ import moment from "moment-timezone"
 import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { BaseLocation, Location } from "../../types/Location.types.js"
-import { SholatkuUnionUser, SholatkuUser, UserProvider } from "../../types/Users.types.js"
+import { SholatkuUnionUser, SholatkuUser, UserProvider } from "../../types/Subscription.types.js"
 
 // has no user
 export class UserManager {

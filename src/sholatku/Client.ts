@@ -1,5 +1,5 @@
 import moment, { Moment } from "moment-timezone";
-import { SholatkuUser } from "../types/Users.types.js";
+import { SholatkuUser } from "../types/Subscription.types.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { UserAccount } from "./domain/UserAccount.js";

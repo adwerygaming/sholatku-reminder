@@ -1,6 +1,6 @@
 import { User } from "discord.js"
 import { Location } from "./Location.types.js"
-import { WhatsAppUser } from "./SholatKu.types.js"
+import { WhatsAppUser } from "./WhatsApp.types.js"
 
 export interface BaseSubscription {
     id: string // universinal uuid

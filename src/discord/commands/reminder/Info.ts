@@ -3,7 +3,7 @@ import { UserAccount } from "../../../sholatku/domain/UserAccount.js";
 import { UserManager } from "../../../sholatku/domain/UserManager.js";
 import { normalizeOutput } from "../../../sholatku/helper/Helper.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
-import { UserProvider } from "../../../types/Users.types.js";
+import { UserProvider } from "../../../types/Subscription.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()

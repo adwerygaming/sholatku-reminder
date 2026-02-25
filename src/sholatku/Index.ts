@@ -1,10 +1,10 @@
 import moment from "moment-timezone";
 import client from "../discord/Client.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
-import { UserProvider } from "../types/Users.types.js";
+import { UserProvider } from "../types/Subscription.types.js";
 import tags from "../utils/Tags.js";
-import { capitalizeWords } from "./helper/Helper.js";
 import sholatkuClient, { PrayerEventPayload } from "./Client.js";
+import { capitalizeWords } from "./helper/Helper.js";
 
 async function annouce(payload: PrayerEventPayload, message: string): Promise<void> {
     const providerTYpe = payload.users[0].provider

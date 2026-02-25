@@ -2,7 +2,7 @@ import { ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, Client, Colors
 import { UserAccount } from "../../../sholatku/domain/UserAccount.js";
 import { UserManager } from "../../../sholatku/domain/UserManager.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
-import { UserProvider } from "../../../types/Users.types.js";
+import { UserProvider } from "../../../types/Subscription.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()

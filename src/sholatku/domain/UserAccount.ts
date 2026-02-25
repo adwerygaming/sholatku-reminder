@@ -1,6 +1,6 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { SholatkuUser } from "../../types/Users.types.js"
+import { SholatkuUser } from "../../types/Subscription.types.js"
 import { normalizeInput } from "../helper/Helper.js"
 // has user
 export class UserAccount {
