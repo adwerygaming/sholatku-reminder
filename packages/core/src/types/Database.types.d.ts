@@ -14,7 +14,7 @@ export interface LocationSchema extends BaseDatabaseSchema {
 
 export interface PrayerDataSchema extends BaseDatabaseSchema {
     locationId: string;
-    prayerTimes: PrayerTimeData[];
+    prayerTimes: PrayerTimeData[]; // this
 }
 
 export interface PrayerLocationStateSchema extends BaseDatabaseSchema {

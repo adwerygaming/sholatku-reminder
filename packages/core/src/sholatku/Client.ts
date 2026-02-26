@@ -78,6 +78,12 @@ async function check(): Promise<void> {
 
     const subscribers = await subs.getByLocation(loc.id)
 
+    for (const sub of subscribers) {
+      console.log(`[${tags.Debug}] ${sub.providerName}`)
+      console.log(sub.metadata)
+      console.log(loc)
+    }
+
     for (const res of checks) {
       for (const sub of subscribers) {
         sholatkuClient.emit(res.type, {
@@ -85,6 +91,9 @@ async function check(): Promise<void> {
           location: loc,
           subscription: sub,
         })
+
+        // TODO: update user states
+        
       }
     }
   }

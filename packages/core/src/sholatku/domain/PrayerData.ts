@@ -145,11 +145,13 @@ export class PrayerData {
      */
     async set(data: PrayerTimeData[]): Promise<PrayerDataSchema[]> {
         // locationId is unique btw
+        // JSON.stringify required: pg driver serializes JS arrays as PostgreSQL array literals,
+        // which is invalid JSONB syntax. Passing a string lets PostgreSQL cast it to JSONB correctly.
         const res = await this.db()
             .insert({
                 createdAt: moment().toISOString(),
                 locationId: this.locationId,
-                prayerTimes: data
+                prayerTimes: JSON.stringify(data) as unknown as PrayerTimeData[]
             })
             .onConflict("locationId")
             .merge(["prayerTimes", "createdAt"])
