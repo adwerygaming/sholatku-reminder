@@ -91,7 +91,7 @@ async function check(): Promise<void> {
           location: loc,
           subscription: sub,
         })
-
+ 
         // TODO: update user states
       }
     }
