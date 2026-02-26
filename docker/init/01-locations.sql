@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS locations (
     createdAt   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     province    TEXT NOT NULL,
     city        TEXT NOT NULL,
+    
     CONSTRAINT  locations_province_city_unique UNIQUE (province, city)
 );
 

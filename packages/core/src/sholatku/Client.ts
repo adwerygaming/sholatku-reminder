@@ -2,8 +2,8 @@ import moment, { Moment } from "moment-timezone";
 import { SholatkuUser } from "../types/Subscription.types.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
-import { UserAccount } from "./domain/UserAccount.js";
-import { UserManager } from "./domain/UserManager.js";
+import { UserAccount } from "./domain/Subscriptions.js";
+import { UserManager } from "./domain/SubscriptionManager.js";
 
 import EventEmitter from "events";
 import { PrayerEvent } from "../types/Prayer.types.js";
