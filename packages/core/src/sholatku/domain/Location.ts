@@ -70,11 +70,11 @@ export class Location {
      * @param query - The search string to match against province names.
      * @returns A promise resolving to the best-matching {@link LocationSearchResult}.
      */
-    async searchProvince(query: string): Promise<LocationSearchResult | undefined> {
-        // somehow resolve"yogya" to "D. I. Yogyakarta", "jakarta" to "DKI Jakarta", etc
+    async searchProvince(query: string): Promise<LocationSearchResult | null> {
+        // somehow resolve"yogya" to "D.I. Yogyakarta", "jakarta" to "DKI Jakarta", etc
+        const userQuery = slugify(query)
 
         const allProvinces = await this.getProvinces()
-
         const searchObj: LocationSearchResult[] = allProvinces.map(x => {
             return {
                 searchKey: slugify(x), 
@@ -83,11 +83,13 @@ export class Location {
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
-
-        const userQuery = slugify(query)
         const res = searcher.search(userQuery)
 
-        return res?.[0]
+        const data = res?.[0] ?? null
+
+        if (!data) return null;
+
+        return data
     }
 
     /**
@@ -96,24 +98,29 @@ export class Location {
      * The result provides two representations of the matched city:
      * - `searchKey` — slugified form, for use in further lookups
      * - `original` — human-readable form for display
-     * @param province - The slugified province key to scope the city search.
+     * @param province - The province to scope the city search.
      * @param query - The search string to match against city names.
      * @returns A promise resolving to the best-matching city result, omitting `databaseKey`.
      */
-    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'> | undefined> {
-        const allCities = await this.getCitiesByProvince(province)
+    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'> | null> {
+        // province must be on proper format
+        const userQuery = slugify(query)
 
+        const allCities = await this.getCitiesByProvince(province)
         const searchObj: Omit<LocationSearchResult, 'databaseKey'>[] = allCities.map(x => {
-            return { searchKey: slugify(x), original: x }
+            return {
+                searchKey: slugify(x),
+                original: x
+            }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
+        const res = searcher.search(userQuery)
 
-        const res = searcher.search(slugify(query))
-        const result = res?.[0]
-        
-        if (!result) return undefined
+        const data = res?.[0] ?? null
 
-        return result
+        if (!data) return null
+
+        return data
     }
 }
