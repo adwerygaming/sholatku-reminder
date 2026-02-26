@@ -33,6 +33,7 @@ export interface PrayerSubscriptionStateSchema extends BaseDatabaseSchema {
 }
 
 export interface SubscriptionSchema extends BaseDatabaseSchema {
+    locationId: string;
     providerName: string;
     metadata: string;
 }

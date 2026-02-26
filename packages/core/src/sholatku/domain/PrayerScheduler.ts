@@ -2,7 +2,7 @@ import moment from "moment-timezone"
 import { PrayerEvent, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
 import { PrayerData } from "./PrayerData.js"
-import { PrayerState } from "./PrayerState.js"
+import { PrayerState } from "./PrayerLocationState.js"
 
 export interface CycleCheckEvent {
     type: PrayerEvent

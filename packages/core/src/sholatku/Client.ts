@@ -2,7 +2,7 @@ import moment, { Moment } from "moment-timezone";
 import { SholatkuUser } from "../types/Subscription.types.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
-import { UserAccount } from "./domain/Subscriptions.js";
+import { UserAccount } from "./domain/SubscriptionRegistrar.js";
 import { UserManager } from "./domain/SubscriptionManager.js";
 
 import EventEmitter from "events";

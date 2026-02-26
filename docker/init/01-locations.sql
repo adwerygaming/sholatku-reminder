@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     createdAt     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
+    locationId    UUID NOT NULL REFERENCES locations (id),
     providerName  TEXT NOT NULL,
     metadata      JSON NOT NULL
 );

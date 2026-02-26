@@ -1,10 +1,22 @@
-import moment from "moment-timezone"
-import DatabaseClient from "../../database/DatabaseClient.js"
-import { PrayerStateSchema } from "../../types/Database.types.js"
+import moment from "moment-timezone";
+import DatabaseClient from "../../database/DatabaseClient.js";
+import { PrayerLocationStateSchema } from "../../types/Database.types.js";
+import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js";
 
-export class PrayerState {
+interface GetPrayerState {
+    prayerName: PrayerName;
+    prayerType: PrayerEvent;
+}
+
+interface SetPrayerData {
+    prayerName: PrayerName;
+    prayerType: PrayerEvent;
+    value: boolean;
+}
+
+export class PrayerLocationState {
     private readonly prayerId: string
-    private readonly db = DatabaseClient<PrayerStateSchema>("prayerStates")
+    private readonly db = DatabaseClient<PrayerLocationStateSchema>("prayerLocationStates")
 
     constructor(
         locationId: string,
@@ -16,8 +28,8 @@ export class PrayerState {
      * #### Helper function to get current day identifier
      * @returns string of DD_MM date format
      */
-    private getDate(): string {
-        return moment().startOf('day').toISOString()
+    private getDate(): Date {
+        return moment().startOf('day').toDate()
     }
 
     /**
@@ -25,13 +37,14 @@ export class PrayerState {
      * @param eventName 
      * @returns boolean value of that state
      */
-    async get(eventName: string): Promise<boolean> {
+    async get({ prayerName, prayerType }: GetPrayerState): Promise<boolean> {
         const dateIdentifier = this.getDate()
 
         const res = await this.db
             .select("*")
             .where("prayerId", this.prayerId)
-            .where("eventName", eventName)
+            .where("prayerName", prayerName)
+            .where("prayerType", prayerType)
             .where("forDate", dateIdentifier)
             .first()
 
@@ -47,16 +60,17 @@ export class PrayerState {
      * @param eventName 
      * @param value boolean value for that state
      */
-    async set(eventName: string, value: boolean): Promise<PrayerStateSchema> {
+    async set({ prayerName, prayerType, value }: SetPrayerData): Promise<PrayerLocationStateSchema> {
         const [res] = await this.db
             .insert({
                 lastUpdatedAt: moment().toISOString(),
                 prayerId: this.prayerId,
-                eventName,
+                prayerName,
+                prayerType,
                 forDate: this.getDate(),
                 isTriggered: value
             })
-            .onConflict(["prayerId", "eventName", "forDate"])
+            .onConflict(["prayerId", "prayerName", "prayerType", "forDate"])
             .merge()
             .returning("*")
 
