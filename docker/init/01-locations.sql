@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS prayerSubscriptionStates (
     forDate         DATE NOT NULL,
     isTriggered     BOOLEAN NOT NULL,
 
-    CONSTRAINT prayerSubscriptionStates_prayerId_prayerName_prayerType_forDate_unique UNIQUE (prayerId, prayerName, prayerType, forDate)
+    CONSTRAINT prayerSubscriptionStates_prayerId_prayerName_prayerType_forDate_unique UNIQUE (subscriptionId, prayerName, prayerType, forDate)
 );
 
 INSERT INTO locations (province, city) VALUES
