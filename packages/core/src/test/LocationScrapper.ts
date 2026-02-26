@@ -8,7 +8,7 @@ import { sleep } from "../utils/Sleep.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const locationPath = path.join(__dirname, "..", "assets", "locations")
+const locationPath = path.join(__dirname, "..", "..", "..", "..", "assets", "locations")
 const outputPath = path.join(locationPath, "locations.json")
 
 const rootApiUrl = "https://equran.id/api/v2/imsakiyah"
