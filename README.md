@@ -7,6 +7,9 @@
     <img alt="GitHub issue custom search in repo" src="https://img.shields.io/github/issues-search/adwerygaming/sholatku-reminder?query=is%3Aopen&style=for-the-badge&label=Open%20Issues">
 </div>
 
+> [!CAUTION]
+> This `dev` branch is having different system from `main` branch, and it's still in development. do not.
+
 ## Showcase
 > [!NOTE]
 > This is an example of how the prayer reminder system can be used to send prayer time notifications to a Discord channel. The system will automatically fetch the prayer times for the specified location and send reminders at the appropriate times.
