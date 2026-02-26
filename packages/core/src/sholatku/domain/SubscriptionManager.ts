@@ -24,15 +24,6 @@ export class SubscriptionManager {
         return res
     }
 
-    async getByLocation(locationId: string): Promise<SubscriptionSchema[]> {
-        const res = await this.db
-            .select("*")
-            .where("id", this.subscriptionId)
-            .where("locationId", locationId)
-
-        return res
-    }
-
     async unsubscribe(): Promise<SubscriptionSchema | null> {
         const res = await this.db
             .where("id", this.subscriptionId)

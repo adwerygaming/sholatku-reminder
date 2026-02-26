@@ -1,23 +1,12 @@
-import { SholatkuUser } from "../types/Subscription.types.js";
-
 import EventEmitter from "events";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import tags from "../utils/Tags.js";
 import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
+import { Location } from "./domain/Location.js";
+import { SubscriptionManager } from "./domain/SubscriptionManager.js";
 
 export type PrayerEventPayload = {
     event: CycleCheckEvent;
-    province: {
-        searchKey: string;
-        original: string;
-        databaseKey: string;
-    };
-    city: {
-        searchKey: string;
-        original: string;
-        databaseKey: string;
-    };
-    users: SholatkuUser[];
 };
 
 type EventMap = {
@@ -45,3 +34,8 @@ const sholatkuClient = new SholatKuEmitter();
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
 export default sholatkuClient
+
+function check(): Promise<void> {
+    const location = new Location();
+    const subscriptions = new SubscriptionManager()
+}

@@ -23,7 +23,7 @@ type WhatsAppRegisterProp = RegisterBaseProp & {
 
 type RegisterProp = DiscordRegisterProp | WhatsAppRegisterProp
 
-export class SubscriptionRegistrar {
+export class SubscriptionRepository {
     private readonly db = DatabaseClient<SubscriptionSchema>("subscriptions");
 
     async findByProvider({ providerName }: GetByProviderProp): Promise<SubscriptionSchema[]> {

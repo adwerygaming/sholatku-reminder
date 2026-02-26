@@ -51,8 +51,8 @@ export type SubscriptionSchema = DiscordSubscription | WhatsAppSubscription
 
 export interface DatabaseTables {
     locations: LocationSchema;
-    prayer_data: PrayerDataSchema;
-    prayer_location_states: PrayerLocationStateSchema;
-    prayer_subscription_states: PrayerSubscriptionStateSchema;
+    prayerData: PrayerDataSchema;
+    prayerLocationStates: PrayerLocationStateSchema;
     subscriptions: SubscriptionSchema;
+    prayerSubscriptionStates: PrayerSubscriptionStateSchema;
 }

@@ -20,6 +20,11 @@ CREATE TYPE prayer_event_type AS ENUM (
     'nextPrayer'
 );
 
+CREATE TYPE providerName AS ENUM (
+    'discord',
+    'whatsapp'
+);
+
 CREATE TABLE IF NOT EXISTS locations (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     createdAt   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -57,7 +62,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     createdAt     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     locationId    UUID NOT NULL REFERENCES locations (id),
-    providerName  TEXT NOT NULL,
+    providerName  providerName NOT NULL,
     metadata      JSONB NOT NULL
 );
 
