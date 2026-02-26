@@ -7,7 +7,6 @@
     "dev": "nodemon",
     "start": "npx tsx ./src/index.ts",
     "scrape": "npx tsx ./src/test/LocationScrapper.ts",
-    "lint": "npx eslint .",
     "build": "tsup"
   },
   "keywords": [],

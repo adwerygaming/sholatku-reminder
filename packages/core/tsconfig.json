@@ -17,7 +17,6 @@
   },
   "include": [
     "src",
-    "eslint.config.ts"
   ],
   "exclude": [
     "coverage",

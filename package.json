@@ -16,7 +16,10 @@
   ],
   "scripts": {
     "start-core": "npx tsx ./packages/core/src/index.ts",
-    "seed": "npx tsx scripts/seed.ts"
+    "seed": "npx tsx scripts/seed.ts",
+    "lint-core": "npx eslint packages/core",
+    "lint-discord": "npx eslint packages/discord",
+    "lint-whatsapp": "npx eslint packages/whatsapp"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
