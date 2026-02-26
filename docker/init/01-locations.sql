@@ -48,13 +48,13 @@ CREATE TABLE IF NOT EXISTS "prayerLocationStates" (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "createdAt"       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     "lastUpdatedAt"   TIMESTAMPTZ DEFAULT NULL,
-    "prayerId"        UUID NOT NULL REFERENCES "prayerData" (id),
+    "locationId"      UUID NOT NULL REFERENCES locations (id),
     "prayerName"      prayer_name NOT NULL,
     "prayerType"      prayer_event_type NOT NULL,
     "forDate"         DATE NOT NULL,
     "isTriggered"     BOOLEAN NOT NULL,
 
-    CONSTRAINT "prayerLocationStates_prayerId_prayerName_prayerType_forDate_unique" UNIQUE ("prayerId", "prayerName", "prayerType", "forDate")
+    CONSTRAINT "prayerLocationStates_locationId_prayerName_prayerType_forDate_unique" UNIQUE ("locationId", "prayerName", "prayerType", "forDate")
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (

@@ -1,4 +1,4 @@
-import { PrayerEvent, PrayerName } from "./Prayer.types.ts";
+import { PrayerEvent, PrayerName, PrayerTimeData } from "./Prayer.types.ts";
 import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "./Subscription.types.ts";
 
 export interface BaseDatabaseSchema {
@@ -14,11 +14,11 @@ export interface LocationSchema extends BaseDatabaseSchema {
 
 export interface PrayerDataSchema extends BaseDatabaseSchema {
     locationId: string;
-    prayerTimes: string;
+    prayerTimes: PrayerTimeData[];
 }
 
 export interface PrayerLocationStateSchema extends BaseDatabaseSchema {
-    prayerId: string;
+    locationId: string;
     prayerName: PrayerName;
     prayerType: PrayerEvent;
     forDate: Date;

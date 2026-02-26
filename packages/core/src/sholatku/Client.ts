@@ -48,10 +48,6 @@ async function check(): Promise<void> {
   if (subscribedLocations.length === 0) {
     console.log(`[${tags.Error}] No subscriptions found. Adding dumy data`)
 
-    const allLocks = await location.fetch()
-
-    console.log(allLocks)
-
     const locky = await location.getByLocation({
       province: "D.I. Yogyakarta",
       city: "Kab. Gunungkidul"

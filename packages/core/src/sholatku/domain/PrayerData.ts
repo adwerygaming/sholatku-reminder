@@ -107,16 +107,36 @@ export class PrayerData {
             .where("locationId", this.locationId)
 
         if (!res || res.length === 0) {
-            return null
+            // fetch from API
+            const location = new Location()
+            const locationData = await location.getById(this.locationId)
+
+            if (!locationData) {
+                console.log(`[${tags.Error}] Failed to resolve location for id ${this.locationId}`)
+                return null
+            }
+
+            const fetched = await this.fetch({
+                city: locationData.city,
+                province: locationData.province
+            })
+
+            if (fetched.length === 0) {
+                console.log(`[${tags.Error}] Failed to fetch prayer data for ${locationData.city}, ${locationData.province}`)
+                return null
+            }
+
+            await this.set(fetched)
+
+            // should i replace res with fetched data? or just fetch again? race condition? recursive?
+            return await this.get()
         }
-        
-        // res should be json string
-        const formatted = res.map((x) => {
-            const mapped = JSON.parse(x.prayerTimes) as PrayerTimeData[]
-            return mapped
+
+        const mapped = res.map(x => {
+            return x.prayerTimes
         }).flat()
 
-        return formatted
+        return mapped
     }
 
     /**
@@ -124,15 +144,15 @@ export class PrayerData {
      * @param data PrayerTimeData for this locaton
      */
     async set(data: PrayerTimeData[]): Promise<PrayerDataSchema[]> {
-        const formattedData = JSON.stringify(data)
-
         // locationId is unique btw
         const res = await this.db()
-            .upsert({
+            .insert({
                 createdAt: moment().toISOString(),
                 locationId: this.locationId,
-                prayerTimes: formattedData
+                prayerTimes: data
             })
+            .onConflict("locationId")
+            .merge(["prayerTimes", "createdAt"])
             .returning("*")
 
         return res

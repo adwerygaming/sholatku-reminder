@@ -16,7 +16,7 @@ interface SetPrayerData {
 }
 
 export class PrayerLocationState {
-    private readonly prayerId: string
+    private readonly locationId: string
     private db(): Knex.QueryBuilder<PrayerLocationStateSchema, PrayerLocationStateSchema[]> {
         return DatabaseClient<PrayerLocationStateSchema>("prayerLocationStates")
     }
@@ -24,7 +24,7 @@ export class PrayerLocationState {
     constructor(
         locationId: string,
     ) {
-        this.prayerId = locationId
+        this.locationId = locationId
     }
 
     /**
@@ -45,7 +45,7 @@ export class PrayerLocationState {
 
         const res = await this.db()
             .select("*")
-            .where("prayerId", this.prayerId)
+            .where("locationId", this.locationId)
             .where("prayerName", prayerName)
             .where("prayerType", prayerType)
             .where("forDate", dateIdentifier)
@@ -67,14 +67,14 @@ export class PrayerLocationState {
         const [res] = await this.db()
             .insert({
                 lastUpdatedAt: moment().toISOString(),
-                prayerId: this.prayerId,
+                locationId: this.locationId,
                 prayerName,
                 prayerType,
                 forDate: this.getDate(),
                 isTriggered: value
             })
-            .onConflict(["prayerId", "prayerName", "prayerType", "forDate"])
-            .merge()
+            .onConflict(["locationId", "prayerName", "prayerType", "forDate"])
+            .merge(["lastUpdatedAt", "isTriggered"])
             .returning("*")
 
         return res

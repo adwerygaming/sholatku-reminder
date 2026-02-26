@@ -58,7 +58,7 @@ export class PrayerScheduler {
         const province = locationData.province
 
         if (!prayerDataResult) {
-            console.log(`[${tags.Error}] Failed to get prayer data for ${city}, ${province}`)
+            console.log(`[${tags.Error}] Failed to get prayer data for ${city}, ${province}. Found no results.`)
             return null
         }
 
