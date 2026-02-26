@@ -1,8 +1,10 @@
 import moment from "moment-timezone"
+import { LocationSchema } from "../../types/Database.types.js"
 import { PrayerEvent, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
+import { Location } from "./Location.js"
 import { PrayerData } from "./PrayerData.js"
-import { PrayerState } from "./PrayerLocationState.js"
+import { PrayerLocationState } from "./PrayerLocationState.js"
 
 export interface CycleCheckEvent {
     type: PrayerEvent
@@ -15,30 +17,48 @@ export interface CycleCheckEvent {
  * Also known as Root Sholatku Service 
  */
 export class PrayerScheduler {
+    private readonly location = new Location()
+    private readonly locationId: string
     private readonly prayerData: PrayerData
-    private readonly prayerState: PrayerState
-    private readonly province: string
-    private readonly city: string
+    private readonly prayerLocationState: PrayerLocationState
     private readonly debugTime: moment.Moment | undefined = undefined
 
     constructor(
-        province: string,
-        city: string,
+        locationId: string,
         debugTime?: moment.Moment
     ) {
-        this.prayerData = new PrayerData(province, city)
-        this.prayerState = new PrayerState(province, city)
-        this.province = province
-        this.city = city
+        this.locationId = locationId
+        this.prayerData = new PrayerData(locationId)
+        this.prayerLocationState = new PrayerLocationState(locationId)
         this.debugTime = debugTime
+    }
+
+    async resolveLocation(): Promise<LocationSchema | null> {
+        const locationData = await this.location.getById(this.locationId)
+
+        if (!locationData) {
+            return null
+        }
+
+        return locationData
     }
 
     async cycleCheck(): Promise<CycleCheckEvent[] | null> {
         const prayerDataResult = await this.prayerData.get()
         const now = this.debugTime ?? moment()
 
+        const locationData = await this.resolveLocation()
+    
+        if (!locationData) {
+            console.log(`[${tags.Error}] Failed to resolve location for id ${this.locationId}`)
+            return null
+        }
+
+        const city = locationData.city
+        const province = locationData.province
+
         if (!prayerDataResult) {
-            console.log(`[${tags.Error}] Failed to get prayer data for ${this.city}, ${this.province}`)
+            console.log(`[${tags.Error}] Failed to get prayer data for ${city}, ${province}`)
             return null
         }
 
@@ -91,14 +111,23 @@ export class PrayerScheduler {
             const isCurrentPrayerTime = isLastPrayer ? now.isSameOrAfter(prayerTime) : now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime)
 
             if (isCurrentPrayerTime) {
-                const currentPrayerCheck = await this.prayerState.get(current.prayerName)
+                const currentPrayerCheck = await this.prayerLocationState.get({
+                    prayerName: current.prayerName,
+                    prayerType: PrayerEvent.PrayerTime
+                })
+
                 if (!currentPrayerCheck) {
                     output.push({
                         type: PrayerEvent.PrayerTime,
                         eventName: current.prayerName,
                         time: prayerTime
                     })
-                    await this.prayerState.set(current.prayerName, true)
+
+                    await this.prayerLocationState.set({
+                        prayerName: current.prayerName,
+                        prayerType: PrayerEvent.PrayerTime,
+                        value: true
+                    })
                 }
                 currentIdx = i
             }
@@ -109,36 +138,63 @@ export class PrayerScheduler {
             // const rolloverSuffix = nextInfo.isRollover ? ' (tomorrow)' : ''
 
             // 5 minute reminder
-            const nextPrayerIn5DiffCheck = await this.prayerState.get(`${nextPrayerName}_5m`)
+            const nextPrayerIn5DiffCheck = await this.prayerLocationState.get({
+                prayerName: nextPrayerName,
+                prayerType: PrayerEvent.PrayerIn5m
+            })
+
             if (nextPrayerDiff > 0 && nextPrayerDiff <= 5 && !nextPrayerIn5DiffCheck) {
                 output.push({
                     type: PrayerEvent.PrayerIn5m,
                     eventName: nextPrayerName,
                     time: next.time
                 })
-                await this.prayerState.set(`${nextPrayerName}_5m`, true)
+
+                await this.prayerLocationState.set({
+                    prayerName: nextPrayerName,
+                    prayerType: PrayerEvent.PrayerIn5m,
+                    value: true
+                })
             }
 
             // 15 minute reminder
-            const nextPrayerIn15DiffCheck = await this.prayerState.get(`${nextPrayerName}_15m`)
+            const nextPrayerIn15DiffCheck = await this.prayerLocationState.get({
+                prayerName: nextPrayerName,
+                prayerType: PrayerEvent.PrayerIn15m
+            })
+
             if (nextPrayerDiff > 5 && nextPrayerDiff <= 15 && !nextPrayerIn15DiffCheck) {
                 output.push({
                     type: PrayerEvent.PrayerIn15m,
                     eventName: nextPrayerName,
                     time: next.time
                 })
-                await this.prayerState.set(`${nextPrayerName}_15m`, true)
+
+                await this.prayerLocationState.set({
+                    prayerName: nextPrayerName,
+                    prayerType: PrayerEvent.PrayerIn15m,
+                    value: true
+                })
             }
 
             // 30 minute reminder
-            const nextPrayerIn30DiffCheck = await this.prayerState.get(`${nextPrayerName}_30m`)
+            const nextPrayerIn30DiffCheck = await this.prayerLocationState.get({
+                prayerName: nextPrayerName,
+                prayerType: PrayerEvent.PrayerIn30m
+            })
+
             if (nextPrayerDiff > 15 && nextPrayerDiff <= 30 && !nextPrayerIn30DiffCheck) {
                 output.push({
                     type: PrayerEvent.PrayerIn30m,
                     eventName: nextPrayerName,
                     time: next.time
                 })
-                await this.prayerState.set(`${nextPrayerName}_30m`, true)
+                
+                await this.prayerLocationState.set({
+                    prayerName: nextPrayerName,
+                    prayerType: PrayerEvent.PrayerIn30m,
+                    value: true
+                })
             }
         }
 

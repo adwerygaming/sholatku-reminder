@@ -124,11 +124,12 @@ export class PrayerData {
         const formattedData = JSON.stringify(data)
 
         // locationId is unique btw
-        const res = await this.db.upsert({
-            createdAt: moment().toISOString(),
-            locationId: this.locationId,
-            prayerTimes: formattedData
-        })
+        const res = await this.db
+            .upsert({
+                createdAt: moment().toISOString(),
+                locationId: this.locationId,
+                prayerTimes: formattedData
+            })
             .returning("*")
 
         return res

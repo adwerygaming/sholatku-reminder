@@ -8,6 +8,11 @@ interface LocationFetchResult {
     [province: string]: string[]
 }
 
+interface GetByLocationProp {
+    province: string
+    city: string
+}
+
 export class Location {
     private readonly db = DatabaseClient<LocationSchema>("locations")
 
@@ -15,6 +20,20 @@ export class Location {
         const res = await this.db
             .select("*")
             .where("id", locationId)
+            .first()
+
+        if (!res) {
+            return null
+        }
+
+        return res
+    }
+
+    async getByLocation({ province, city }: GetByLocationProp): Promise<LocationSchema | null> {
+        const res = await this.db
+            .select("*")
+            .where("province", province)
+            .where("city", city)
             .first()
 
         if (!res) {
