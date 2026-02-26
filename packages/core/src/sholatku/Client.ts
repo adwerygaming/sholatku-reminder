@@ -1,6 +1,7 @@
 import EventEmitter from "events";
 import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
+import { SubscriptionProvider } from "../types/Subscription.types.js";
 import tags from "../utils/Tags.js";
 import { Location } from "./domain/Location.js";
 import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
@@ -45,7 +46,31 @@ async function check(): Promise<void> {
   const subscribedLocations = await location.getSubscribedLocations()
 
   if (subscribedLocations.length === 0) {
-    console.log(`[${tags.PrayerService}] No subscriptions found.`)
+    console.log(`[${tags.Error}] No subscriptions found. Adding dumy data`)
+
+    const allLocks = await location.fetch()
+
+    console.log(allLocks)
+
+    const locky = await location.getByLocation({
+      province: "D.I. Yogyakarta",
+      city: "Kab. Gunungkidul"
+    })
+
+    if (!locky) {
+      console.log(`[${tags.Error}] Locky not found.`)
+      return
+    }
+
+    await subs.register({
+      locationId: locky.id,
+      providerName: SubscriptionProvider.Discord,
+      metadata: {
+        authorId: "506108777343352881",
+        channelId: "1471750280713601116",
+        guildId: "598412465750933504"
+      }
+    })
     return
   }
 
@@ -70,3 +95,4 @@ async function check(): Promise<void> {
 }
 
 await check()
+setInterval(() => void check(), 5 * 1000)

@@ -1,4 +1,5 @@
 import FuzzySearch from 'fuzzy-search';
+import { Knex } from 'knex';
 import DatabaseClient from '../../database/DatabaseClient.js';
 import { LocationSchema } from '../../types/Database.types.js';
 import { LocationSearchResult } from '../../types/Location.types.js';
@@ -14,15 +15,20 @@ interface GetByLocationProp {
 }
 
 export class Location {
-    private readonly db = DatabaseClient<LocationSchema>("locations")
+    // private readonly db = DatabaseClient<LocationSchema>("locations")
+    private db(): Knex.QueryBuilder<LocationSchema, LocationSchema[]> {
+        return DatabaseClient<LocationSchema>("locations")
+    }
 
     async getSubscribedLocations(): Promise<LocationSchema[]> {
-        return this.db
+        const res = await this.db()
             .whereIn("id", DatabaseClient("subscriptions").distinct("locationId"))
+
+        return res
     }
 
     async getById(locationId: string): Promise<LocationSchema | null> {
-        const res = await this.db
+        const res = await this.db()
             .select("*")
             .where("id", locationId)
             .first()
@@ -35,7 +41,7 @@ export class Location {
     }
 
     async getByLocation({ province, city }: GetByLocationProp): Promise<LocationSchema | null> {
-        const res = await this.db
+        const res = await this.db()
             .select("*")
             .where("province", province)
             .where("city", city)
@@ -55,7 +61,8 @@ export class Location {
      * @returns An array of objects mapping province keys to their city arrays.
      */
     async fetch(): Promise<LocationFetchResult[]> {
-        const data = await this.db.select('province', 'city')
+        const data = await this.db().select('province', 'city')
+
         const sortedData = data.reduce((acc: LocationFetchResult[], curr) => {
             const provinceKey = normalizeInput(curr.province)
             const cityValue = normalizeInput(curr.city)
@@ -79,7 +86,7 @@ export class Location {
      * @returns A promise resolving to an array of province identifiers.
      */
     async getProvinces(): Promise<string[]> {
-        const provinces = await this.db.distinct('province')
+        const provinces = await this.db().distinct('province')
         const sortedProvinces = provinces.map(x => x.province)
         return sortedProvinces
     }
@@ -92,7 +99,7 @@ export class Location {
     async getCitiesByProvince(province: string): Promise<string[]> {
         //! province must be on proper format
 
-        const cities = await this.db.where('province', province)
+        const cities = await this.db().where('province', province)
         const sortedCities = cities.map(x => x.city)
         return sortedCities
     }

@@ -1,3 +1,4 @@
+import { Knex } from "knex";
 import moment from "moment-timezone";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { SubscriptionSchema } from "../../types/Database.types.js";
@@ -24,10 +25,12 @@ type WhatsAppRegisterProp = RegisterBaseProp & {
 type RegisterProp = DiscordRegisterProp | WhatsAppRegisterProp
 
 export class SubscriptionRepository {
-    private readonly db = DatabaseClient<SubscriptionSchema>("subscriptions");
+    private db(): Knex.QueryBuilder<SubscriptionSchema, SubscriptionSchema[]> {
+        return DatabaseClient<SubscriptionSchema>("subscriptions")
+    }
 
     async findByProvider({ providerName }: GetByProviderProp): Promise<SubscriptionSchema[]> {
-        const res = await this.db
+        const res = await this.db()
             .select("*")
             .where("providerName", providerName)
 
@@ -35,7 +38,7 @@ export class SubscriptionRepository {
     }
 
     async getByLocation(locationId: string): Promise<SubscriptionSchema[]> {
-        return this.db
+        return this.db()
             .select("*")
             .where("locationId", locationId)
     }
@@ -49,7 +52,7 @@ export class SubscriptionRepository {
 
         if (found) return found
 
-        const [res] = await this.db
+        const [res] = await this.db()
             .insert({
                 createdAt: moment().toISOString(),
                 locationId,

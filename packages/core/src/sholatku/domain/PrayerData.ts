@@ -1,4 +1,5 @@
 import axios from "axios"
+import { Knex } from "knex"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { PrayerDataSchema } from "../../types/Database.types.js"
@@ -10,7 +11,9 @@ import { Location } from "./Location.js"
 
 export class PrayerData {
     private readonly locationId: string
-    private readonly db = DatabaseClient<PrayerDataSchema>("prayerData")
+    private db(): Knex.QueryBuilder<PrayerDataSchema, PrayerDataSchema[]> {
+        return DatabaseClient<PrayerDataSchema>("prayerData")
+    }
 
     constructor(
         locationId: string,
@@ -99,7 +102,7 @@ export class PrayerData {
      */
     async get(): Promise<PrayerTimeData[] | null> {
         // console.log(`[${tags.Debug}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
-        const res = await this.db
+        const res = await this.db()
             .select("prayerTimes")
             .where("locationId", this.locationId)
 
@@ -124,7 +127,7 @@ export class PrayerData {
         const formattedData = JSON.stringify(data)
 
         // locationId is unique btw
-        const res = await this.db
+        const res = await this.db()
             .upsert({
                 createdAt: moment().toISOString(),
                 locationId: this.locationId,

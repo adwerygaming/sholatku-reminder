@@ -1,3 +1,4 @@
+import { Knex } from "knex";
 import moment from "moment-timezone";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { PrayerLocationStateSchema } from "../../types/Database.types.js";
@@ -16,7 +17,9 @@ interface SetPrayerData {
 
 export class PrayerLocationState {
     private readonly prayerId: string
-    private readonly db = DatabaseClient<PrayerLocationStateSchema>("prayerLocationStates")
+    private db(): Knex.QueryBuilder<PrayerLocationStateSchema, PrayerLocationStateSchema[]> {
+        return DatabaseClient<PrayerLocationStateSchema>("prayerLocationStates")
+    }
 
     constructor(
         locationId: string,
@@ -40,7 +43,7 @@ export class PrayerLocationState {
     async get({ prayerName, prayerType }: GetPrayerState): Promise<boolean> {
         const dateIdentifier = this.getDate()
 
-        const res = await this.db
+        const res = await this.db()
             .select("*")
             .where("prayerId", this.prayerId)
             .where("prayerName", prayerName)
@@ -61,7 +64,7 @@ export class PrayerLocationState {
      * @param value boolean value for that state
      */
     async set({ prayerName, prayerType, value }: SetPrayerData): Promise<PrayerLocationStateSchema> {
-        const [res] = await this.db
+        const [res] = await this.db()
             .insert({
                 lastUpdatedAt: moment().toISOString(),
                 prayerId: this.prayerId,
