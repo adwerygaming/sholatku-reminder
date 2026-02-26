@@ -1,11 +1,15 @@
 import EventEmitter from "events";
+import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import tags from "../utils/Tags.js";
-import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
+import { Location } from "./domain/Location.js";
+import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 
 export type PrayerEventPayload = {
     event: CycleCheckEvent;
+    location: LocationSchema;
+    subscription: SubscriptionSchema;
 };
 
 type EventMap = {
@@ -35,12 +39,34 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 export default sholatkuClient
 
 async function check(): Promise<void> {
-  // const location = new Location();
+  const location = new Location()
   const subs = new SubscriptionRepository()
 
-  const locations = await subs.fetchAllLocations()
+  const subscribedLocations = await location.getSubscribedLocations()
 
-  console.log(locations)
+  if (subscribedLocations.length === 0) {
+    console.log(`[${tags.PrayerService}] No subscriptions found.`)
+    return
+  }
+
+  for (const loc of subscribedLocations) {
+    const scheduler = new PrayerScheduler(loc.id)
+    const checks = await scheduler.cycleCheck()
+
+    if (!checks) continue
+
+    const subscribers = await subs.getByLocation(loc.id)
+
+    for (const res of checks) {
+      for (const sub of subscribers) {
+        sholatkuClient.emit(res.type, {
+          event: res,
+          location: loc,
+          subscription: sub,
+        })
+      }
+    }
+  }
 }
 
 await check()

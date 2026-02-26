@@ -16,6 +16,11 @@ interface GetByLocationProp {
 export class Location {
     private readonly db = DatabaseClient<LocationSchema>("locations")
 
+    async getSubscribedLocations(): Promise<LocationSchema[]> {
+        return this.db
+            .whereIn("id", DatabaseClient("subscriptions").distinct("locationId"))
+    }
+
     async getById(locationId: string): Promise<LocationSchema | null> {
         const res = await this.db
             .select("*")
