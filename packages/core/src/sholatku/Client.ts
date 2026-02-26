@@ -93,7 +93,6 @@ async function check(): Promise<void> {
         })
 
         // TODO: update user states
-        
       }
     }
   }
