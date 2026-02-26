@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS prayerData (
     createdAt     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     locationId    UUID NOT NULL REFERENCES locations (id),
-    prayerTimes   JSON NOT NULL,
+    prayerTimes   JSONB NOT NULL,
 
     CONSTRAINT prayerData_locationId_unique UNIQUE (locationId)
 );
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     locationId    UUID NOT NULL REFERENCES locations (id),
     providerName  TEXT NOT NULL,
-    metadata      JSON NOT NULL
+    metadata      JSONB NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS prayerSubscriptionStates (

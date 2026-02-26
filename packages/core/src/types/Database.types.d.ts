@@ -1,4 +1,5 @@
 import { PrayerEvent, PrayerName } from "./Prayer.types.ts";
+import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "./Subscription.types.ts";
 
 export interface BaseDatabaseSchema {
     id: string;
@@ -32,11 +33,21 @@ export interface PrayerSubscriptionStateSchema extends BaseDatabaseSchema {
     isTriggered: boolean;
 }
 
-export interface SubscriptionSchema extends BaseDatabaseSchema {
-    locationId: string;
-    providerName: string;
-    metadata: string;
+export interface BaseSubscriptionSchema extends BaseDatabaseSchema {
+    locationId: string
 }
+
+export type DiscordSubscription = BaseSubscriptionSchema & {
+    providerName: SubscriptionProvider.Discord
+    metadata: DiscordMetadata
+}
+
+export type WhatsAppSubscription = BaseSubscriptionSchema & {
+    providerName: SubscriptionProvider.WhatsApp
+    metadata: WhatsAppMetadata
+}
+
+export type SubscriptionSchema = DiscordSubscription | WhatsAppSubscription
 
 export interface DatabaseTables {
     locations: LocationSchema;

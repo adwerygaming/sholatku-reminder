@@ -1,40 +1,9 @@
-import { User } from "discord.js"
-import { Location } from "./Location.types.js"
-import { WhatsAppUser } from "./WhatsApp.types.js"
-
-export interface BaseSubscription {
-    id: string // universinal uuid
-    lastUpdatedAt?: string
-    provider: SubscriptionProvider
-    location?: Location
-}
-
-export type SholatkuUnionSubsription = {
-    provider: SubscriptionProvider.Discord,
-    subscription: User
-} | {
-    provider: SubscriptionProvider.WhatsApp,
-    subscription: WhatsAppUser
-} 
-
-export type SholatkuSubscription = DiscordSubscription | WhatsAppSubscription
-
-export interface DiscordSubscription extends BaseSubscription {
-    provider: SubscriptionProvider.Discord
-    metadata: DiscordSubscriptionMetadata
-}
-
-export interface DiscordSubscriptionMetadata {
-    guildId: string
+export interface DiscordMetadata {
+    guildId: string,
     channelId: string
 }
 
-export interface WhatsAppSubscription extends BaseSubscription {
-    provider: SubscriptionProvider.WhatsApp
-    metadata: WhatsAppSubscriptionMetadata
-}
-
-export interface WhatsAppSubscriptionMetadata {
+export interface WhatsAppMetadata {
     chatId: string
 }
 
