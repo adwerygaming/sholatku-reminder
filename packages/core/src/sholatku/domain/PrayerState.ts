@@ -1,27 +1,24 @@
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { normalizeInput } from "../helper/Helper.js"
+import { PrayerStateSchema } from "../../types/Database.types.js"
 
 export class PrayerState {
-    private readonly province: string
-    private readonly city: string
+    private readonly prayerId: string
+    private readonly db = DatabaseClient<PrayerStateSchema>("prayerStates")
 
     constructor(
-        province: string,
-        city: string,
-        private readonly db = DatabaseClient.table("prayer_state")
+        locationId: string,
     ) {
-        this.province = normalizeInput(province)
-        this.city = normalizeInput(city)
+        this.prayerId = locationId
     }
 
     /**
      * #### Helper function to get current day identifier
      * @returns string of DD_MM date format
      */
-    private getDayIdentifier(): string {
+    private getDate(): string {
         const now = moment()
-        return now.format("DD_MM") // 11_03
+        return now.toISOString()
     }
 
     /**
@@ -30,11 +27,20 @@ export class PrayerState {
      * @returns boolean value of that state
      */
     async get(eventName: string): Promise<boolean> {
-        const dayIdentifier = this.getDayIdentifier()
+        const dateIdentifier = this.getDate()
 
-        const res = await this.db.get(`${this.province}.${this.city}.${dayIdentifier}.${eventName}`)
+        const res = await this.db
+            .select("*")
+            .where("prayerId", this.prayerId)
+            .where("eventName", eventName)
+            .where("forDate", dateIdentifier)
+            .first()
 
-        return res ? true : false
+        if (!res) {
+            return false
+        } else {
+            return true
+        }
     }
 
     /**
@@ -43,8 +49,13 @@ export class PrayerState {
      * @param value boolean value for that state
      */
     async set(eventName: string, value: boolean): Promise<void> {
-        const dayIdentifier = this.getDayIdentifier()
-
-        await this.db.set(`${this.province}.${this.city}.${dayIdentifier}.${eventName}`, value)
+        const res = await this.db
+            .upsert({
+                prayerId: this.prayerId,
+                eventName,
+                forDate: this.getDate(),
+                value
+            })
+            .returning("*")
     }
 }

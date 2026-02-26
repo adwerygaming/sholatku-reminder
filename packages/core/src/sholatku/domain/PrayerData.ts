@@ -1,7 +1,7 @@
 import axios from "axios"
 import moment from "moment-timezone"
 import DatabaseClient from "../../database/DatabaseClient.js"
-import { type PrayerData as PrayerDataSchema } from "../../types/Database.types.js"
+import { PrayerDataSchema } from "../../types/Database.types.js"
 import { BaseLocation } from "../../types/Location.types.js"
 import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
@@ -9,7 +9,7 @@ import { convertTimeToMoment } from "../helper/Helper.js"
 import { Location } from "./Location.js"
 
 export class PrayerData {
-    private readonly locationId
+    private readonly locationId: string
     private readonly db = DatabaseClient<PrayerDataSchema>("prayerData")
 
     constructor(

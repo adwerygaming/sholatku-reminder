@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS prayerData (
     createdAt     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     locationId    UUID NOT NULL REFERENCES locations (id),
-    prayerTimes  JSON NOT NULL,
+    prayerTimes   JSON NOT NULL,
 
     CONSTRAINT prayerData_locationId_unique UNIQUE (locationId)
 );
@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS prayerStates (
     prayerId      UUID NOT NULL REFERENCES prayerData (id),
     eventName     TEXT NOT NULL,
     forDate       TIMESTAMPTZ NOT NULL,
+    isTriggered   BOOLEAN NOT NULL,
 
     CONSTRAINT prayerStates_prayerId_eventName_forDate_unique UNIQUE (prayerId, eventName, forDate)
 );

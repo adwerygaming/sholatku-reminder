@@ -4,30 +4,31 @@ export interface BaseDatabaseSchema {
     lastUpdatedAt: string;
 }
 
-export interface Locations extends BaseDatabaseSchema {
+export interface LocationSchema extends BaseDatabaseSchema {
     province: string;
     city: string;
 }
 
-export interface PrayerData extends BaseDatabaseSchema {
+export interface PrayerDataSchema extends BaseDatabaseSchema {
     locationId: string;
     prayerTimes: string; // JSON stringified data
 }
 
-export interface PrayerStates extends BaseDatabaseSchema {
+export interface PrayerStateSchema extends BaseDatabaseSchema {
     prayerId: string;
     eventName: string;
     forDate: string;
+    isTriggered: boolean;
 }
 
-export interface Subscriptions extends BaseDatabaseSchema {
+export interface SubscriptionSchema extends BaseDatabaseSchema {
     providerName: string;
     metadata: string; // JSON stringified data
 }
 
 export interface DatabaseTables {
-    locations: Locations;
-    prayer_data: PrayerData;
-    prayer_states: PrayerStates;
-    subscriptions: Subscriptions;
+    locations: LocationSchema;
+    prayer_data: PrayerDataSchema;
+    prayer_states: PrayerStateSchema;
+    subscriptions: SubscriptionSchema;
 }

@@ -1,6 +1,6 @@
 import FuzzySearch from 'fuzzy-search';
 import DatabaseClient from '../../database/DatabaseClient.js';
-import { Locations } from '../../types/Database.types.js';
+import { LocationSchema } from '../../types/Database.types.js';
 import { LocationSearchResult } from '../../types/Location.types.js';
 import { normalizeInput, slugify } from '../helper/Helper.js';
 
@@ -9,9 +9,9 @@ interface LocationFetchResult {
 }
 
 export class Location {
-    private readonly db = DatabaseClient<Locations>("locations")
+    private readonly db = DatabaseClient<LocationSchema>("locations")
 
-    async getById(locationId: string): Promise<Locations | null> {
+    async getById(locationId: string): Promise<LocationSchema | null> {
         const res = await this.db
             .select("*")
             .where("id", locationId)
