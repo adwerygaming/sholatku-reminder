@@ -5,20 +5,17 @@ import { type PrayerData as PrayerDataSchema } from "../../types/Database.types.
 import { BaseLocation } from "../../types/Location.types.js"
 import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/Prayer.types.js"
 import tags from "../../utils/Tags.js"
-import { convertTimeToMoment, normalizeInput } from "../helper/Helper.js"
+import { convertTimeToMoment } from "../helper/Helper.js"
 import { Location } from "./Location.js"
 
 export class PrayerData {
-    private readonly province
-    private readonly city
+    private readonly locationId
     private readonly db = DatabaseClient<PrayerDataSchema>("prayerData")
 
     constructor(
-        province: string,
-        city: string,
+        locationId: string,
     ) {
-        this.province = normalizeInput(province)
-        this.city = normalizeInput(city)
+        this.locationId = locationId
     }
 
     //! from all prayer data (30 days), filter only today prayer times
@@ -65,14 +62,22 @@ export class PrayerData {
 
         const provinceResult = await location.searchProvince(province)
 
-        if (!provinceResult) return []
+        if (!provinceResult) {
+            console.log(`[${tags.Error}] Fetching prayer data for province "${province}" failed. Province not found.`)
+            return []
+        }
 
-        const cityFinal = await location.searchCity(provinceResult.original, city)
+        const cityResult = await location.searchCity(provinceResult.original, city)
+
+        if (!cityResult) {
+            console.log(`[${tags.Error}] Fetching prayer data for city "${city}" failed. City not found.`)
+            return []
+        }
 
         const url = `https://equran.id/api/v2/imsakiyah`
         const body = {
-            provinsi: provinceFinal.original,
-            kabkota: cityFinal.original
+            provinsi: provinceResult.original,
+            kabkota: cityResult.original
         }
 
         console.log(`[${tags.System}] Fetching prayer data for ${body.provinsi}, ${body.kabkota}`)
@@ -92,11 +97,11 @@ export class PrayerData {
      * Fetch API if not exist, fetch database if already exist
      * @returns 
      */
-    async get(locationId: string): Promise<PrayerTimeData[] | null> {
+    async get(): Promise<PrayerTimeData[] | null> {
         // console.log(`[${tags.Debug}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
         const res = await this.db
             .select("prayerTimes")
-            .where("locationId", locationId)
+            .where("locationId", this.locationId)
 
         if (!res || res.length === 0) {
             return null
@@ -115,13 +120,13 @@ export class PrayerData {
      * #### Write PrayerTimeData (30 days) to the database for this location.
      * @param data PrayerTimeData for this locaton
      */
-    async set(locationId: string, data: PrayerTimeData[]): Promise<PrayerDataSchema[]> {
+    async set(data: PrayerTimeData[]): Promise<PrayerDataSchema[]> {
         const formattedData = JSON.stringify(data)
 
         // locationId is unique btw
         const res = await this.db.upsert({
             createdAt: moment().toISOString(),
-            locationId,
+            locationId: this.locationId,
             prayerTimes: formattedData
         })
             .returning("*")

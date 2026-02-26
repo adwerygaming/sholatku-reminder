@@ -11,6 +11,19 @@ interface LocationFetchResult {
 export class Location {
     private readonly db = DatabaseClient<Locations>("locations")
 
+    async getById(locationId: string): Promise<Locations | null> {
+        const res = await this.db
+            .select("*")
+            .where("id", locationId)
+            .first()
+
+        if (!res) {
+            return null
+        }
+
+        return res
+    }
+
     /**
      * #### Fetches all location data, structured with the province as the key
      * ---
