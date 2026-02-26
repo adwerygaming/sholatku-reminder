@@ -34,6 +34,15 @@ export class SubscriptionRepository {
         return res
     }
 
+    // should this belong here? idk
+    async fetchAllLocations(): Promise<string[]> {
+        const res = await this.db
+            .distinct("locationId")
+
+        const mapped = res.map((x) => x.locationId)
+        return mapped
+    }
+
     async register({ locationId, metadata, providerName }: RegisterProp): Promise<SubscriptionSchema> {
         //! with union types, should be guarante correct metadata per provider.
 

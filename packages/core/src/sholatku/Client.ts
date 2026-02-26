@@ -2,8 +2,7 @@ import EventEmitter from "events";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import tags from "../utils/Tags.js";
 import { CycleCheckEvent } from "./domain/PrayerScheduler.js";
-import { Location } from "./domain/Location.js";
-import { SubscriptionManager } from "./domain/SubscriptionManager.js";
+import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 
 export type PrayerEventPayload = {
     event: CycleCheckEvent;
@@ -35,7 +34,13 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
 export default sholatkuClient
 
-function check(): Promise<void> {
-    const location = new Location();
-    const subscriptions = new SubscriptionManager()
+async function check(): Promise<void> {
+  // const location = new Location();
+  const subs = new SubscriptionRepository()
+
+  const locations = await subs.fetchAllLocations()
+
+  console.log(locations)
 }
+
+await check()

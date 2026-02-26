@@ -1,6 +1,7 @@
 export interface DiscordMetadata {
     guildId: string,
     channelId: string
+    authorId: string
 }
 
 export interface WhatsAppMetadata {
