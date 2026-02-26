@@ -29,7 +29,7 @@ const locations: LocationEntry[] = []
 
 for (let i = 0; i < provinces.length; i++) {
     const province = provinces[i];
-    const provinceName = normalizeInput(province)
+    const provinceName = province
 
     console.log(`[${i + 1}/${provinces.length}] Scraping: ${province}`)
 
