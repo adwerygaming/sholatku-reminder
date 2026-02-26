@@ -45,7 +45,7 @@ export class PrayerData {
             .map(([key, value]) => {
                 return {
                     prayerName: key as PrayerName,
-                    time: convertTimeToMoment(value)
+                    time: convertTimeToMoment(value as string)
                 }
             })
 

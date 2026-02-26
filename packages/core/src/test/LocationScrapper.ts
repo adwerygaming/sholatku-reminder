@@ -2,7 +2,6 @@ import axios from "axios";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { normalizeInput } from "../sholatku/helper/Helper.js";
 import { sleep } from "../utils/Sleep.js";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,20 +1,23 @@
-import js from "@eslint/js";
-import importPlugin from 'eslint-plugin-import';
+import eslint from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import { defineConfig } from "eslint/config";
-import globals from "globals";
 import tseslint from "typescript-eslint";
- 
-export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
-  tseslint.configs.recommended,
 
-  parserOptions: {
-    projectService: true,
-    tsconfigRootDir: import.meta.dirname,
+export default defineConfig([
+  eslint.configs.recommended,
+  tseslint.configs.recommendedTypeChecked,
+
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
   },
 
   {
-    plugins: { import: importPlugin },
+    plugins: { "@stylistic": stylistic },
     rules: {
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "error",
@@ -22,6 +25,7 @@ export default defineConfig([
       "@typescript-eslint/explicit-module-boundary-types": "error",
       "@typescript-eslint/no-inferrable-types": "error",
       "@typescript-eslint/no-non-null-assertion": "error",
+      "@stylistic/semi-style": "error",
     }
   },
 

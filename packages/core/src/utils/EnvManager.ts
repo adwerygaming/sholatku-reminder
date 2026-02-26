@@ -25,4 +25,4 @@ if (envParsed.success) {
     console.log(`[${Tags.System}] Env check success.`)
 }
 
-export const env = envParsed.data as z.infer<typeof envSchema>;
+export const env = envParsed.data
