@@ -1,14 +1,12 @@
 import moment from "moment-timezone"
 import { v4 as uuidv4 } from 'uuid'
 import DatabaseClient from "../../database/DatabaseClient.js"
+import { SubscriptionSchema } from "../../types/Database.types.js"
 import { BaseLocation, Location } from "../../types/Location.types.js"
-import { SholatkuUnionUser, SholatkuUser, UserProvider } from "../../types/Subscription.types.js"
 
 // has no user
 export class UserManager {
-    constructor(
-        private readonly db = DatabaseClient.table<SholatkuUser>("users")
-    ) { }
+    private readonly db = DatabaseClient<SubscriptionSchema>("subscriptions")
 
     //! get locations from all users & remote duplicate, resulting in base location (province, city) list
     /**

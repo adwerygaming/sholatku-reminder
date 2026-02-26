@@ -1,3 +1,25 @@
+-- make sure it synced to Prayer.types.ts
+CREATE TYPE prayer_name AS ENUM (
+    'imsak',
+    'subuh',
+    'terbit',
+    'dhuha',
+    'dzuhur',
+    'jummah',
+    'ashar',
+    'maghrib',
+    'isya'
+);
+
+-- make sure it synced to Prayer.types.ts
+CREATE TYPE prayer_event_type AS ENUM (
+    'prayerTime',
+    'prayer_in_5m',
+    'prayer_in_15m',
+    'prayer_in_30m',
+    'nextPrayer'
+);
+
 CREATE TABLE IF NOT EXISTS locations (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     createdAt   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -17,16 +39,17 @@ CREATE TABLE IF NOT EXISTS prayerData (
     CONSTRAINT prayerData_locationId_unique UNIQUE (locationId)
 );
 
-CREATE TABLE IF NOT EXISTS prayerStates (
+CREATE TABLE IF NOT EXISTS prayerLocationStates (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     createdAt     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     prayerId      UUID NOT NULL REFERENCES prayerData (id),
-    eventName     TEXT NOT NULL,
-    forDate       TIMESTAMPTZ NOT NULL,
+    prayerName    prayer_name NOT NULL,
+    prayerType    prayer_event_type NOT NULL,
+    forDate       DATE NOT NULL,
     isTriggered   BOOLEAN NOT NULL,
 
-    CONSTRAINT prayerStates_prayerId_eventName_forDate_unique UNIQUE (prayerId, eventName, forDate)
+    CONSTRAINT prayerLocationStates_prayerId_prayerName_prayerType_forDate_unique UNIQUE (prayerId, prayerName, prayerType, forDate)
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (
@@ -35,6 +58,19 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     lastUpdatedAt TIMESTAMPTZ DEFAULT NULL,
     providerName  TEXT NOT NULL,
     metadata      JSON NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS prayerSubscriptionStates (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    createdAt       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    lastUpdatedAt   TIMESTAMPTZ DEFAULT NULL,
+    subscriptionId  UUID NOT NULL REFERENCES subscriptions (id),
+    prayerName      prayer_name NOT NULL,
+    prayerType      prayer_event_type NOT NULL,
+    forDate         DATE NOT NULL,
+    isTriggered     BOOLEAN NOT NULL,
+
+    CONSTRAINT prayerSubscriptionStates_prayerId_prayerName_prayerType_forDate_unique UNIQUE (prayerId, prayerName, prayerType, forDate)
 );
 
 INSERT INTO locations (province, city) VALUES

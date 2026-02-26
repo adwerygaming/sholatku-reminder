@@ -1,3 +1,5 @@
+import { PrayerEvent, PrayerName } from "./Prayer.types.ts";
+
 export interface BaseDatabaseSchema {
     id: string;
     createdAt: string;
@@ -11,24 +13,34 @@ export interface LocationSchema extends BaseDatabaseSchema {
 
 export interface PrayerDataSchema extends BaseDatabaseSchema {
     locationId: string;
-    prayerTimes: string; // JSON stringified data
+    prayerTimes: string;
 }
 
-export interface PrayerStateSchema extends BaseDatabaseSchema {
+export interface PrayerLocationStateSchema extends BaseDatabaseSchema {
     prayerId: string;
-    eventName: string;
-    forDate: string;
+    prayerName: PrayerName;
+    prayerType: PrayerEvent;
+    forDate: Date;
+    isTriggered: boolean;
+}
+
+export interface PrayerSubscriptionStateSchema extends BaseDatabaseSchema {
+    subscriptionId: string;
+    prayerName: PrayerName;
+    prayerType: PrayerEvent;
+    forDate: Date;
     isTriggered: boolean;
 }
 
 export interface SubscriptionSchema extends BaseDatabaseSchema {
     providerName: string;
-    metadata: string; // JSON stringified data
+    metadata: string;
 }
 
 export interface DatabaseTables {
     locations: LocationSchema;
     prayer_data: PrayerDataSchema;
-    prayer_states: PrayerStateSchema;
+    prayer_location_states: PrayerLocationStateSchema;
+    prayer_subscription_states: PrayerSubscriptionStateSchema;
     subscriptions: SubscriptionSchema;
 }
