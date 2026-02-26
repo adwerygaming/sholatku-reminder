@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@types/fuzzy-search": "^2.1.5",
+    "@types/knex": "^0.15.2",
     "@types/node": "^25.3.0",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",

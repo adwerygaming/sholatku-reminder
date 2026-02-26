@@ -10,5 +10,6 @@ export interface Location extends BaseLocation {
 export interface LocationSearchResult {
     searchKey: string;
     original: string;
-    databaseKey: string;
 }
+
+export type CitySearchResult = Pick<LocationSearchResult, 'original'>

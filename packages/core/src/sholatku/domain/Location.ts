@@ -1,24 +1,15 @@
 import FuzzySearch from 'fuzzy-search';
-import LocationDatabaseClient from "../../database/LocationDatabaseClient.js";
+import DatabaseClient from '../../database/DatabaseClient.js';
+import { Locations } from '../../types/Database.types.js';
 import { LocationSearchResult } from '../../types/Location.types.js';
-import { DatabaseRawSchema } from '../../types/SholatKu.types.js';
-import { normalizeInput, normalizeOutput, slugify } from '../helper/Helper.js';
+import { normalizeInput, slugify } from '../helper/Helper.js';
 
 interface LocationFetchResult {
     [province: string]: string[]
 }
 
 export class Location {
-    /**
-     * #### Retrieves all raw location data from the database.
-     * ---
-     * Each entry contains a province key and an array of city strings.
-     * @returns Raw location records from the database.
-     */
-    private async getAllRaw(): Promise<DatabaseRawSchema<string[]>[]> {
-        const allRaw = await LocationDatabaseClient.all<string[]>()
-        return allRaw
-    }
+    private readonly db = DatabaseClient<Locations>("locations")
 
     /**
      * #### Fetches all location data, structured with the province as the key
@@ -27,14 +18,23 @@ export class Location {
      * @returns An array of objects mapping province keys to their city arrays.
      */
     async fetch(): Promise<LocationFetchResult[]> {
-        const allRaw = await this.getAllRaw()
-        const all = allRaw.map(x => {
-            return {
-                [x.id]: x.value
-            }
-        })
+        const data = await this.db.select('province', 'city')
+        const sortedData = data.reduce((acc: LocationFetchResult[], curr) => {
+            const provinceKey = normalizeInput(curr.province)
+            const cityValue = normalizeInput(curr.city)
 
-        return all
+            const existingProvince = acc.find(x => Object.keys(x)[0] === provinceKey)
+
+            if (existingProvince) {
+                existingProvince[provinceKey].push(cityValue)
+            } else {
+                acc.push({ [provinceKey]: [cityValue] })
+            }
+
+            return acc
+        }, [])
+
+        return sortedData
     }
 
     /**
@@ -42,11 +42,9 @@ export class Location {
      * @returns A promise resolving to an array of province identifiers.
      */
     async getProvinces(): Promise<string[]> {
-        const allRaw = await this.getAllRaw()
-        const provinces = allRaw.map(x => x.id)
-            .filter((v, i, a) => a.indexOf(v) === i)
-
-        return provinces
+        const provinces = await this.db.distinct('province')
+        const sortedProvinces = provinces.map(x => x.province)
+        return sortedProvinces
     }
 
     /**
@@ -55,16 +53,11 @@ export class Location {
      * @returns A promise resolving to a deduplicated array of city names in that province.
      */
     async getCitiesByProvince(province: string): Promise<string[]> {
-        const allRaw = await this.getAllRaw()
+        //! province must be on proper format
 
-        const provinceSlug = normalizeInput(province)
-
-        const cities = allRaw
-            .filter(x => x.id === provinceSlug)
-            .flatMap(x => x.value)
-            .filter((v, i, a) => a.indexOf(v) === i)
-
-        return cities
+        const cities = await this.db.where('province', province)
+        const sortedCities = cities.map(x => x.city)
+        return sortedCities
     }
 
     /**
@@ -77,20 +70,22 @@ export class Location {
      * @param query - The search string to match against province names.
      * @returns A promise resolving to the best-matching {@link LocationSearchResult}.
      */
-    async searchProvince(query: string): Promise<LocationSearchResult> {
+    async searchProvince(query: string): Promise<LocationSearchResult | undefined> {
+        // somehow resolve"yogya" to "D. I. Yogyakarta", "jakarta" to "DKI Jakarta", etc
+
         const allProvinces = await this.getProvinces()
 
         const searchObj: LocationSearchResult[] = allProvinces.map(x => {
-            return { 
+            return {
                 searchKey: slugify(x), 
-                databaseKey: x, 
-                original: normalizeOutput(x) 
+                original: x 
             }
         })
 
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
-        const res = searcher.search(slugify(query))
+        const userQuery = slugify(query)
+        const res = searcher.search(userQuery)
 
         return res?.[0]
     }
@@ -105,7 +100,7 @@ export class Location {
      * @param query - The search string to match against city names.
      * @returns A promise resolving to the best-matching city result, omitting `databaseKey`.
      */
-    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'>> {
+    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'> | undefined> {
         const allCities = await this.getCitiesByProvince(province)
 
         const searchObj: Omit<LocationSearchResult, 'databaseKey'>[] = allCities.map(x => {
@@ -115,7 +110,10 @@ export class Location {
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
 
         const res = searcher.search(slugify(query))
+        const result = res?.[0]
+        
+        if (!result) return undefined
 
-        return res?.[0]
+        return result
     }
 }
