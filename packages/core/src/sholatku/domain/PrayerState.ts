@@ -17,8 +17,7 @@ export class PrayerState {
      * @returns string of DD_MM date format
      */
     private getDate(): string {
-        const now = moment()
-        return now.toISOString()
+        return moment().startOf('day').toISOString()
     }
 
     /**
@@ -48,14 +47,19 @@ export class PrayerState {
      * @param eventName 
      * @param value boolean value for that state
      */
-    async set(eventName: string, value: boolean): Promise<void> {
-        const res = await this.db
-            .upsert({
+    async set(eventName: string, value: boolean): Promise<PrayerStateSchema> {
+        const [res] = await this.db
+            .insert({
+                lastUpdatedAt: moment().toISOString(),
                 prayerId: this.prayerId,
                 eventName,
                 forDate: this.getDate(),
-                value
+                isTriggered: value
             })
+            .onConflict(["prayerId", "eventName", "forDate"])
+            .merge()
             .returning("*")
+
+        return res
     }
 }
