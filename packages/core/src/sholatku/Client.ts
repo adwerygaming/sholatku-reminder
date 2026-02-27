@@ -1,11 +1,10 @@
 import tags from "sholatku-reminder-shared/utils/Tags.js";
-import { PrayerEvent } from "../types/Prayer.types.js";
 import { SubscriptionProvider } from "../types/Subscription.types.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 import { SubscriptionState } from "./domain/SubscriptionState.js";
-import sholatkuClient from "./Emitter.js";
+import { redisPublisher } from "sholatku-reminder-shared/redis/RedisClient.js";
 
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
@@ -56,12 +55,6 @@ async function check(): Promise<void> {
 
     for (const res of checks) {
       for (const sub of subscribers) {
-        sholatkuClient.emit(res.type, {
-          event: res,
-          location: loc,
-          subscription: sub,
-        })
-
         const subState = new SubscriptionState(sub.id)
 
         const stateCheck = await subState.get({
@@ -70,35 +63,20 @@ async function check(): Promise<void> {
           date: res.time.toDate()
         })
 
-        if (res.type == PrayerEvent.PrayerTime && !stateCheck) {
-          await subState.set({
-            prayerName: res.eventName,
-            prayerType: res.type,
-            date: res.time.toDate(),
-            value: true
-          })
-        } else if (res.type == PrayerEvent.PrayerIn5m) {
-          await subState.set({
-            prayerName: res.eventName,
-            prayerType: res.type,
-            date: res.time.toDate(),
-            value: true
-          })
-        } else if (res.type == PrayerEvent.PrayerIn15m) {
-          await subState.set({
-            prayerName: res.eventName,
-            prayerType: res.type,
-            date: res.time.toDate(),
-            value: true
-          })
-        } else if (res.type == PrayerEvent.PrayerIn30m) {
-          await subState.set({
-            prayerName: res.eventName,
-            prayerType: res.type,
-            date: res.time.toDate(),
-            value: true
-          })
-        }
+        if (stateCheck) continue
+
+        await redisPublisher.publish(res.type, JSON.stringify({
+          event: res,
+          location: loc,
+          subscription: sub,
+        }))
+
+        await subState.set({
+          prayerName: res.eventName,
+          prayerType: res.type,
+          date: res.time.toDate(),
+          value: true
+        })
       }
     }
   }

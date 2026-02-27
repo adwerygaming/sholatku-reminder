@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { PrayerSubscriptionStateSchema } from "../../types/Database.types.js";
-import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js";
+import { PrayerEvent, PrayerName } from "../../types/SholatKu.types.js";
 
 interface SetStateProp {
     prayerName: PrayerName

@@ -1,10 +1,10 @@
-import moment from "moment-timezone"
+import moment from "moment-timezone";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
-import { LocationSchema } from "../../types/Database.types.js"
-import { PrayerEvent, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
-import { Location } from "./Location.js"
-import { PrayerData } from "./PrayerData.js"
-import { PrayerLocationState } from "./PrayerLocationState.js"
+import { LocationSchema } from "../../types/Database.types.js";
+import { PrayerEvent, PrayerName, PrayerTime } from "../../types/SholatKu.types.js";
+import { Location } from "./Location.js";
+import { PrayerData } from "./PrayerData.js";
+import { PrayerLocationState } from "./PrayerLocationState.js";
 
 export interface CycleCheckEvent {
     type: PrayerEvent

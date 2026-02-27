@@ -2,7 +2,7 @@ import { Knex } from "knex";
 import moment from "moment-timezone";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { PrayerLocationStateSchema } from "../../types/Database.types.js";
-import { PrayerEvent, PrayerName } from "../../types/Prayer.types.js";
+import { PrayerEvent, PrayerName } from "../../types/SholatKu.types.js";
 
 interface GetPrayerState {
     prayerName: PrayerName;

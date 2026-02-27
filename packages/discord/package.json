@@ -28,15 +28,16 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "sholatku-reminder-core": "*",
-    "sholatku-reminder-shared": "*",
     "axios": "^1.13.5",
     "discord.js": "^14.25.1",
     "dotenv": "^17.3.1",
     "eslint": "^9.39.2",
     "eslint-plugin-import": "^2.32.0",
     "gradient-string": "^3.0.0",
+    "ioredis": "^5.9.3",
     "moment-timezone": "^0.6.0",
+    "sholatku-reminder-core": "*",
+    "sholatku-reminder-shared": "*",
     "typescript-eslint": "^8.56.0"
   }
 }

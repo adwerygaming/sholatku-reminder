@@ -1,4 +1,4 @@
-import { PrayerEvent, PrayerName, PrayerTimeData } from "./Prayer.types.ts";
+import { PrayerEvent, PrayerName, PrayerTimeData } from "./SholatKu.types.ts";
 import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "./Subscription.types.ts";
 
 export interface BaseDatabaseSchema {
