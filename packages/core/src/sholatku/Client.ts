@@ -78,11 +78,11 @@ async function check(): Promise<void> {
 
     const subscribers = await subs.getByLocation(loc.id)
 
-    for (const sub of subscribers) {
-      console.log(`[${tags.Debug}] ${sub.providerName}`)
-      console.log(sub.metadata)
-      console.log(loc)
-    }
+    // for (const sub of subscribers) {
+    //   console.log(`[${tags.Debug}] ${sub.providerName}`)
+    //   console.log(sub.metadata)
+    //   console.log(loc)
+    // }
 
     for (const res of checks) {
       for (const sub of subscribers) {
@@ -91,7 +91,9 @@ async function check(): Promise<void> {
           location: loc,
           subscription: sub,
         })
- 
+
+        console.log(res)
+
         // TODO: update user states
       }
     }
@@ -99,4 +101,4 @@ async function check(): Promise<void> {
 }
 
 await check()
-setInterval(() => void check(), 5 * 1000)
+setInterval(() => void check(), 3 * 1000)

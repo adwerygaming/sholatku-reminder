@@ -31,6 +31,7 @@ export interface PrayerTimeData {
   terbit: string
   dhuha: string
   dzuhur: string
+  jummah?: string
   ashar: string
   maghrib: string
   isya: string

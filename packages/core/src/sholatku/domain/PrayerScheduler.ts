@@ -77,11 +77,10 @@ export class PrayerScheduler {
             console.log(`[${tags.Debug}] Using Debug Time.`)
         }
         
-        console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.SSS")}`)
+        console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.SSS DD/MM")}`)
 
         let currentIdx = -1
 
-        // Helper to get next prayer (handles rollover to tomorrow)
         const getNextPrayer = (idx: number): { prayer: PrayerTime, source: 'today' | 'tomorrow', isRollover: boolean } => {
             if (idx + 1 < prayerToday.length) {
                 return {
@@ -106,6 +105,9 @@ export class PrayerScheduler {
             const prayerTime = current.time
             const nextPrayerTime = next.time
 
+            // console.log(`[${tags.Debug}] Current prayer: ${current.prayerName} at ${prayerTime.format("HH:mm")}`)
+            // console.log(`[${tags.Debug}] Next prayer: ${next.prayerName} at ${nextPrayerTime.format("HH:mm")} (${nextInfo.isRollover ? 'tomorrow' : 'today'})`)
+
             // Check if we're in current prayer's time window
             const isLastPrayer = i === prayerToday.length - 1
             const isCurrentPrayerTime = isLastPrayer ? now.isSameOrAfter(prayerTime) : now.isSameOrAfter(prayerTime) && now.isBefore(nextPrayerTime)
@@ -129,6 +131,7 @@ export class PrayerScheduler {
                         value: true
                     })
                 }
+
                 currentIdx = i
             }
 
@@ -136,6 +139,9 @@ export class PrayerScheduler {
             const nextPrayerDiff = nextPrayerTime.diff(now, "minutes")
             const nextPrayerName = next.prayerName
             // const rolloverSuffix = nextInfo.isRollover ? ' (tomorrow)' : ''
+
+            console.log(`[${tags.Debug}] Time until next prayer (${next.prayerName}): ${nextPrayerDiff} minutes`)
+            console.log(`[${tags.Debug}] Current IDX: ${currentIdx}`)
 
             // 5 minute reminder
             const nextPrayerIn5DiffCheck = await this.prayerLocationState.get({

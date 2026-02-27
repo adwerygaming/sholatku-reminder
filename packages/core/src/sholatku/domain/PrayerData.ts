@@ -34,23 +34,25 @@ export class PrayerData {
             return null
         }
 
-        const now = time
-        const currentDay = now.format("DD")
-
+        const currentDay = time.format("DD")
         const currentPrayerData = prayerData.find((x) => x.tanggal == Number(currentDay))
 
         if (!currentPrayerData) {
             return null
         }
 
-        const formatted: PrayerTime[] = Object.entries(currentPrayerData)
-            .filter((x) => x[0] !== "tanggal")
-            .map(([key, value]) => {
-                return {
-                    prayerName: key as PrayerName,
-                    time: convertTimeToMoment(value as string)
-                }
-            })
+        const ORDER: PrayerName[] = ["imsak", "subuh", "terbit", "dhuha", "dzuhur", "jummah", "ashar", "maghrib", "isya"]
+
+        const isFriday = time.day() === 5
+        const data = isFriday ? { ...currentPrayerData, jummah: currentPrayerData.dzuhur, dzuhur: currentPrayerData.dzuhur }
+            : currentPrayerData
+
+        const formatted: PrayerTime[] = ORDER
+            .filter((name) => name in data && data[name] !== undefined)
+            .map((name) => ({
+                prayerName: name,
+                time: convertTimeToMoment(data[name] as string)
+            }))
 
         return formatted
     }
