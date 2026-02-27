@@ -2,11 +2,11 @@
 
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
+import { capitalizeWords } from "sholatku-reminder-core/src/sholatku/helper/Helper.js"
+import { PrayerEvent, PrayerEventPayload, SerializedPrayerEventPayload } from "sholatku-reminder-core/src/types/SholatKu.types.js"
+import { SubscriptionProvider } from "sholatku-reminder-core/src/types/Subscription.types.js"
 import { redisSubscriber } from "sholatku-reminder-shared/redis/RedisClient.js"
 import tags from "sholatku-reminder-shared/utils/Tags.js"
-import { capitalizeWords } from "../../../core/src/sholatku/helper/Helper.js"
-import { PrayerEvent, PrayerEventPayload, SerializedPrayerEventPayload } from "../../../core/src/types/SholatKu.types.js"
-import { SubscriptionProvider } from "../../../core/src/types/Subscription.types.js"
 import client from "./Client.js"
 
 interface SendMessageProp extends PrayerEventPayload {

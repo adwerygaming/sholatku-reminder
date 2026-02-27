@@ -14,7 +14,11 @@
     ],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "composite": true
+    "composite": true,
+
+    "paths": {
+      "sholatku-reminder-shared/*": ["../shared/*"]
+    }
   },
   "include": [
     ".", "../shared/redis/RedisClient.ts",

@@ -9,7 +9,11 @@
     "scrape": "npx tsx ./src/test/LocationScrapper.ts",
     "build": "tsup"
   },
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*.js": "./src/*.ts",
+    "./src/*": "./src/*.ts"
+  },
   "keywords": [],
   "author": "adwerygaming",
   "license": "ISC",

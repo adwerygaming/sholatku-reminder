@@ -1,7 +1,7 @@
 import "dotenv/config";
 
+import Tags from "sholatku-reminder-shared/utils/Tags.js";
 import { z } from "zod";
-import Tags from "../../../shared/utils/Tags.js";
 
 // Schema for .env file,
 // Make sure to sync this.

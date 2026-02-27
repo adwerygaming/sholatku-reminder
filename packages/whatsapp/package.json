@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/*": "./src/*.ts"
+  },
   "scripts": {
     "dev": "nodemon",
     "start": "npx tsx ./src/index.ts",
