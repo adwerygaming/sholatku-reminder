@@ -1,7 +1,7 @@
 import axios from "axios"
 import { Knex } from "knex"
 import moment from "moment-timezone"
-import tags from "../../../../shared/utils/Tags.js"
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { PrayerDataSchema } from "../../types/Database.types.js"
 import { BaseLocation } from "../../types/Location.types.js"

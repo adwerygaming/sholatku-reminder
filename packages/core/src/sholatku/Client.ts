@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import tags from "../../../shared/utils/Tags.js";
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SubscriptionProvider } from "../types/Subscription.types.js";

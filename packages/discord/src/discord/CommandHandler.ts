@@ -3,8 +3,8 @@
 import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, ModalSubmitInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import { fileURLToPath, pathToFileURL } from 'url';
-import tags from '../../../shared/utils/Tags.js';
 import type { ButtonLayout, DropdownLayout, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
 import { env } from '../utils/EnvManager.js';
 import client from './Client.js';

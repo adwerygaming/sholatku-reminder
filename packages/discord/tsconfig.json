@@ -14,7 +14,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "include": ["src", "src/utils"],
+  "include": ["src", "src/utils", "./tsup.config.ts"],
   "exclude": ["coverage", "dist", "docs", "node_modules"],
   "references": [
     { "path": "../core" },

@@ -17,7 +17,7 @@
     "composite": true
   },
   "include": [
-    ".", "../discord/src/utils/EnvManager.ts",
+    ".",
   ],
   "exclude": [
     "coverage",

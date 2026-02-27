@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon",
-    "start": "npx tsx ./src/Index.ts",
+    "start": "npx tsx ./src/index.ts",
     "lint": "npx eslint .",
     "build": "tsup"
   },

@@ -1,5 +1,5 @@
 import moment from "moment-timezone"
-import tags from "../../../../shared/utils/Tags.js"
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import { LocationSchema } from "../../types/Database.types.js"
 import { PrayerEvent, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
 import { Location } from "./Location.js"

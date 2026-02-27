@@ -2,11 +2,9 @@
 
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
-import sholatkuclient, { PrayerEventPayload } from "sholatku-reminder-core/src/sholatku/Client.js"
-import { capitalizeWords } from "sholatku-reminder-core/src/sholatku/helper/Helper.js"
-import { PrayerEvent } from "sholatku-reminder-core/src/types/Prayer.types.js"
-import { SubscriptionProvider } from "sholatku-reminder-core/src/types/Subscription.types.js"
-import tags from "sholatku-reminder-core/src/utils/Tags.js"
+import { PrayerEvent, PrayerEventPayload, sholatkuClient, SubscriptionProvider } from "sholatku-reminder-core"
+import tags from "sholatku-reminder-shared/utils/Tags.js"
+import { capitalizeWords } from "../../../core/src/sholatku/helper/Helper.js"
 import client from "./Client.js"
 
 interface SendMessageProp extends PrayerEventPayload {
@@ -92,7 +90,7 @@ export class DiscordListener {
     listen(): void {
         console.log(`[${tags.Discord}] Discord Listener started listening for events.`)
 
-        sholatkuclient.on(PrayerEvent.PrayerTime, async (payload) => {
+        sholatkuClient.on(PrayerEvent.PrayerTime, async (payload) => {
             const event = payload.event
             const location = payload.location
             const subscription = payload.subscription
@@ -125,7 +123,7 @@ export class DiscordListener {
             await this.sendMessage({ event, location, subscription, message })
         })
 
-        sholatkuclient.on(PrayerEvent.PrayerIn5m, async (payload) => {
+        sholatkuClient.on(PrayerEvent.PrayerIn5m, async (payload) => {
             const event = payload.event
             const location = payload.location
             const subscription = payload.subscription
@@ -160,7 +158,7 @@ export class DiscordListener {
             await this.sendMessage({ event, location, subscription, message })
         })
 
-        sholatkuclient.on(PrayerEvent.PrayerIn15m, async (payload) => {
+        sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
             const event = payload.event
             const location = payload.location
             const subscription = payload.subscription
@@ -195,7 +193,7 @@ export class DiscordListener {
             await this.sendMessage({ event, location, subscription, message })
         })
 
-        sholatkuclient.on(PrayerEvent.PrayerIn15m, async (payload) => {
+        sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
             const event = payload.event
             const location = payload.location
             const subscription = payload.subscription

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Client, Events } from 'discord.js';
-import tags from '../../../shared/utils/Tags.js';
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import client from './Client.js';
 import { CommandHandler } from './CommandHandler.js';
 import { DiscordListener } from './Listener.js';

@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits } from 'discord.js';
+import tags from 'sholatku-reminder-shared/utils/Tags.js';
 import { env } from '../utils/EnvManager.js';
-import tags from './utils/Tags.js';
 
 const BotToken = env.DISCORD_TOKEN;
 
