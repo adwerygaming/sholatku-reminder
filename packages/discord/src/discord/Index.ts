@@ -5,7 +5,7 @@ import client from './Client.js';
 import { CommandHandler } from './CommandHandler.js';
 import { DiscordListener } from './Listener.js';
 
-console.log(`[${tags.Discord}] Loaded Discord Index Script.`)
+console.log(`[${tags.Discord}] Loaded Discord Index Script.`) 
 
 const commandHandler = new CommandHandler();
 const listener = new DiscordListener();
