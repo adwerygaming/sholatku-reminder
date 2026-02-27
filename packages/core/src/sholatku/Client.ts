@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+import moment from "moment-timezone";
 import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SubscriptionProvider } from "../types/Subscription.types.js";
@@ -39,6 +40,8 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
 export default sholatkuClient
 
+const debugTime = moment("11:30", "HH:mm")
+
 async function check(): Promise<void> {
   const location = new Location()
   const subs = new SubscriptionRepository()
@@ -71,7 +74,7 @@ async function check(): Promise<void> {
   }
 
   for (const loc of subscribedLocations) {
-    const scheduler = new PrayerScheduler(loc.id)
+    const scheduler = new PrayerScheduler(loc.id, debugTime)
     const checks = await scheduler.cycleCheck()
 
     if (!checks) continue
@@ -92,9 +95,8 @@ async function check(): Promise<void> {
           subscription: sub,
         })
 
-        console.log(res)
-
         // TODO: update user states
+        
       }
     }
   }

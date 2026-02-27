@@ -12,6 +12,12 @@ export interface CycleCheckEvent {
     time: moment.Moment
 }
 
+interface GetNextPrayerResult {
+    prayer: PrayerTime,
+    source: 'today' | 'tomorrow',
+    isRollover: boolean
+}
+
 /**
  * PrayerScheduler.
  * Also known as Root Sholatku Service 
@@ -81,7 +87,7 @@ export class PrayerScheduler {
 
         let currentIdx = -1
 
-        const getNextPrayer = (idx: number): { prayer: PrayerTime, source: 'today' | 'tomorrow', isRollover: boolean } => {
+        const getNextPrayer = (idx: number): GetNextPrayerResult => {
             if (idx + 1 < prayerToday.length) {
                 return {
                     prayer: prayerToday[idx + 1],
@@ -140,8 +146,8 @@ export class PrayerScheduler {
             const nextPrayerName = next.prayerName
             // const rolloverSuffix = nextInfo.isRollover ? ' (tomorrow)' : ''
 
-            console.log(`[${tags.Debug}] Time until next prayer (${next.prayerName}): ${nextPrayerDiff} minutes`)
-            console.log(`[${tags.Debug}] Current IDX: ${currentIdx}`)
+            // console.log(`[${tags.Debug}] Time until next prayer (${next.prayerName}): ${nextPrayerDiff > 0 ? `${nextPrayerDiff} minutes` : "Passed"}`)
+            // console.log(`[${tags.Debug}] Current IDX: ${currentIdx}`)
 
             // 5 minute reminder
             const nextPrayerIn5DiffCheck = await this.prayerLocationState.get({

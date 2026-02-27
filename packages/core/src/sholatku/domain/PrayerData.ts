@@ -41,11 +41,12 @@ export class PrayerData {
             return null
         }
 
+        //! PRAYER ORDER WAS WRONG HERE, ITS FIXED.
+        //! BUT MAYBE CONSIDER FIXING IT FROM WHEN FETCHING DATA FROM API / INSERTING TO DATABASE.
+
         const ORDER: PrayerName[] = ["imsak", "subuh", "terbit", "dhuha", "dzuhur", "jummah", "ashar", "maghrib", "isya"]
 
-        const isFriday = time.day() === 5
-        const data = isFriday ? { ...currentPrayerData, jummah: currentPrayerData.dzuhur, dzuhur: currentPrayerData.dzuhur }
-            : currentPrayerData
+        const data = currentPrayerData
 
         const formatted: PrayerTime[] = ORDER
             .filter((name) => name in data && data[name] !== undefined)
