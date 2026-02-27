@@ -18,7 +18,7 @@ export class DiscordListener {
         console.log(`[${tags.Discord}] Discord Listener initialized.`)
     }
 
-    async sendMessage({ event, location, subscription, message }: SendMessageProp): Promise<boolean> {
+    async sendMessage({ location, subscription, message }: SendMessageProp): Promise<boolean> {
         if (subscription.providerName !== SubscriptionProvider.Discord) return false
 
         const guilds = await client.guilds.fetch()
@@ -64,7 +64,7 @@ export class DiscordListener {
         }
 
         try {
-            const timeFormatted = event.time.tz("Asia/Jakarta").locale("id").format("HH:mm:ss")
+            const timeFormatted = moment().tz("Asia/Jakarta").locale("id").format("HH:mm:ss")
 
             const container = new ContainerBuilder()
                 .setAccentColor(Colors.DarkGreen)
