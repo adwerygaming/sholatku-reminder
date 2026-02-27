@@ -1,5 +1,5 @@
- 
- 
+/* eslint-disable @typescript-eslint/no-misused-promises */
+
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
 import { redisSubscriber } from "sholatku-reminder-shared/redis/RedisClient.js"
@@ -18,7 +18,7 @@ export class DiscordListener {
         console.log(`[${tags.Discord}] Discord Listener initialized.`)
     }
 
-    async sendMessage({ location, subscription, message }: SendMessageProp): Promise<boolean> {
+    async sendMessage({ event, location, subscription, message }: SendMessageProp): Promise<boolean> {
         if (subscription.providerName !== SubscriptionProvider.Discord) return false
 
         const guilds = await client.guilds.fetch()
@@ -66,8 +66,16 @@ export class DiscordListener {
         try {
             const timeFormatted = moment().tz("Asia/Jakarta").locale("id").format("HH:mm:ss")
 
+            const colorMap = {
+                [PrayerEvent.PrayerTime]: Colors.DarkGreen,
+                [PrayerEvent.PrayerIn5m]: Colors.Yellow,
+                [PrayerEvent.PrayerIn15m]: Colors.Yellow,
+                [PrayerEvent.PrayerIn30m]: Colors.Yellow,
+                [PrayerEvent.NextPrayer]: Colors.Yellow
+            }
+
             const container = new ContainerBuilder()
-                .setAccentColor(Colors.DarkGreen)
+                .setAccentColor(colorMap[event.type])
                 .addTextDisplayComponents(
                     text => text.setContent(`${message}`)
                 )
@@ -80,7 +88,7 @@ export class DiscordListener {
                 flags: [MessageFlags.IsComponentsV2]
             })
 
-            console.log(`[${tags.PrayerService}] Message sent to channel ${channelId} in guild ${guildId}.`)
+            console.log(`[${tags.PrayerService}] Sent ${event.type} message to ${guild.name} on ${channel.name}.`)
             return true
         } catch (error) {
             console.log(`[${tags.Error}] Failed to send message to channel ${channelId} in guild ${guildId}.`)
@@ -94,10 +102,9 @@ export class DiscordListener {
 
         void redisSubscriber.subscribe(...Object.values(PrayerEvent))
 
-        redisSubscriber.on("message", (channel, rawMessage) => {
+        redisSubscriber.on("message", async (channel, rawMessage) => {
             const raw = JSON.parse(rawMessage) as SerializedPrayerEventPayload
 
-            // Reconstruct moment.Moment from the serialized string
             const payload: PrayerEventPayload = {
                 ...raw,
                 event: { ...raw.event, time: moment(raw.event.time) }
@@ -140,8 +147,11 @@ export class DiscordListener {
 
             if (!message) return
 
-            this.sendMessage({ event, location, subscription, message })
-                .catch((err: unknown) => console.error(`[${tags.Error}] sendMessage failed:`, err))
+            try {
+                await this.sendMessage({ event, location, subscription, message })
+            } catch (e) {
+                console.error(`[${tags.Error}] sendMessage failed:`, e)
+            }
         })
     }
 }
