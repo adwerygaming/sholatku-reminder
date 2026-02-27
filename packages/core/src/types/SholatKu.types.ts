@@ -1,3 +1,6 @@
+import { CycleCheckEvent } from "../sholatku/domain/PrayerScheduler.js"
+import { LocationSchema, SubscriptionSchema } from "./Database.types.js"
+
 export interface DatabaseRawSchema<D> {
     id: string
     value: D
@@ -63,3 +66,15 @@ export type PrayerEventPayload = {
     location: LocationSchema;
     subscription: SubscriptionSchema;
 };
+
+/**
+ * Wire-safe version of CycleCheckEvent — moment.Moment becomes a string after JSON.stringify.
+ * Use this when deserializing from Redis.
+ */
+export type SerializedCycleCheckEvent = Omit<CycleCheckEvent, "time"> & { time: string }
+
+/**
+ * Wire-safe version of PrayerEventPayload for Redis pub/sub.
+ * Reconstruct into PrayerEventPayload by wrapping time with moment().
+ */
+export type SerializedPrayerEventPayload = Omit<PrayerEventPayload, "event"> & { event: SerializedCycleCheckEvent }

@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
+ 
+ 
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
+import { redisSubscriber } from "sholatku-reminder-shared/redis/RedisClient.js"
 import tags from "sholatku-reminder-shared/utils/Tags.js"
-import sholatkuClient, { PrayerEventPayload } from "../../../core/src/sholatku/Emitter.js"
 import { capitalizeWords } from "../../../core/src/sholatku/helper/Helper.js"
-import { PrayerEvent } from "../../../core/src/types/Prayer.types.js"
+import { PrayerEvent, PrayerEventPayload, SerializedPrayerEventPayload } from "../../../core/src/types/SholatKu.types.js"
 import { SubscriptionProvider } from "../../../core/src/types/Subscription.types.js"
 import client from "./Client.js"
 
@@ -91,138 +92,56 @@ export class DiscordListener {
     listen(): void {
         console.log(`[${tags.Discord}] Discord Listener started listening for events.`)
 
-        sholatkuClient.on(PrayerEvent.PrayerTime, async (payload) => {
-            const event = payload.event
-            const location = payload.location
-            const subscription = payload.subscription
+        void redisSubscriber.subscribe(...Object.values(PrayerEvent))
 
-            const isFriday = moment().day() === 5
+        redisSubscriber.on("message", (channel, rawMessage) => {
+            const raw = JSON.parse(rawMessage) as SerializedPrayerEventPayload
 
-            let prayerName = event.eventName
-            let message = null
-
-            if (isFriday) {
-                prayerName = "jummah"
+            // Reconstruct moment.Moment from the serialized string
+            const payload: PrayerEventPayload = {
+                ...raw,
+                event: { ...raw.event, time: moment(raw.event.time) }
             }
 
-            switch (prayerName) {
-                case "terbit":
-                    message = `**The sun** has risen.`
-                    break;
-
-                case "imsak":
-                    message = `It's **Imsak** time.`
-                    break;
-
-                default:
-                    message = `It's time for ${capitalizeWords(prayerName)} prayer.`
-                    break;
-            }
-
-            if (!message) return
-
-            await this.sendMessage({ event, location, subscription, message })
-        })
-
-        sholatkuClient.on(PrayerEvent.PrayerIn5m, async (payload) => {
-            const event = payload.event
-            const location = payload.location
-            const subscription = payload.subscription
-
+            const { event, location, subscription } = payload
             const isFriday = moment().day() === 5
-
             const diffInMinutes = event.time.diff(moment(), "minutes")
 
             let prayerName = event.eventName
-            let message = null
+            if (isFriday && prayerName === "dzuhur") prayerName = "jummah"
 
-            if (isFriday) {
-                prayerName = "jummah"
-            }
+            let message: string | null = null
 
-            switch (prayerName) {
-                case "terbit":
-                    message = `**The sun** will rise in **${diffInMinutes} minutes**.`
-                    break;
+            switch (channel as PrayerEvent) {
+                case PrayerEvent.PrayerTime:
+                    switch (prayerName) {
+                        case "terbit": message = `**The sun** has risen.`; break
+                        case "imsak":  message = `It's **Imsak** time.`; break
+                        default:       message = `It's time for ${capitalizeWords(prayerName)} prayer.`; break
+                    }
+                    break
 
-                case "imsak":
-                    message = `**Imsak** will begin in **${diffInMinutes} minutes**.`
-                    break;
+                case PrayerEvent.PrayerIn5m:
+                case PrayerEvent.PrayerIn15m:
+                    switch (prayerName) {
+                        case "terbit": message = `**The sun** will rise in **${diffInMinutes} minutes**.`; break
+                        case "imsak":  message = `**Imsak** will begin in **${diffInMinutes} minutes**.`; break
+                        default:       message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`; break
+                    }
+                    break
 
-                default:
-                    message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`
-                    break;
-            }
-
-            if (!message) return
-
-            await this.sendMessage({ event, location, subscription, message })
-        })
-
-        sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
-            const event = payload.event
-            const location = payload.location
-            const subscription = payload.subscription
-
-            const isFriday = moment().day() === 5
-
-            const diffInMinutes = event.time.diff(moment(), "minutes")
-
-            let prayerName = event.eventName
-            let message = null
-
-            if (isFriday) {
-                prayerName = "jummah"
-            }
-
-            switch (prayerName) {
-                case "terbit":
-                    message = `**The sun** will rise in **${diffInMinutes} minutes**.`
-                    break;
-
-                case "imsak":
-                    message = `**Imsak** will begin in **${diffInMinutes} minutes**.`
-                    break;
-
-                default:
-                    message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`
-                    break;
+                case PrayerEvent.PrayerIn30m:
+                    switch (prayerName) {
+                        case "imsak":   message = `**Imsak** will begin in **${diffInMinutes} minutes**.`; break
+                        case "maghrib": message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`; break
+                    }
+                    break
             }
 
             if (!message) return
 
-            await this.sendMessage({ event, location, subscription, message })
-        })
-
-        sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
-            const event = payload.event
-            const location = payload.location
-            const subscription = payload.subscription
-
-            const isFriday = moment().day() === 5
-
-            const diffInMinutes = event.time.diff(moment(), "minutes")
-
-            let prayerName = event.eventName
-            let message = null
-
-            if (isFriday) {
-                prayerName = "jummah"
-            }
-
-            switch (prayerName) {
-                case "imsak":
-                    message = `**Imsak** will begin in **${diffInMinutes} minutes**.`
-                    break;
-
-                case "maghrib":
-                    message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`
-                    break;
-            }
-
-            if (!message) return
-
-            await this.sendMessage({ event, location, subscription, message })
+            this.sendMessage({ event, location, subscription, message })
+                .catch((err: unknown) => console.error(`[${tags.Error}] sendMessage failed:`, err))
         })
     }
 }

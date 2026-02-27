@@ -5,6 +5,7 @@ import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 import { SubscriptionState } from "./domain/SubscriptionState.js";
 import { redisPublisher } from "sholatku-reminder-shared/redis/RedisClient.js";
+import { PrayerEvent } from "../types/SholatKu.types.js";
 
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
@@ -70,6 +71,9 @@ async function check(): Promise<void> {
           location: loc,
           subscription: sub,
         }))
+
+        if (res.type === PrayerEvent.NextPrayer) return
+        console.log(`[${tags.PrayerService}] Publishing event ${res.eventName} (${res.type}).`)
 
         await subState.set({
           prayerName: res.eventName,
