@@ -12,6 +12,20 @@ services:
       - ./init:/docker-entrypoint-initdb.d
     ports:
       - "5443:5432"
+    networks:
+      - sholatku-net
+
+  redis:
+    container_name: sholatku-redis
+    image: redis:8-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - sholatku-net
 
 volumes: 
   db_data:
+
+networks:
+  sholatku-net:
+    name: sholatku-network
