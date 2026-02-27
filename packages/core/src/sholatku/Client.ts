@@ -7,6 +7,7 @@ import tags from "../utils/Tags.js";
 import { Location } from "./domain/Location.js";
 import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
+import { SubscriptionState } from "./domain/SubscriptionState.js";
 
 export type PrayerEventPayload = {
     event: CycleCheckEvent;
@@ -95,8 +96,43 @@ async function check(): Promise<void> {
           subscription: sub,
         })
 
-        // TODO: update user states
-        
+        const subState = new SubscriptionState(sub.id)
+
+        const stateCheck = await subState.get({
+          prayerName: res.eventName,
+          prayerType: res.type,
+          date: res.time.toDate()
+        })
+
+        if (res.type == PrayerEvent.PrayerTime && !stateCheck) {
+          await subState.set({
+            prayerName: res.eventName,
+            prayerType: res.type,
+            date: res.time.toDate(),
+            value: true
+          })
+        } else if (res.type == PrayerEvent.PrayerIn5m) {
+          await subState.set({
+            prayerName: res.eventName,
+            prayerType: res.type,
+            date: res.time.toDate(),
+            value: true
+          })
+        } else if (res.type == PrayerEvent.PrayerIn15m) {
+          await subState.set({
+            prayerName: res.eventName,
+            prayerType: res.type,
+            date: res.time.toDate(),
+            value: true
+          })
+        } else if (res.type == PrayerEvent.PrayerIn30m) {
+          await subState.set({
+            prayerName: res.eventName,
+            prayerType: res.type,
+            date: res.time.toDate(),
+            value: true
+          })
+        }
       }
     }
   }
