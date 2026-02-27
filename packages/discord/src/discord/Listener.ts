@@ -2,9 +2,11 @@
 
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
-import { PrayerEvent, PrayerEventPayload, sholatkuClient, SubscriptionProvider } from "sholatku-reminder-core"
 import tags from "sholatku-reminder-shared/utils/Tags.js"
+import sholatkuClient, { PrayerEventPayload } from "../../../core/src/sholatku/Client.js"
 import { capitalizeWords } from "../../../core/src/sholatku/helper/Helper.js"
+import { PrayerEvent } from "../../../core/src/types/Prayer.types.js"
+import { SubscriptionProvider } from "../../../core/src/types/Subscription.types.js"
 import client from "./Client.js"
 
 interface SendMessageProp extends PrayerEventPayload {

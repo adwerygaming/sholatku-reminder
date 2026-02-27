@@ -21,7 +21,8 @@
     "seed": "npx tsx scripts/seed.ts",
     "lint-core": "npx eslint packages/core",
     "lint-discord": "npx eslint packages/discord",
-    "lint-whatsapp": "npx eslint packages/whatsapp"
+    "lint-whatsapp": "npx eslint packages/whatsapp",
+    "lint-shared": "npx eslint packages/shared"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
