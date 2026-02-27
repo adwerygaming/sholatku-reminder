@@ -1,11 +1,11 @@
 import axios from "axios"
 import { Knex } from "knex"
 import moment from "moment-timezone"
+import tags from "../../../../shared/utils/Tags.js"
 import DatabaseClient from "../../database/DatabaseClient.js"
 import { PrayerDataSchema } from "../../types/Database.types.js"
 import { BaseLocation } from "../../types/Location.types.js"
 import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/Prayer.types.js"
-import tags from "../../utils/Tags.js"
 import { convertTimeToMoment } from "../helper/Helper.js"
 import { Location } from "./Location.js"
 

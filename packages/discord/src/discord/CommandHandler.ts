@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, ModalSubmitInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import tags from '../../../shared/utils/Tags.js';
 import type { ButtonLayout, DropdownLayout, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
 import { env } from '../utils/EnvManager.js';
-import tags from '../utils/Tags.js';
 import client from './Client.js';
 
 const BotToken = env.DISCORD_TOKEN;
@@ -268,7 +269,8 @@ export class CommandHandler {
                     await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
                 }
             } catch (e) {
-                console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
+                console.log(`[${tags.Discord}] Error sending error catch message`);
+                console.error(e)
             }
         }
     }
@@ -301,7 +303,8 @@ export class CommandHandler {
                     await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
                 }
             } catch (e) {
-                console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
+                console.log(`[${tags.Discord}] Error sending error catch message`);
+                console.error(e)
             }
         }
     }
@@ -337,7 +340,8 @@ export class CommandHandler {
                     await interaction.reply({ content: msg, flags: MessageFlags.Ephemeral });
                 }
             } catch (e) {
-                console.log(`[${tags.Discord}] Error sending error catch message: ${e}`);
+                console.log(`[${tags.Discord}] Error sending error catch message`);
+                console.error(e)
             }
         }
     }

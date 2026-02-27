@@ -12,7 +12,8 @@
   "workspaces": [
     "packages/core",
     "packages/discord",
-    "packages/whatsapp"
+    "packages/whatsapp",
+    "packages/shared"
   ],
   "scripts": {
     "start-core": "npx tsx ./packages/core/src/index.ts",

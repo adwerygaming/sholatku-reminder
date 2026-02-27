@@ -9,6 +9,7 @@
     "scrape": "npx tsx ./src/test/LocationScrapper.ts",
     "build": "tsup"
   },
+  "exports": "./src/index.ts",
   "keywords": [],
   "author": "adwerygaming",
   "license": "ISC",
@@ -30,6 +31,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "sholatku-reminder-shared": "*",
     "axios": "^1.13.5",
     "better-sqlite3": "^12.6.2",
     "dotenv": "^17.3.1",

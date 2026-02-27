@@ -1,7 +1,7 @@
 import moment from "moment-timezone"
+import tags from "../../../../shared/utils/Tags.js"
 import { LocationSchema } from "../../types/Database.types.js"
 import { PrayerEvent, PrayerName, PrayerTime } from "../../types/Prayer.types.js"
-import tags from "../../utils/Tags.js"
 import { Location } from "./Location.js"
 import { PrayerData } from "./PrayerData.js"
 import { PrayerLocationState } from "./PrayerLocationState.js"

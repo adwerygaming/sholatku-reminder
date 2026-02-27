@@ -1,5 +1,5 @@
 {
-  "name": "pemula-ts",
+  "name": "sholatku-reminder-discord",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -28,6 +28,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "sholatku-reminder-core": "*",
+    "sholatku-reminder-shared": "*",
     "axios": "^1.13.5",
     "discord.js": "^14.25.1",
     "dotenv": "^17.3.1",

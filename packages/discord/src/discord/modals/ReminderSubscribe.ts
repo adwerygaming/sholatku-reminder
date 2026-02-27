@@ -5,7 +5,7 @@ import { UserManager } from "../../sholatku/domain/UserManager.js";
 import { normalizeOutput } from "../../sholatku/helper/Helper.js";
 import { ModalLayout } from "../../types/Discord.types.js";
 import { UserProvider } from "../../types/Subscription.types.js";
-import tags from "../../utils/Tags.js";
+import tags from "../utils/Tags.js";
 
 export default {
     id: "reminder",

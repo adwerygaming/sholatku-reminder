@@ -1,9 +1,8 @@
 import EventEmitter from "events";
-import moment from "moment-timezone";
+import tags from "../../../shared/utils/Tags.js";
 import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SubscriptionProvider } from "../types/Subscription.types.js";
-import tags from "../utils/Tags.js";
 import { Location } from "./domain/Location.js";
 import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
@@ -41,8 +40,6 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 
 export default sholatkuClient
 
-const debugTime = moment("11:30", "HH:mm")
-
 async function check(): Promise<void> {
   const location = new Location()
   const subs = new SubscriptionRepository()
@@ -75,7 +72,7 @@ async function check(): Promise<void> {
   }
 
   for (const loc of subscribedLocations) {
-    const scheduler = new PrayerScheduler(loc.id, debugTime)
+    const scheduler = new PrayerScheduler(loc.id)
     const checks = await scheduler.cycleCheck()
 
     if (!checks) continue

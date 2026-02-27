@@ -3,21 +3,26 @@
   "compilerOptions": {
     "module": "nodenext",
     "target": "es2023",
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"],
-
+    "types": [
+      "node"
+    ],
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    "composite": true
   },
-  "include": ["src", "src/utils"],
-  "exclude": ["coverage", "dist", "docs", "node_modules"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../shared" }
-  ]
+  "include": [
+    ".", "../discord/src/utils/EnvManager.ts",
+  ],
+  "exclude": [
+    "coverage",
+    "dist",
+    "docs",
+    "node_modules"
+  ],
 }
