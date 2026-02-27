@@ -1,44 +1,13 @@
-import EventEmitter from "events";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
-import { LocationSchema, SubscriptionSchema } from "../types/Database.types.js";
 import { PrayerEvent } from "../types/Prayer.types.js";
 import { SubscriptionProvider } from "../types/Subscription.types.js";
 import { Location } from "./domain/Location.js";
-import { CycleCheckEvent, PrayerScheduler } from "./domain/PrayerScheduler.js";
+import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 import { SubscriptionState } from "./domain/SubscriptionState.js";
-
-export type PrayerEventPayload = {
-    event: CycleCheckEvent;
-    location: LocationSchema;
-    subscription: SubscriptionSchema;
-};
-
-type EventMap = {
-  [K in PrayerEvent]: PrayerEventPayload;
-};
-
-export class SholatKuEmitter extends EventEmitter {
-  emit<K extends keyof EventMap>(
-    event: K,
-    payload: EventMap[K]
-  ): boolean {
-    return super.emit(event, payload);
-  }
-
-  on<K extends keyof EventMap>(
-    event: K,
-    listener: (payload: EventMap[K]) => void
-  ): this {
-    return super.on(event, listener);
-  }
-}
-
-const sholatkuClient = new SholatKuEmitter();
+import sholatkuClient from "./Emitter.js";
 
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
-
-export default sholatkuClient
 
 async function check(): Promise<void> {
   const location = new Location()
