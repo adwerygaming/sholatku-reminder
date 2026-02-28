@@ -66,10 +66,10 @@ async function check(): Promise<void> {
     return
   }
 
-  console.log(subscribedLocations)
+  // console.log(subscribedLocations)
 
   for (const loc of subscribedLocations) {
-    console.log(`[${tags.PrayerService}] Checking location ${loc.city}, ${loc.province} with id ${loc.id}.`)
+    // console.log(`[${tags.PrayerService}] Checking location ${loc.city}, ${loc.province} with id ${loc.id}.`)
     const scheduler = new PrayerScheduler(loc.id)
     const checks = await scheduler.cycleCheck()
 

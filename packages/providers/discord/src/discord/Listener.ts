@@ -113,6 +113,7 @@ export class DiscordListener {
             const { event, location, subscription } = payload
             const isFriday = moment().day() === 5
             const diffInMinutes = event.time.diff(moment(), "minutes")
+            const eventTime = event.time.format("HH:mm")
 
             let prayerName = event.eventName
             if (isFriday && prayerName === "dzuhur") prayerName = "jummah"
@@ -131,16 +132,16 @@ export class DiscordListener {
                 case PrayerEvent.PrayerIn5m:
                 case PrayerEvent.PrayerIn15m:
                     switch (prayerName) {
-                        case "terbit": message = `**The sun** will rise in **${diffInMinutes} minutes**.`; break
-                        case "imsak":  message = `**Imsak** will begin in **${diffInMinutes} minutes**.`; break
+                        case "terbit": message = `**The sun** will rise in **${diffInMinutes} minutes** at **${eventTime}**.`; break
+                        case "imsak":  message = `**Imsak** will begin in **${diffInMinutes} minutes** at **${eventTime}**.`; break
                         default:       message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`; break
                     }
                     break
 
                 case PrayerEvent.PrayerIn30m:
                     switch (prayerName) {
-                        case "imsak":   message = `**Imsak** will begin in **${diffInMinutes} minutes**.`; break
-                        case "maghrib": message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`; break
+                        case "imsak":   message = `**Imsak** will begin in **${diffInMinutes} minutes** at **${eventTime}**.`; break
+                        case "maghrib": message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes** at **${eventTime}**.`; break
                     }
                     break
             }
