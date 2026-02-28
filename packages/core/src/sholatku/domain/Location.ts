@@ -1,7 +1,7 @@
 import FuzzySearch from 'fuzzy-search';
 import { Knex } from 'knex';
 import DatabaseClient from '../../database/DatabaseClient.js';
-import { LocationSchema } from '../../types/Database.types.js';
+import { LocationSchema, SubscriptionSchema } from '../../types/Database.types.js';
 import { LocationSearchResult } from '../../types/Location.types.js';
 import { normalizeInput, slugify } from '../helper/Helper.js';
 
@@ -21,8 +21,11 @@ export class Location {
     }
 
     async getSubscribedLocations(): Promise<LocationSchema[]> {
+        const locationIds = await DatabaseClient<SubscriptionSchema>("subscriptions").distinct("locationId")
+        const mappedLocIds = locationIds.map(x => x.locationId)
+
         const res = await this.db()
-            .whereIn("id", DatabaseClient("subscriptions").distinct("locationId"))
+            .whereIn("id", mappedLocIds)
 
         return res
     }

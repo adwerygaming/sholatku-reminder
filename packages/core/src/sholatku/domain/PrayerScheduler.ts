@@ -83,7 +83,7 @@ export class PrayerScheduler {
             console.log(`[${tags.Debug}] Using Debug Time.`)
         }
         
-        console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.SSS DD/MM")}`)
+        // console.log(`[${tags.Debug}] ${now.format("HH:mm:ss.SSS DD/MM")}`)
 
         let currentIdx = -1
 

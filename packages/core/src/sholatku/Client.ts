@@ -66,7 +66,10 @@ async function check(): Promise<void> {
     return
   }
 
+  console.log(subscribedLocations)
+
   for (const loc of subscribedLocations) {
+    console.log(`[${tags.PrayerService}] Checking location ${loc.city}, ${loc.province} with id ${loc.id}.`)
     const scheduler = new PrayerScheduler(loc.id)
     const checks = await scheduler.cycleCheck()
 
@@ -98,8 +101,8 @@ async function check(): Promise<void> {
           subscription: sub,
         }))
 
-        if (res.type === PrayerEvent.NextPrayer) return
-        console.log(`[${tags.PrayerService}] Publishing event ${res.eventName} (${res.type}).`)
+        if (res.type === PrayerEvent.NextPrayer) continue
+        console.log(`[${tags.PrayerService}] Publishing event ${res.eventName} (${res.type}) to ${subscribers.length} subs.`)
 
         await subState.set({
           prayerName: res.eventName,
