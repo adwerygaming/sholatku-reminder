@@ -11,18 +11,18 @@
   },
   "workspaces": [
     "packages/core",
-    "packages/discord",
-    "packages/whatsapp",
+    "packages/providers/discord",
+    "packages/providers/whatsapp",
     "packages/shared"
   ],
   "scripts": {
     "start-core": "npx tsx ./packages/core/src/index.ts",
-    "start-discord": "npx tsx ./packages/discord/src/index.ts",
+    "start-discord": "npx tsx ./packages/providers/discord/src/index.ts",
     "seed": "npx tsx scripts/seed.ts",
     "lint-core": "npx eslint packages/core",
-    "lint-discord": "npx eslint packages/discord",
-    "lint-whatsapp": "npx eslint packages/whatsapp",
-    "lint-shared": "npx eslint packages/shared"
+    "lint-shared": "npx eslint packages/shared",
+    "lint-discord": "npx eslint packages/providers/discord",
+    "lint-whatsapp": "npx eslint packages/providers/whatsapp"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.9.0",
