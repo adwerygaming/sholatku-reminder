@@ -1,11 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+ 
 
 import { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Collection, Colors, EmbedBuilder, Interaction, MessageFlags, ModalSubmitInteraction, REST, RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
+import { TemporaryData } from 'sholatku-reminder-shared/database/TemporaryData.js';
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import { fileURLToPath, pathToFileURL } from 'url';
-import type { ButtonLayout, DropdownLayout, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
+import type { ButtonLayout, DropdownLayout, InteractionData, ModalLayout, SlashCommandLayout } from '../types/Discord.types.js';
 import { env } from '../utils/EnvManager.js';
 import client from './Client.js';
 
@@ -239,14 +240,33 @@ export class CommandHandler {
     }
 
     private async handleDropdown(interaction: AnySelectMenuInteraction): Promise<void> {
-        const [customId, originalUserId, ...rest] = interaction.customId.split('_');
+        const [customId, interactionKey, action] = interaction.customId.split('_');
+
+        console.log(`[${tags.Debug}] Interaction Dropdown CustomId: ${interaction.customId}`)
+
+        const interactionData = await TemporaryData.get<InteractionData>({ key: interactionKey })
+
+        if (!interactionData) {
+            await interaction.reply({ content: 'This interaction has no data.', flags: MessageFlags.Ephemeral });
+            return
+        }
+
+        const newInteractionData = await TemporaryData.set<InteractionData>({
+            key: interactionKey,
+            data: {
+                action: action as InteractionData["action"],
+                ...interactionData,
+            }
+        })
+
+        const originalUserId = newInteractionData.data.user.id;
 
         console.log(`[${tags.Debug}] Interaction UserId: ${interaction.user.id}`)
         console.log(`[${tags.Debug}] Original UserId: ${originalUserId}`)
         console.log(`[${tags.Debug}] Same user? ${(interaction.user.id === originalUserId) ? "Yes" : "No"}`)
 
         if (interaction.user.id !== originalUserId) {
-            await interaction.reply({content: 'Not your interaction.', flags: MessageFlags.Ephemeral});
+            await interaction.reply({ content: 'Not your interaction.', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -257,7 +277,7 @@ export class CommandHandler {
         }
         
         try {
-            await dropdown.execute(client, interaction, rest);
+            await dropdown.execute(client, interaction, newInteractionData.key);
         } catch (err) {
             console.error(`[${tags.CommandRegister}] Error handling dropdown ${customId}:`, err);
             const msg = 'There was an error handling this dropdown.';
@@ -276,7 +296,26 @@ export class CommandHandler {
     }
 
     private async handleButton(interaction: ButtonInteraction): Promise<void> {
-        const [customId, originalUserId, ...rest] = interaction.customId.split('_');
+        const [customId, interactionKey, action] = interaction.customId.split('_');
+
+        console.log(`[${tags.Debug}] Interaction Button CustomId: ${interaction.customId}`)
+
+        const interactionData = await TemporaryData.get<InteractionData>({ key: interactionKey })
+
+        if (!interactionData) {
+            await interaction.reply({ content: 'This interaction has no data.', flags: MessageFlags.Ephemeral });
+            return
+        }
+
+        const newInteractionData = await TemporaryData.set<InteractionData>({
+            key: interactionKey,
+            data: {
+                action: action as InteractionData["action"],
+                ...interactionData,
+            }
+        })
+
+        const originalUserId = newInteractionData.data.user.id;
 
         if (interaction.user.id !== originalUserId) {
             await interaction.reply({content: 'Not your interaction.', flags: MessageFlags.Ephemeral});
@@ -291,7 +330,7 @@ export class CommandHandler {
         }
 
         try {
-            await button.execute(client, interaction, rest);
+            await button.execute(client, interaction, newInteractionData.key);
         } catch (err) {
             console.error(`[${tags.CommandRegister}] Error handling button ${interaction.customId}:`, err);
             const msg = 'There was an error handling this button.';
@@ -310,7 +349,26 @@ export class CommandHandler {
     }
 
     private async handleModal(interaction: ModalSubmitInteraction): Promise<void> {
-        const [customId, originalUserId, ...rest] = interaction.customId.split('_');
+        const [customId, interactionKey, action] = interaction.customId.split('_');
+
+        console.log(`[${tags.Debug}] Interaction Modal CustomId: ${interaction.customId}`)
+
+         const interactionData = await TemporaryData.get<InteractionData>({ key: interactionKey })
+
+        if (!interactionData) {
+            await interaction.reply({ content: 'This interaction has no data.', flags: MessageFlags.Ephemeral });
+            return
+        }
+
+        const newInteractionData = await TemporaryData.set<InteractionData>({
+            key: interactionKey,
+            data: {
+                action: action as InteractionData["action"],
+                ...interactionData,
+            }
+        })
+
+        const originalUserId = newInteractionData.data.user.id;
 
         console.log(`[${tags.Debug}] Interaction UserId: ${interaction.user.id}`)
         console.log(`[${tags.Debug}] Original UserId: ${originalUserId}`)
@@ -328,7 +386,7 @@ export class CommandHandler {
         }
 
         try {
-            await modal.execute(client, interaction, rest);
+            await modal.execute(client, interaction, newInteractionData.key);
         } catch (err) {
             console.error(`[${tags.CommandRegister}] Error handling modal ${customId}:`, err);
             const msg = 'There was an error handling this modal.';

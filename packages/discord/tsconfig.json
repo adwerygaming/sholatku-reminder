@@ -20,7 +20,7 @@
       "sholatku-reminder-shared/*": ["../shared/*"]
     }
   },
-  "include": ["src", "src/utils"],
+  "include": ["src", "src/utils", "src/types"],
   "exclude": ["coverage", "dist", "docs", "node_modules"],
   "references": [
     { "path": "../core" },

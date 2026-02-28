@@ -1,9 +1,13 @@
 import { v7 as uuidv7 } from "uuid"
-import cache from "./Cache.js"
+import cacheClient from "./CacheClient.js"
 
 interface SetDataProp<T> {
-    key: string
+    key?: string
     data: T
+}
+
+interface SetDataResult<T> extends SetDataProp<T> {
+    key: string
 }
 
 interface GetDataProp {
@@ -18,7 +22,7 @@ interface DeleteDataProp {
  * Generate a random unique key using UUID v7
  * @returns string - generated unique key
  */
-function GenerateRandomKey(): string {
+function generateRandomKey(): string {
     return uuidv7()
 }
 
@@ -26,11 +30,16 @@ function GenerateRandomKey(): string {
  * Set data in cache
  * @param data Data to set in cache
  * @param key Key to identify the data in cache. Use GenerateRandomKey() to get a random unique key. 
- * @returns 
+ * @returns true when set is complete
  */
-function SetData<T>({ data, key }: SetDataProp<T>): true {
-    cache.set(key, data)
-    return true
+async function set<T>({ data, key }: SetDataProp<T>): Promise<SetDataResult<T>> {
+    if (!key) key = generateRandomKey()
+    
+    await cacheClient.set<T>(key, data)
+    return {
+        key,
+        data
+    }
 }
 
 /**
@@ -38,8 +47,8 @@ function SetData<T>({ data, key }: SetDataProp<T>): true {
  * @param key Key to identify the data in cache 
  * @returns T | undefined - data if found, undefined if not found
  */
-async function GetData<T>({ key }: GetDataProp): Promise<T | undefined> {
-    const res: T | undefined = await cache.get(key) as T | undefined
+async function get<T>({ key }: GetDataProp): Promise<T | undefined> {
+    const res = await cacheClient.get<T>(key)
     return res
 }
 
@@ -48,15 +57,13 @@ async function GetData<T>({ key }: GetDataProp): Promise<T | undefined> {
 * @param key Key to identify the data in cache
 * @returns T | undefined - data if found, undefined if not found
 */
-function DeleteData<T>({ key }: DeleteDataProp): T | undefined {
-    const data: T | undefined = cache.get(key) as T | undefined
-    cache.delete(key)
+async function remove<T>({ key }: DeleteDataProp): Promise<T | undefined> {
+    const data = await get<T>({ key })
+    await cacheClient.delete(key)
     return data
 }
 
-export default {
-    GenerateRandomKey,
-    SetData,
-    GetData,
-    DeleteData
+export const TemporaryData = {
+    remove, generateRandomKey, get, set
 }
+
