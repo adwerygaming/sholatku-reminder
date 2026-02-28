@@ -8,32 +8,54 @@
 </div>
 
 > [!CAUTION]
-> This `dev` branch is having different system from `main` branch, and it's still in development. do not.
+> This `dev` branch is having different system from `main` branch, and it's still in development. do not use it yet. ok?
 
 ## Showcase
-> [!NOTE]
-> This is an example of how the prayer reminder system can be used to send prayer time notifications to a Discord channel. The system will automatically fetch the prayer times for the specified location and send reminders at the appropriate times.
+This is an example of how the prayer reminder system can be used to send prayer time notifications to a Discord channel.
 
-<img alt="Showcase" src="/assets/images/example.png"></img>
+<div align=center>
+    <img alt="Discord bot sending a prayer notification in a Discord channel, displaying the prayer name, time, and location information with a clean interface" src="/assets/images/example.png"></img>
+    <p style="font-size: 12px">Discord bot sending prayer notification in Discord channel</p>
+</div>
+
+## Packages
+This project is a monorepo that consists of several packages, each with its own purpose and functionality. Here are the main packages in this project:
+
+1. <b>`sholatku-reminder-core`</b>
+<b>This package contains the core logic and functionality of the prayer reminder system.</b> It includes the main scheduler that calculates prayer times and triggers events based on the schedule. It also defines the data structures and interfaces used throughout the system.
+2. <b>`sholatku-reminder-shared`</b>
+<b>This package contains shared utilities and components that are used across different packages in the monorepo.</b> It includes common functions, types, and configurations that can be reused by other packages to ensure consistency and reduce code duplication. And especially the Redis client that is used for communication between the core and the providers.
+3. <b>`sholatku-reminder-discord`</b> [Provider]
+<b>This package is a provider that integrates the prayer reminder system with Discord. </b>It listens for prayer events from the core package and sends notifications to a specified Discord channel using a bot.
+4. <b>`sholatku-reminder-whatsapp`</b> [Provider]
+<b>Same as discord, a provider that integrates the prayer reminder system with WhatsApp.</b> It listens for prayer events from the core package and sends notifications to a specified WhatsApp number using a bot.
+
+## How it works
+
+<div align=center>
+    <img alt="Showcase" src="/assets/images/sholatku-flow.png"></img>
+    <p style="font-size: 12px">Image of Flowchart showing how the flow goes</p>
+</div>
+
+<b>Redis message broker</b> is used for distributing the prayer event to multiple provider at the same time.
+Currently, we only have <b>Discord</b> and <b>WhatsApp</b> but we will add more provider in the future, such as Telegram, Slack, and more. Or you can contribute to this project by adding your own provider.
 
 ## Usage
 There are <b>4 event available to use</b>, that includes `PrayerTime`, `PrayerIn5m`, `PrayerIn15m`, and `PrayerIn30m`. Each event will trigger at the specified time before the prayer time, allowing you to set up reminders or perform any necessary actions.
+
+Here an example of <b>how a provider can subscribe to the prayer event</b> using the Redis message broker:
 ```ts
-import sholatkuClient from "./Client.js";
+import { redisSubscriber } from "sholatku-reminder-shared/redis/RedisClient.js"
 
-sholatkuClient.on(PrayerEvent.PrayerTime, async (payload) => {
-    // Triggered when the it's time for prayer
-});
+redisSubscriber.on("message", async (channel, rawMessage) => {
+    // Construct back the payload
+    const raw = JSON.parse(rawMessage) as SerializedPrayerEventPayload
+    const payload: PrayerEventPayload = {
+        ...raw,
+        event: { ...raw.event, time: moment(raw.event.time) }
+    }
 
-sholatkuClient.on(PrayerEvent.PrayerIn5m, async (payload) => {
-    // Triggered 5 minutes before the prayer time
-});
-
-sholatkuClient.on(PrayerEvent.PrayerIn15m, async (payload) => {
-    // Triggered 15 minutes before the prayer time
-});
-
-sholatkuClient.on(PrayerEvent.PrayerIn30m, async (payload) => {
-    // Triggered 30 minutes before the prayer time
-});
+    // Ready to use
+    const { event, location, subscription } = payload
+})
 ```
