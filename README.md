@@ -15,7 +15,6 @@ This is an example of how the prayer reminder system can be used to send prayer 
 
 <div align=center>
     <img alt="Discord bot sending a prayer notification in a Discord channel, displaying the prayer name, time, and location information with a clean interface" src="/assets/images/example.png"></img>
-    <p style="font-size: 12px">Discord bot sending prayer notification in Discord channel</p>
 </div>
 
 ## Packages
@@ -41,7 +40,6 @@ This project is a monorepo that consists of several packages, each with its own 
 
 <div align=center>
     <img alt="Showcase" src="/assets/images/sholatku-flow.png"></img>
-    <p style="font-size: 12px">Image of Flowchart showing how the flow goes</p>
 </div>
 
 <b>Redis message broker</b> is used for distributing the prayer event to multiple provider at the same time.
