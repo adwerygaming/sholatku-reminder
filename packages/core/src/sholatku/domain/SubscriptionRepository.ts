@@ -1,5 +1,6 @@
 import { Knex } from "knex";
 import moment from "moment-timezone";
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { SubscriptionSchema } from "../../types/Database.types.js";
 import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "../../types/Subscription.types.js";
@@ -36,6 +37,16 @@ export class SubscriptionRepository {
 
         return res
     }
+    
+    async findByDiscordGuild(guildId: DiscordMetadata["guildId"]): Promise<SubscriptionSchema | null> {
+        const res = await this.db()
+            .select("*")
+            .where("providerName", SubscriptionProvider.Discord)
+            .andWhereRaw("metadata->>'guildId' = ?", [guildId])
+            .first()
+
+        return res ?? null
+    }
 
     async getByLocation(locationId: string): Promise<SubscriptionSchema[]> {
         return this.db()
@@ -48,9 +59,23 @@ export class SubscriptionRepository {
 
         const check = await this.findByProvider({ providerName })
 
-        const found = check.find((x) => JSON.stringify(x.metadata) === JSON.stringify(metadata))
+        const found = check.find((x) => {
+            if (providerName === SubscriptionProvider.Discord) {
+                const data = x.metadata as DiscordMetadata
+                return data.guildId === metadata.guildId
+            } else if (providerName === SubscriptionProvider.WhatsApp) {
+                const data = x.metadata as WhatsAppMetadata
+                return data.chatId === metadata.chatId
+            }
+
+            return false
+        })
 
         if (found) return found
+
+        console.log(`[${tags.PrayerService}] Registering new subscription.`)
+        console.log(`[${tags.PrayerService}] Provider: ${providerName}`)
+        console.log(metadata)
 
         const [res] = await this.db()
             .insert({
