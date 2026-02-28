@@ -82,3 +82,41 @@ jobs:
 
       - name: "Lint - Check for errors & unused vars on package shared"
         run: npm run lint-shared
+
+    linting-frontend:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package frontend"
+        run: npm run lint-frontend
+
+    linting-backend:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package backend"
+        run: npm run lint-backend
