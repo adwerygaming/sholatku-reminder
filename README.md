@@ -38,7 +38,9 @@ This project is a monorepo that consists of several packages, each with its own 
 
 ## How it works
 
-**The core package** is basically just a polling system. it checks every few seconds or idk to check if is it time to trigger AND has it NOT triggered before? if yes, fire the event via Redis message broker.
+**The core package** is basically just a polling system. it checks every few seconds or idk to check if is it time to trigger AND has it NOT triggered before? if yes, fire the event via Redis message broker. andd also update the state. is that easy? yes. is it practical? maybe. but it works. remember, if it ain't broke, don't fix it. lmao
+
+Below is the diagram of how the system works in general:
 
 <div align=center>
     <img alt="Showcase" src="/assets/images/sholatku-flow.png"></img>
