@@ -11,6 +11,8 @@
   },
   "workspaces": [
     "packages/core",
+    "packages/frontend",
+    "packages/backend",
     "packages/providers/discord",
     "packages/providers/whatsapp",
     "packages/shared"
@@ -20,6 +22,8 @@
     "start-discord": "npx tsx ./packages/providers/discord/src/index.ts",
     "seed": "npx tsx scripts/seed.ts",
     "lint-core": "npx eslint packages/core",
+    "lint-frontend": "npx eslint packages/frontend",
+    "lint-backend": "npx eslint packages/backend",
     "lint-shared": "npx eslint packages/shared",
     "lint-discord": "npx eslint packages/providers/discord",
     "lint-whatsapp": "npx eslint packages/providers/whatsapp"
