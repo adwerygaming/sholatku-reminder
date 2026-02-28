@@ -22,13 +22,20 @@ This is an example of how the prayer reminder system can be used to send prayer 
 This project is a monorepo that consists of several packages, each with its own purpose and functionality. Here are the main packages in this project:
 
 1. <b>`sholatku-reminder-core`</b>
-<b>This package contains the core logic and functionality of the prayer reminder system.</b> It includes the main scheduler that calculates prayer times and triggers events based on the schedule. It also defines the data structures and interfaces used throughout the system.
+
+    <b>This package contains the core logic and functionality of the prayer reminder system.</b> It includes the main scheduler that calculates prayer times and triggers events based on the schedule. It also defines the data structures and interfaces used throughout the system.
+
 2. <b>`sholatku-reminder-shared`</b>
-<b>This package contains shared utilities and components that are used across different packages in the monorepo.</b> It includes common functions, types, and configurations that can be reused by other packages to ensure consistency and reduce code duplication. And especially the Redis client that is used for communication between the core and the providers.
+
+    <b>This package contains shared utilities and components that are used across different packages in the monorepo.</b> It includes common functions, types, and configurations that can be reused by other packages to ensure consistency and reduce code duplication. And especially the Redis client that is used for communication between the core and the providers.
+
 3. <b>`sholatku-reminder-discord`</b> [Provider]
-<b>This package is a provider that integrates the prayer reminder system with Discord. </b>It listens for prayer events from the core package and sends notifications to a specified Discord channel using a bot.
+
+    <b>This package is a provider that integrates the prayer reminder system with Discord. </b>It listens for prayer events from the core package and sends notifications to a specified Discord channel using a bot.
+
 4. <b>`sholatku-reminder-whatsapp`</b> [Provider]
-<b>Same as discord, a provider that integrates the prayer reminder system with WhatsApp.</b> It listens for prayer events from the core package and sends notifications to a specified WhatsApp number using a bot.
+
+    <b>Same as discord, a provider that integrates the prayer reminder system with WhatsApp.</b> It listens for prayer events from the core package and sends notifications to a specified WhatsApp number using a bot.
 
 ## How it works
 
