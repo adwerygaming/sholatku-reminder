@@ -1,11 +1,11 @@
 import axios from "axios";
 import { Knex } from "knex";
 import moment from "moment-timezone";
+import { PrayerDataSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { BaseLocation } from "sholatku-reminder-shared/types/Location.types.js";
+import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { PrayerDataSchema } from "../../types/Database.types.js";
-import { BaseLocation } from "../../types/Location.types.js";
-import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "../../types/SholatKu.types.js";
 import { convertTimeToMoment } from "../helper/Helper.js";
 import { Location } from "./Location.js";
 

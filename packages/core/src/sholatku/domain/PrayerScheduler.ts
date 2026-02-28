@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
+import { LocationSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { PrayerEvent, PrayerName, PrayerTime } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
-import { LocationSchema } from "../../types/Database.types.js";
-import { PrayerEvent, PrayerName, PrayerTime } from "../../types/SholatKu.types.js";
 import { Location } from "./Location.js";
 import { PrayerData } from "./PrayerData.js";
 import { PrayerLocationState } from "./PrayerLocationState.js";

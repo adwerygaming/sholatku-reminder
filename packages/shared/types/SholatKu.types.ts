@@ -1,4 +1,4 @@
-import { CycleCheckEvent } from "../sholatku/domain/PrayerScheduler.js"
+import { CycleCheckEvent } from "sholatku-reminder-core/src/sholatku/domain/PrayerScheduler.js"
 import { LocationSchema, SubscriptionSchema } from "./Database.types.js"
 
 export interface DatabaseRawSchema<D> {

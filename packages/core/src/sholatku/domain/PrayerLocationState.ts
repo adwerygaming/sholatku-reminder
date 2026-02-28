@@ -1,8 +1,8 @@
 import { Knex } from "knex";
 import moment from "moment-timezone";
+import { PrayerLocationStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { PrayerEvent, PrayerName } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { PrayerLocationStateSchema } from "../../types/Database.types.js";
-import { PrayerEvent, PrayerName } from "../../types/SholatKu.types.js";
 
 interface GetPrayerState {
     prayerName: PrayerName;

@@ -2,8 +2,8 @@ import { Knex } from "knex";
 import moment from "moment-timezone";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { SubscriptionSchema } from "../../types/Database.types.js";
-import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "../../types/Subscription.types.js";
+import { SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "sholatku-reminder-shared/types/Subscription.types.js";
 
 interface GetByProviderProp {
     providerName: SubscriptionProvider

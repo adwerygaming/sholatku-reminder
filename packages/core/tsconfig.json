@@ -21,7 +21,7 @@
     }
   },
   "include": [
-    ".", "../shared/redis/RedisClient.ts",
+    ".", "../shared/redis/RedisClient.ts", "../shared/types",
   ],
   "exclude": [
     "coverage",

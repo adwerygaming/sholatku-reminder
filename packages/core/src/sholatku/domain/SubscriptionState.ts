@@ -1,7 +1,7 @@
 import { Knex } from "knex";
+import { PrayerSubscriptionStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { PrayerEvent, PrayerName } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { PrayerSubscriptionStateSchema } from "../../types/Database.types.js";
-import { PrayerEvent, PrayerName } from "../../types/SholatKu.types.js";
 
 interface SetStateProp {
     prayerName: PrayerName

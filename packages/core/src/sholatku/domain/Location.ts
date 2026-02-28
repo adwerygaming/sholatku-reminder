@@ -1,8 +1,8 @@
 import FuzzySearch from 'fuzzy-search';
 import { Knex } from 'knex';
+import { LocationSchema, SubscriptionSchema } from 'sholatku-reminder-shared/types/Database.types.js';
+import { LocationSearchResult } from 'sholatku-reminder-shared/types/Location.types.js';
 import DatabaseClient from '../../database/DatabaseClient.js';
-import { LocationSchema, SubscriptionSchema } from '../../types/Database.types.js';
-import { LocationSearchResult } from '../../types/Location.types.js';
 import { normalizeInput, slugify } from '../helper/Helper.js';
 
 interface LocationFetchResult {

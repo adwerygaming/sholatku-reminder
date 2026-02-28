@@ -1,6 +1,6 @@
 import { redisPublisher } from "sholatku-reminder-shared/redis/RedisClient.js";
+import { PrayerEvent } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
-import { PrayerEvent } from "../types/SholatKu.types.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";

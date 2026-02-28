@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { SubscriptionSchema } from "../../types/Database.types.js";
+import { SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
 
 export class SubscriptionManager {
     private db(): Knex.QueryBuilder<SubscriptionSchema, SubscriptionSchema[]> {
