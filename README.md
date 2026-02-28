@@ -57,8 +57,8 @@ To install this project, you need these prerequisites:
 - **Docker**
 - **Docker Compose**
 
-> [!IMPOPTANT]
-> **Docker** is used to run **postgreSQL and Redis**, which are the database and message broker used by the system. You can learn more in [docker-compose.yml](./docker/docker-compose.yml) file on this repository.
+> [!IMPORTANT]
+> **Docker** is used to run **postgreSQL and Redis**, which are the database and message broker used by the system.You can learn more in [docker-compose.yml](./docker/docker-compose.yml) file on this repository.
 
 ## Usage
 There are <b>4 events available to use</b>, that includes `PrayerTime`, `PrayerIn5m`, `PrayerIn15m`, and `PrayerIn30m`. Each event will trigger at the specified time before the prayer time, allowing you to set up reminders or perform any necessary actions.
