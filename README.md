@@ -45,8 +45,20 @@ This project is a monorepo that consists of several packages, each with its own 
 <b>Redis message broker</b> is used for distributing the prayer event to multiple provider at the same time.
 Currently, we only have <b>Discord</b> and <b>WhatsApp</b> but we will add more provider in the future, such as Telegram, Slack, and more. Or you can contribute to this project by adding your own provider.
 
+## Prerequisites
+To install this project, you need these prerequisites:
+- **Node.js** (version 21 or higher)
+- **NPM** (should be included with Node.js)
+- **PM2** NPM Package
+- **Docker**
+- **Docker Compose**
+
+> [!IMPOPTANT]
+> **Docker** is used to run **postgreSQL and Redis**, which are the database and message broker used by the system.
+> You can learn more in [docker-compose.yml](./docker/docker-compose.yml) file on this repository.
+
 ## Usage
-There are <b>4 event available to use</b>, that includes `PrayerTime`, `PrayerIn5m`, `PrayerIn15m`, and `PrayerIn30m`. Each event will trigger at the specified time before the prayer time, allowing you to set up reminders or perform any necessary actions.
+There are <b>4 events available to use</b>, that includes `PrayerTime`, `PrayerIn5m`, `PrayerIn15m`, and `PrayerIn30m`. Each event will trigger at the specified time before the prayer time, allowing you to set up reminders or perform any necessary actions.
 
 Here an example of <b>how a provider can subscribe to the prayer event</b> using the Redis message broker:
 ```ts
