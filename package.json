@@ -18,8 +18,10 @@
     "packages/shared"
   ],
   "scripts": {
-    "start-core": "npx tsx ./packages/core/src/index.ts",
-    "start-discord": "npx tsx ./packages/providers/discord/src/index.ts",
+    "start-core": "npm run dev --workspace=packages/core",
+    "start-discord": "npm run start --workspace=packages/providers/discord",
+    "start-backend": "npm run dev --workspace=packages/backend",
+    "start-frontend": "npm run dev --workspace=packages/frontend",
     "seed": "npx tsx scripts/seed.ts",
     "lint-core": "npx eslint packages/core",
     "lint-frontend": "npx eslint packages/frontend",

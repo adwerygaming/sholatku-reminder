@@ -1,27 +1,18 @@
-import { config } from "dotenv";
 import "dotenv/config";
 
-import { dirname, resolve } from "path";
 import Tags from "sholatku-reminder-shared/utils/Tags.js";
-import { fileURLToPath } from "url";
 import { z } from "zod";
 
-// Schema for .env file,
-// Make sure to sync this.
-// Default value are: z.string()
 const envSchema = z.object({
-    REDIS_HOST: z.string(),
-    REDIS_PORT: z.string(),
+    BETTER_AUTH_SECRET: z.string(),
+    BETTER_AUTH_URL: z.string(),
+
+    OAUTH_DISCORD_CLIENT_ID: z.string(),
+    OAUTH_DISCORD_CLIENT_SECRET: z.string(),
+
+    FRONTEND_URL: z.string(),
+    BACKEND_PORT: z.string(),
 })
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const sharedRoot = resolve(__dirname, "../../shared")
-
-config({ path: resolve(sharedRoot, ".env") });
-
-console.log(sharedRoot)
-console.log(process.cwd())
 
 const envParsed = envSchema.safeParse(process.env)
 
