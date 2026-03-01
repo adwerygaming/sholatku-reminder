@@ -1,6 +1,6 @@
 import eslint from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
-import { defineConfig } from "eslint/config";
+import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
@@ -32,7 +32,12 @@ export default defineConfig([
     }
   },
 
-  {
-    ignores: ["dist", "build", "node_modules"]
-  }
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "dist",
+    "node_modules"
+  ]),
 ]);
