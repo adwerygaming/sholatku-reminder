@@ -22,7 +22,9 @@
     "start-discord": "npm run start --workspace=packages/providers/discord",
     "start-backend": "npm run dev --workspace=packages/backend",
     "start-frontend": "npm run dev --workspace=packages/frontend",
+    
     "seed": "npx tsx scripts/seed.ts",
+
     "lint-core": "npx eslint packages/core",
     "lint-frontend": "npx eslint packages/frontend",
     "lint-backend": "npx eslint packages/backend",

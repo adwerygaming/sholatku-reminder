@@ -1,7 +1,9 @@
-import "dotenv/config";
 
-import { z } from "zod";
+import { config } from "dotenv";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import Tags from "sholatku-reminder-shared/utils/Tags.js";
+import { z } from "zod";
 
 // Schema for .env file,
 // Make sure to sync this.
@@ -10,6 +12,11 @@ const envSchema = z.object({
     NODE_ENV: z.enum(["PROD", "DEV"]).optional(),
     PG_CONNECTION_STRING: z.string(),
 })
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+config({ path: resolve(__dirname, "../../.env") });
 
 const envParsed = envSchema.safeParse(process.env)
 
