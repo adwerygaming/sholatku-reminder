@@ -1,8 +1,8 @@
 import { Colors, ContainerBuilder, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { Location } from "sholatku-reminder-core/src/sholatku/domain/Location.js";
 import { SubscriptionRepository } from "sholatku-reminder-core/src/sholatku/domain/SubscriptionRepository.js";
-import { SubscriptionProvider } from "sholatku-reminder-core/src/types/Subscription.types.js";
 import { SlashCommandLayout } from "../../../types/Discord.types.js";
+import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 
 export default {
     metadata: new SlashCommandBuilder()

@@ -134,7 +134,7 @@ export class DiscordListener {
                     switch (prayerName) {
                         case "terbit": message = `**The sun** will rise in **${diffInMinutes} minutes** at **${eventTime}**.`; break
                         case "imsak":  message = `**Imsak** will begin in **${diffInMinutes} minutes** at **${eventTime}**.`; break
-                        default:       message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes**.`; break
+                        default:       message = `${capitalizeWords(prayerName)} prayer will begin in **${diffInMinutes} minutes** at **${eventTime}**..`; break
                     }
                     break
 
