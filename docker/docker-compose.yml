@@ -1,10 +1,11 @@
-services:
+name: sholatku
 
+services:
   pgadmin:
     container_name: sholatku-pgadmin
     image: dpage/pgadmin4:latest
     ports:
-      - 5050:80
+      - ${PGADMIN_PORT}:80
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@masdepan.my.id
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
@@ -24,7 +25,7 @@ services:
       - ./db_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
     ports:
-      - "5443:5432"
+      - "${POSTGRES_PORT}:5432"
     networks:
       - sholatku-net
 
@@ -32,7 +33,7 @@ services:
     container_name: sholatku-redis
     image: redis:8-alpine
     ports:
-      - "6379:6379"
+      - ${REDIS_PORT}:6379
     networks:
       - sholatku-net
 

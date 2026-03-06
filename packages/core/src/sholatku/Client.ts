@@ -13,8 +13,6 @@ const location = new Location()
 const subs = new SubscriptionRepository()
 
 // async function init(): Promise<void> {
-//   return
-
 //   const jogja = await location.getByLocation({
 //     province: "D.I. Yogyakarta",
 //     city: "Kab. Gunungkidul"
@@ -41,7 +39,7 @@ const subs = new SubscriptionRepository()
 //     metadata: {
 //       authorId: "506108777343352881",
 //       channelId: "632209598035787781",
-//       guildId: "632198121866264597"
+//       guildId: "632198121866264597"1
 //     }
 //   })
 
