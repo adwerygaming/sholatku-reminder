@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,9 +15,37 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+import { useForm } from "react-hook-form"
+import { Separator } from "./ui/separator"
+
+interface LoginFormData {
+  email: string
+  password: string
+}
 
 export function LoginForm() {
+  const { register, handleSubmit } = useForm<LoginFormData>()
+
+  const onSubmit = (data: LoginFormData) => {
+    console.log(data)
+  }
+
+  const handleDiscordLogin = async () => {
+    await authClient.signIn.social({
+      provider: "discord",
+      callbackURL: "/",
+    })
+  }
+
+  const handleGoogleLogin = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    })
+  }
+
   return (
     <div className={cn("flex flex-col gap-6")}>
       <Card>
@@ -26,7 +56,7 @@ export function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -35,6 +65,7 @@ export function LoginForm() {
                   type="email"
                   placeholder="m@example.com"
                   required
+                  {...register("email")}
                 />
               </Field>
               <Field>
@@ -42,21 +73,29 @@ export function LoginForm() {
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
                     href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
                   >
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" required 
+                  {...register("password")}
+                />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
-                <Button variant="outline" type="button">
-                  Login with Google
-                </Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account? <a href="#">Sign up</a>
                 </FieldDescription>
+
+                <Separator className="my-2"/>
+
+                <Button variant="outline" type="button" onClick={handleDiscordLogin}>
+                  Login with Discord
+                </Button>
+                <Button variant="outline" type="button" onClick={handleGoogleLogin}>
+                  Login with Google
+                </Button>
               </Field>
             </FieldGroup>
           </form>

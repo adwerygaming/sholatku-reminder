@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "nodenext",
+    "module": "nodenext",
     "resolvePackageJsonExports": true,
     "declaration": true,
     "removeComments": true,

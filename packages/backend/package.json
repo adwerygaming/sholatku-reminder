@@ -24,6 +24,7 @@
     "@nestjs/common": "^11.1.16",
     "@nestjs/core": "^11.1.16",
     "@nestjs/platform-express": "^11.1.16",
+    "@thallesp/nestjs-better-auth": "^2.4.0",
     "@types/pg": "^8.18.0",
     "better-auth": "^1.5.0",
     "dotenv": "^17.3.1",

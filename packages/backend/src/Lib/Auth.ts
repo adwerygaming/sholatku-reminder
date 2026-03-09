@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
+import { nextCookies } from "better-auth/next-js";
 import { Pool } from 'pg';
-import { env } from '../utils/EnvManager.js';
+import { env } from '../Utils/EnvManager.js';
 
 export const auth = betterAuth({
     secret: env.BETTER_AUTH_SECRET,
@@ -26,4 +27,5 @@ export const auth = betterAuth({
         },
     },
     trustedOrigins: [env.FRONTEND_URL ?? 'http://localhost:3000'],
+    plugins: [nextCookies()]
 });
