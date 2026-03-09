@@ -15,7 +15,7 @@ export const auth = betterAuth({
     socialProviders: {
         discord: {
             clientId: env.OAUTH_DISCORD_CLIENT_ID,
-            clientSecret: env.OAUTH_DISCORD_CLIENT_SECRET,
+            clientSecret: env.OAUTH_DISCORD_CLIENT_SECRET
         },
     },
     session: {
