@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "prayerData" (
     CONSTRAINT "prayerData_locationId_unique" UNIQUE ("locationId")
 );
 
-CREATE TABLE IF NOT EXISTS "prayerLocationStates" (
+CREATE TABLE IF NOT EXISTS "locationPrayerStates" (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "createdAt"       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     "lastUpdatedAt"   TIMESTAMPTZ DEFAULT NULL,
@@ -54,19 +54,20 @@ CREATE TABLE IF NOT EXISTS "prayerLocationStates" (
     "forDate"         DATE NOT NULL,
     "isTriggered"     BOOLEAN NOT NULL,
 
-    CONSTRAINT "prayerLocationStates_locationId_prayerName_prayerType_forDate_unique" UNIQUE ("locationId", "prayerName", "prayerType", "forDate")
+    CONSTRAINT "locationPrayerStates_locationId_prayerName_prayerType_forDate_unique" UNIQUE ("locationId", "prayerName", "prayerType", "forDate")
 );
 
 CREATE TABLE IF NOT EXISTS subscriptions (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "createdAt"       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     "lastUpdatedAt"   TIMESTAMPTZ DEFAULT NULL,
+    "userId"          TEXT NOT NULL REFERENCES "user" (id) ON DELETE CASCADE,
     "locationId"      UUID NOT NULL REFERENCES locations (id),
     "providerName"    providerName NOT NULL,
     metadata          JSONB NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "prayerSubscriptionStates" (
+CREATE TABLE IF NOT EXISTS "subscriptionPrayerStates" (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "createdAt"         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     "lastUpdatedAt"     TIMESTAMPTZ DEFAULT NULL,
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS "prayerSubscriptionStates" (
     "forDate"           DATE NOT NULL,
     "isTriggered"       BOOLEAN NOT NULL,
 
-    CONSTRAINT "prayerSubscriptionStates_subscriptionId_prayerName_prayerType_forDate_unique" UNIQUE ("subscriptionId", "prayerName", "prayerType", "forDate")
+    CONSTRAINT "subscriptionPrayerStates_subscriptionId_prayerName_prayerType_forDate_unique" UNIQUE ("subscriptionId", "prayerName", "prayerType", "forDate")
 );
 
 INSERT INTO locations (province, city) VALUES
