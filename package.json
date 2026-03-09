@@ -18,10 +18,15 @@
     "packages/shared"
   ],
   "scripts": {
-    "start-core": "npm run dev --workspace=packages/core",
+    "start-core": "npm run start --workspace=packages/core",
     "start-discord": "npm run start --workspace=packages/providers/discord",
-    "start-backend": "npm run dev --workspace=packages/backend",
-    "start-frontend": "npm run dev --workspace=packages/frontend",
+    "start-backend": "npm run start --workspace=packages/backend",
+    "start-frontend": "npm run start --workspace=packages/frontend",
+
+    "dev-core": "npm run dev --workspace=packages/core",
+    "dev-discord": "npm run dev --workspace=packages/providers/discord",
+    "dev-backend": "npm run start:dev --workspace=packages/backend",
+    "dev-frontend": "npm run dev --workspace=packages/frontend",
     
     "seed": "npx tsx scripts/seed.ts",
 

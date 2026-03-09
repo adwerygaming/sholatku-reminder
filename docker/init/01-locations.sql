@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     "providerName"    providerName NOT NULL,
     metadata          JSONB NOT NULL
 );
-
+2
 CREATE TABLE IF NOT EXISTS "prayerSubscriptionStates" (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "createdAt"         TIMESTAMPTZ NOT NULL DEFAULT NOW(),

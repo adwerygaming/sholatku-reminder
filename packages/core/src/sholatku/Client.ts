@@ -5,6 +5,7 @@ import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 import { SubscriptionState } from "./domain/SubscriptionState.js";
+import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 // import { SubscriptionProvider } from "../types/Subscription.types.js";
 
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
@@ -12,49 +13,49 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 const location = new Location()
 const subs = new SubscriptionRepository()
 
-// async function init(): Promise<void> {
-//   const jogja = await location.getByLocation({
-//     province: "D.I. Yogyakarta",
-//     city: "Kab. Gunungkidul"
-//   })
+async function init(): Promise<void> {
+  const jogja = await location.getByLocation({
+    province: "D.I. Yogyakarta",
+    city: "Kab. Gunungkidul"
+  })
 
-//   const jakarta = await location.getByLocation({
-//     province: "DKI Jakarta",
-//     city: "Kota Jakarta"
-//   })
+  const jakarta = await location.getByLocation({
+    province: "DKI Jakarta",
+    city: "Kota Jakarta"
+  })
 
-//   if (!jogja) {
-//     console.log(`[${tags.Error}] Jogja not found.`)
-//     return
-//   }
+  if (!jogja) {
+    console.log(`[${tags.Error}] Jogja not found.`)
+    return
+  }
 
-//   if (!jakarta) {
-//     console.log(`[${tags.Error}] Jakarta not found.`)
-//     return
-//   }
+  if (!jakarta) {
+    console.log(`[${tags.Error}] Jakarta not found.`)
+    return
+  }
 
-//   await subs.register({
-//     locationId: jakarta.id,
-//     providerName: SubscriptionProvider.Discord,
-//     metadata: {
-//       authorId: "506108777343352881",
-//       channelId: "632209598035787781",
-//       guildId: "632198121866264597"1
-//     }
-//   })
+  await subs.register({
+    locationId: jakarta.id,
+    providerName: SubscriptionProvider.Discord,
+    metadata: {
+      authorId: "506108777343352881",
+      channelId: "632209598035787781",
+      guildId: "632198121866264597"
+    }
+  })
 
-//   await subs.register({
-//     locationId: jogja.id,
-//     providerName: SubscriptionProvider.Discord,
-//     metadata: {
-//       authorId: "506108777343352881",
-//       channelId: "1471750280713601116",
-//       guildId: "598412465750933504"
-//     }
-//   })
-// }
+  await subs.register({
+    locationId: jogja.id,
+    providerName: SubscriptionProvider.Discord,
+    metadata: {
+      authorId: "506108777343352881",
+      channelId: "1471750280713601116",
+      guildId: "598412465750933504"
+    }
+  })
+}
 
-// await init()
+await init()
 
 async function check(): Promise<void> {
   const subscribedLocations = await location.getSubscribedLocations()
