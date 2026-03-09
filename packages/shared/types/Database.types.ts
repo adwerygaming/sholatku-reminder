@@ -1,5 +1,5 @@
-import { PrayerEvent, PrayerName, PrayerTimeData } from "./SholatKu.types.ts";
-import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "./Subscription.types.ts";
+import { PrayerEvent, PrayerName, PrayerTimeData } from "./SholatKu.types.js";
+import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "./Subscription.types.js";
 
 export interface BaseDatabaseSchema {
     id: string;

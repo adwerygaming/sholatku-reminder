@@ -1,11 +1,11 @@
 import { redisPublisher } from "sholatku-reminder-shared/redis/RedisClient.js";
 import { PrayerEvent } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
 import { SubscriptionState } from "./domain/SubscriptionState.js";
-import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 // import { SubscriptionProvider } from "../types/Subscription.types.js";
 
 console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);

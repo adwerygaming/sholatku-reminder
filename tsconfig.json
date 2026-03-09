@@ -3,17 +3,12 @@
   "compilerOptions": {
     "module": "nodenext",
     "target": "es2023",
-    "rootDir": ".",
-    "outDir": "dist",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["node"],
-
     "noUnusedLocals": true,
     "noUnusedParameters": true
-  },
-  "include": ["packages/core/src", "./eslint.config.ts", "packages/providers/discord/src", "packages/shared/"],
-  "exclude": ["coverage", "dist", "docs", "node_modules"]
+  }
 }
