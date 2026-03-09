@@ -6,7 +6,9 @@ import { z } from "zod";
 const envSchema = z.object({
     BETTER_AUTH_SECRET: z.string(),
     BETTER_AUTH_URL: z.string(),
-
+    
+    PG_CONNECTION_STRING: z.string(),
+    
     OAUTH_DISCORD_CLIENT_ID: z.string(),
     OAUTH_DISCORD_CLIENT_SECRET: z.string(),
 

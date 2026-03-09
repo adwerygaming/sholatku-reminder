@@ -38,6 +38,7 @@ export default defineConfig([
     "build/**",
     "next-env.d.ts",
     "**/dist/**",
+    "**/test/**",
     "**/node_modules/**"
   ]),
 ]);

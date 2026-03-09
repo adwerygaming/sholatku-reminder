@@ -1,11 +1,13 @@
 import { betterAuth } from 'better-auth';
+import { Pool } from 'pg';
 import { env } from '../utils/EnvManager.js';
-import { createKnexAdapter } from "sholatku-reminder-core/src/database/DatabaseAdapter.js"
 
 export const auth = betterAuth({
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
-    database: createKnexAdapter(),
+    database: new Pool({
+        connectionString: env.PG_CONNECTION_STRING // sync dont forgoet to sync ok !!!!
+    }),
     emailAndPassword: {
         enabled: true,
     },
