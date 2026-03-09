@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
-import { createKnexAdapter } from 'sholatku-reminder-core/src/database/DatabaseAdapter';
-import { env } from '../utils/EnvManager';
+import { env } from '../utils/EnvManager.js';
+import { createKnexAdapter } from "sholatku-reminder-core/src/database/DatabaseAdapter.js"
 
 export const auth = betterAuth({
     secret: env.BETTER_AUTH_SECRET,

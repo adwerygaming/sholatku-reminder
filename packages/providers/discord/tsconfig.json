@@ -9,21 +9,40 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node"],
-
+    "types": [
+      "node"
+    ],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-
     "paths": {
-      "sholatku-reminder-core": ["../core/src/index.ts"],
-      "sholatku-reminder-core/src/*": ["../core/src/*"],
-      "sholatku-reminder-shared/*": ["../shared/*"]
+      "sholatku-reminder-core": [
+        "../core/src/index.ts"
+      ],
+      "sholatku-reminder-core/src/*": [
+        "../core/src/*"
+      ],
+      "sholatku-reminder-shared/*": [
+        "../shared/*"
+      ]
     }
   },
-  "include": ["src", "src/utils", "src/types"],
-  "exclude": ["coverage", "dist", "docs", "node_modules"],
+  "include": [
+    "src",
+    "src/utils",
+    "src/types"
+  ],
+  "exclude": [
+    "coverage",
+    "dist",
+    "docs",
+    "node_modules"
+  ],
   "references": [
-    { "path": "../../core" },
-    { "path": "../../shared" }
+    {
+      "path": "../../core"
+    },
+    {
+      "path": "../../shared"
+    }
   ]
 }

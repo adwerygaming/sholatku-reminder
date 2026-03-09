@@ -4,6 +4,7 @@
     "module": "nodenext",
     "target": "es2023",
     "rootDir": ".",
+    "outDir": "dist",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,

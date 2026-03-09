@@ -21,8 +21,30 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
+    "types": ["node"],
     "paths": {
-      "sholatku-reminder-shared/*": ["../shared/*"]
+      "sholatku-reminder-core": [
+        "../core/src/index.ts"
+      ],
+      "sholatku-reminder-core/src/*": [
+        "../core/src/*"
+      ],
+      "sholatku-reminder-shared/*": [
+        "../shared/*"
+      ]
     }
-  }
+  },
+  "exclude": [
+    "test",
+    "dist",
+    "node_modules"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../shared"
+    }
+  ]
 }
