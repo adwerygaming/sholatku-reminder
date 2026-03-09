@@ -19,24 +19,31 @@
   ],
   "scripts": {
     "start-core": "npm run start --workspace=packages/core",
-    "start-discord": "npm run start --workspace=packages/providers/discord",
-    "start-backend": "npm run start --workspace=packages/backend",
     "start-frontend": "npm run start --workspace=packages/frontend",
+    "start-backend": "npm run start --workspace=packages/backend",
+    "start-discord": "npm run start --workspace=packages/providers/discord",
 
     "dev-core": "npm run dev --workspace=packages/core",
-    "dev-discord": "npm run dev --workspace=packages/providers/discord",
-    "dev-backend": "npm run start:dev --workspace=packages/backend",
     "dev-frontend": "npm run dev --workspace=packages/frontend",
+    "dev-backend": "npm run start:dev --workspace=packages/backend",
+    "dev-discord": "npm run dev --workspace=packages/providers/discord",
 
-    "dev-b": "npm run dev-backend",
-    "dev-f": "npm run dev-frontend",
-    "dev-c": "npm run dev-core",
-    "dev-d": "npm run dev-discord",
-
-    "build-shared": "npm run build --workspace=packages/shared",
     "build-core": "npm run build --workspace=packages/core",
+    "build-shared": "npm run build --workspace=packages/shared",
+    "build-frontend": "npm run build --workspace=packages/frontend",
     "build-backend": "npm run build --workspace=packages/backend",
     "build-discord": "npm run build --workspace=packages/providers/discord",
+
+    "dev-c": "npm run dev-core",
+    "dev-f": "npm run dev-frontend",
+    "dev-b": "npm run dev-backend",
+    "dev-d": "npm run dev-discord",
+
+    "build-c": "npm run build-core",
+    "build-s": "npm run build-shared",
+    "build-f": "npm run build-frontend",
+    "build-b": "npm run build-backend",
+    "build-d": "npm run build-discord",
     
     "seed": "npx tsx scripts/seed.ts",
 
