@@ -35,7 +35,7 @@
 
     "build-shared": "npm run build --workspace=packages/shared",
     "build-core": "npm run build --workspace=packages/core",
-    "build-backend": "npm run build-shared && npm run build-core && npm run build --workspace=packages/backend",
+    "build-backend": "npm run build --workspace=packages/backend",
     
     "seed": "npx tsx scripts/seed.ts",
 
