@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "exports": {
-    ".": "./index.js",
+    ".": "./index.ts",
+    "./*.js": "./*.ts",
     "./*": "./*"
   },
   "scripts": {
