@@ -18,8 +18,6 @@
   },
   "include": [
     "src",
-    "src/utils",
-    "src/types"
   ],
   "exclude": [
     "coverage",
