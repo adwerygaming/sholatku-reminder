@@ -27,6 +27,13 @@
     "dev-discord": "npm run dev --workspace=packages/providers/discord",
     "dev-backend": "npm run start:dev --workspace=packages/backend",
     "dev-frontend": "npm run dev --workspace=packages/frontend",
+
+    "dev-b": "npm run dev-backend",
+    "dev-f": "npm run dev-frontend",
+    "dev-c": "npm run dev-core",
+    "dev-d": "npm run dev-discord",
+
+    "build-backend": "npm run build --workspace=packages/backend",
     
     "seed": "npx tsx scripts/seed.ts",
 
