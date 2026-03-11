@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import moment from "moment-timezone";
-import { PrayerLocationStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { LocationPrayerStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
 import { PrayerEvent, PrayerName } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 
@@ -17,8 +17,8 @@ interface SetPrayerData {
 
 export class PrayerLocationState {
     private readonly locationId: string
-    private db(): Knex.QueryBuilder<PrayerLocationStateSchema, PrayerLocationStateSchema[]> {
-        return DatabaseClient<PrayerLocationStateSchema>("prayerLocationStates")
+    private db(): Knex.QueryBuilder<LocationPrayerStateSchema, LocationPrayerStateSchema[]> {
+        return DatabaseClient<LocationPrayerStateSchema>("locationPrayerStates")
     }
 
     constructor(
@@ -63,7 +63,7 @@ export class PrayerLocationState {
      * @param eventName 
      * @param value boolean value for that state
      */
-    async set({ prayerName, prayerType, value }: SetPrayerData): Promise<PrayerLocationStateSchema> {
+    async set({ prayerName, prayerType, value }: SetPrayerData): Promise<LocationPrayerStateSchema> {
         const [res] = await this.db()
             .insert({
                 lastUpdatedAt: moment().toISOString(),

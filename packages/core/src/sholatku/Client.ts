@@ -41,7 +41,8 @@ async function init(): Promise<void> {
       authorId: "506108777343352881",
       channelId: "632209598035787781",
       guildId: "632198121866264597"
-    }
+    },
+    userId: "123"
   })
 
   await subs.register({
@@ -51,62 +52,67 @@ async function init(): Promise<void> {
       authorId: "506108777343352881",
       channelId: "1471750280713601116",
       guildId: "598412465750933504"
-    }
+    },
+    userId: "123"
   })
 }
 
 await init()
 
 async function check(): Promise<void> {
-  const subscribedLocations = await location.getSubscribedLocations()
+  // deduped locations
+  const subscriberLocations = await subs.getLocations()
 
-  if (subscribedLocations.length === 0) {
+  if (subscriberLocations.length === 0) {
     console.log(`[${tags.Error}] No subscriptions found.`)
     return
   }
 
-  // console.log(subscribedLocations)
-
-  for (const loc of subscribedLocations) {
-    // console.log(`[${tags.PrayerService}] Checking location ${loc.city}, ${loc.province} with id ${loc.id}.`)
+  // On deduped locations
+  for (const loc of subscriberLocations) {
+    // run a check
     const scheduler = new PrayerScheduler(loc.id)
-    const checks = await scheduler.cycleCheck()
+    const check = await scheduler.cycleCheck()
 
-    if (!checks) continue
+    // if there no updates, skip
+    if (!check) continue
 
+    // get every subscriptions on that location
     const subscribers = await subs.getByLocation(loc.id)
 
-    // for (const sub of subscribers) {
-    //   console.log(`[${tags.Debug}] ${sub.providerName}`)
-    //   console.log(sub.metadata)
-    //   console.log(loc)
-    // }
+    // on every event of every subs
+    for (const ev of check) {
+      // batch fetch all states for all subs on this date — 1 query instead of N
+      const stateMap = await SubscriptionState.getBatch(
+        subscribers.map(s => s.id),
+        ev.time.toDate()
+      )
 
-    for (const res of checks) {
       for (const sub of subscribers) {
         const subState = new SubscriptionState(sub.id)
 
-        const stateCheck = await subState.get({
-          prayerName: res.eventName,
-          prayerType: res.type,
-          date: res.time.toDate()
-        })
+        // check sub state, have i send x event prayer to this sub before?
+        const stateCheck = stateMap.get(`${sub.id}:${ev.eventName}:${ev.type}`)
 
+        // oh, i already did, skip
         if (stateCheck) continue
 
-        await redisPublisher.publish(res.type, JSON.stringify({
-          event: res,
+        // if not, sends
+        await redisPublisher.publish(ev.type, JSON.stringify({
+          event: ev,
           location: loc,
           subscription: sub,
         }))
 
-        if (res.type === PrayerEvent.NextPrayer) continue
-        console.log(`[${tags.PrayerService}] Publishing event ${res.eventName} (${res.type}) to ${subscribers.length} subs.`)
+        // skip notification for a prayer
+        if (ev.type === PrayerEvent.NextPrayer) continue
+        console.log(`[${tags.PrayerService}] Publishing event ${ev.eventName} (${ev.type}) to ${subscribers.length} subs.`)
 
+        // update the state check, marking i have notify a sub of x event prayer
         await subState.set({
-          prayerName: res.eventName,
-          prayerType: res.type,
-          date: res.time.toDate(),
+          prayerName: ev.eventName,
+          prayerType: ev.type,
+          date: ev.time.toDate(),
           value: true
         })
       }

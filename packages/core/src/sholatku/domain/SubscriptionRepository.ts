@@ -1,15 +1,18 @@
 import { Knex } from "knex";
 import moment from "moment-timezone";
+import { LocationSchema, SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { SubscriptionFull } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "sholatku-reminder-shared/types/Subscription.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
-import { SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
-import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "sholatku-reminder-shared/types/Subscription.types.js";
+import { SubscriptionManager } from "./SubscriptionManager.js";
 
 interface GetByProviderProp {
     providerName: SubscriptionProvider
 }
 
 interface RegisterBaseProp {
+    userId: string
     locationId: string
 }
 
@@ -30,31 +33,56 @@ export class SubscriptionRepository {
         return DatabaseClient<SubscriptionSchema>("subscriptions")
     }
 
-    async findByProvider({ providerName }: GetByProviderProp): Promise<SubscriptionSchema[]> {
+    async findByProvider({ providerName }: GetByProviderProp): Promise<SubscriptionFull[]> {
         const res = await this.db()
-            .select("*")
-            .where("providerName", providerName)
+            .join("locations", "subscriptions.locationId", "=", "locations.id")
+            .join("user", "subscriptions.userId", "=", "user.id")
+            .select<SubscriptionFull[]>([
+                "subscriptions.*",
+                DatabaseClient.raw(`row_to_json(locations.*) as location`),
+                DatabaseClient.raw(`row_to_json("user".*) as user`)
+            ])
+            .where("subscriptions.providerName", providerName)
 
         return res
     }
-    
-    async findByDiscordGuild(guildId: DiscordMetadata["guildId"]): Promise<SubscriptionSchema | null> {
+
+    async findByDiscordGuild(guildId: DiscordMetadata["guildId"]): Promise<SubscriptionFull | null> {
         const res = await this.db()
-            .select("*")
-            .where("providerName", SubscriptionProvider.Discord)
-            .andWhereRaw("metadata->>'guildId' = ?", [guildId])
+            .join("locations", "subscriptions.locationId", "=", "locations.id")
+            .join("user", "subscriptions.userId", "=", "user.id")
+            .select<SubscriptionFull>([
+                "subscriptions.*",
+                DatabaseClient.raw(`row_to_json(locations.*) as location`),
+                DatabaseClient.raw(`row_to_json("user".*) as user`)
+            ])
+            .where("subscriptions.providerName", SubscriptionProvider.Discord)
+            .andWhereRaw("subscriptions.metadata->>'guildId' = ?", [guildId])
             .first()
 
         return res ?? null
     }
 
+    /**
+     * #### Fetch all locations from subscriptions and **deduped them**
+     * @returns deduped LocationSchema[]
+     */
+    async getLocations(): Promise<LocationSchema[]> {
+        const res = await this.db()
+            .join("locations", "subscriptions.locationId", "=", "locations.id")
+            .select<LocationSchema[]>("locations.*")
+            .distinct<LocationSchema[]>("locations.id")
+        
+        return res
+    }
+
     async getByLocation(locationId: string): Promise<SubscriptionSchema[]> {
-        return this.db()
+        return await this.db()
             .select("*")
             .where("locationId", locationId)
     }
 
-    async register({ locationId, metadata, providerName }: RegisterProp): Promise<SubscriptionSchema> {
+    async register({ locationId, metadata, providerName, userId }: RegisterProp): Promise<SubscriptionFull> {
         //! with union types, should be guarante correct metadata per provider.
 
         const check = await this.findByProvider({ providerName })
@@ -75,17 +103,24 @@ export class SubscriptionRepository {
 
         console.log(`[${tags.PrayerService}] Registering new subscription.`)
         console.log(`[${tags.PrayerService}] Provider: ${providerName}`)
+        console.log(`[${tags.PrayerService}] UserId: ${userId}`)
         console.log(metadata)
 
-        const [res] = await this.db()
+        const [inserted] = await this.db()
             .insert({
                 createdAt: moment().toISOString(),
                 locationId,
+                userId,
                 providerName,
-                metadata
-            } as SubscriptionSchema)
+                metadata,
+            } as Knex.DbRecord<SubscriptionSchema>)
             .returning("*")
-        
+
+        const subManager = new SubscriptionManager(inserted.id)
+
+        const res = await subManager.getById()
+        if (!res) throw new Error(`Subscription ${inserted.id} not found after insert`)
+
         return res
     }
 }

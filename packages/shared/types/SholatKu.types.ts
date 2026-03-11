@@ -1,5 +1,5 @@
 import { CycleCheckEvent } from "sholatku-reminder-core/src/sholatku/domain/PrayerScheduler.js"
-import { LocationSchema, SubscriptionSchema } from "./Database.types.js"
+import { LocationSchema, SubscriptionPrayerStateSchema, SubscriptionSchema, UserSchema } from "./Database.types.js"
 
 export interface DatabaseRawSchema<D> {
     id: string
@@ -78,3 +78,12 @@ export type SerializedCycleCheckEvent = Omit<CycleCheckEvent, "time"> & { time: 
  * Reconstruct into PrayerEventPayload by wrapping time with moment().
  */
 export type SerializedPrayerEventPayload = Omit<PrayerEventPayload, "event"> & { event: SerializedCycleCheckEvent }
+
+export type SubscriptionFull = SubscriptionSchema & {
+    location: LocationSchema
+    user: UserSchema
+}
+
+export type SubscriptionPrayerStateFull = SubscriptionPrayerStateSchema & {
+  subscriptions: SubscriptionFull
+}

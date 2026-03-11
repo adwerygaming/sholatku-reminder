@@ -1,5 +1,4 @@
 import { betterAuth } from 'better-auth';
-import { nextCookies } from "better-auth/next-js";
 import { Pool } from 'pg';
 import { env } from '../Utils/EnvManager.js';
 
@@ -15,7 +14,10 @@ export const auth = betterAuth({
     socialProviders: {
         discord: {
             clientId: env.OAUTH_DISCORD_CLIENT_ID,
-            clientSecret: env.OAUTH_DISCORD_CLIENT_SECRET
+            clientSecret: env.OAUTH_DISCORD_CLIENT_SECRET,
+            disableDefaultScope: true,
+            prompt: "consent",
+            scope: ["identify", "email", "guilds"],
         },
     },
     session: {
@@ -27,5 +29,5 @@ export const auth = betterAuth({
         },
     },
     trustedOrigins: [env.FRONTEND_URL ?? 'http://localhost:3000'],
-    plugins: [nextCookies()]
+    plugins: []
 });

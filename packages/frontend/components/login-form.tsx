@@ -1,24 +1,13 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { authClient } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import { useForm } from "react-hook-form"
-import { Separator } from "./ui/separator"
 
 interface LoginFormData {
   email: string
@@ -33,16 +22,18 @@ export function LoginForm() {
   }
 
   const handleDiscordLogin = async () => {
+    const callbackURL = `${window.location.origin}/`
     await authClient.signIn.social({
       provider: "discord",
-      callbackURL: "/",
+      callbackURL,
     })
   }
 
   const handleGoogleLogin = async () => {
+    const callbackURL = `${window.location.origin}/`
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/",
+      callbackURL,
     })
   }
 

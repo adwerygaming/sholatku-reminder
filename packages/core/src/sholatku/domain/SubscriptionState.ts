@@ -1,5 +1,5 @@
 import { Knex } from "knex";
-import { PrayerSubscriptionStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import { SubscriptionPrayerStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
 import { PrayerEvent, PrayerName } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 
@@ -18,9 +18,8 @@ interface GetStateProp {
 
 export class SubscriptionState {
     private readonly subscriptionId: string
-
-    private db(): Knex.QueryBuilder<PrayerSubscriptionStateSchema, PrayerSubscriptionStateSchema[]> {
-        return DatabaseClient<PrayerSubscriptionStateSchema>("prayerSubscriptionStates")
+    private db(): Knex.QueryBuilder<SubscriptionPrayerStateSchema, SubscriptionPrayerStateSchema[]> {
+        return DatabaseClient<SubscriptionPrayerStateSchema>("subscriptionPrayerStates")
     }
 
     constructor(
@@ -29,7 +28,7 @@ export class SubscriptionState {
         this.subscriptionId = subscriptionId
     }
 
-    async set({ prayerName, prayerType, value, date }: SetStateProp): Promise<PrayerSubscriptionStateSchema> {
+    async set({ prayerName, prayerType, value, date }: SetStateProp): Promise<SubscriptionPrayerStateSchema> {
         const [res] = await this.db()
             .insert({
                 subscriptionId: this.subscriptionId,
@@ -45,7 +44,7 @@ export class SubscriptionState {
         return res
     }
 
-    async get({ prayerType, prayerName, date }: GetStateProp): Promise<PrayerSubscriptionStateSchema | null> {
+    async get({ prayerType, prayerName, date }: GetStateProp): Promise<SubscriptionPrayerStateSchema | null> {
         const res = await this.db()
             .select("*")
             .where("subscriptionId", this.subscriptionId)
@@ -54,10 +53,23 @@ export class SubscriptionState {
             .where("forDate", date)
             .first()
 
-        if (!res) {
-            return null
-        }
+        return res ?? null
+    }
 
-        return res
+    /**
+     * Batch fetch all states for multiple subscriptions on a given date.
+     * Returns a Map keyed by `subscriptionId:prayerName:prayerType` for O(1) lookup.
+     */
+    static async getBatch(subscriptionIds: string[], date: Date): Promise<Map<string, SubscriptionPrayerStateSchema>> {
+        const rows = await DatabaseClient<SubscriptionPrayerStateSchema>("subscriptionPrayerStates")
+            .select("*")
+            .whereIn("subscriptionId", subscriptionIds)
+            .where("forDate", date)
+
+        const map = new Map<string, SubscriptionPrayerStateSchema>()
+        for (const row of rows) {
+            map.set(`${row.subscriptionId}:${row.prayerName}:${row.prayerType}`, row)
+        }
+        return map
     }
 }

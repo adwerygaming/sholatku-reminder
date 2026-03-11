@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import "dotenv/config";
 
-import { dirname, resolve } from "path";
+import path, { dirname, resolve } from "path";
 import Tags from "sholatku-reminder-shared/utils/Tags.js";
 import { fileURLToPath } from "url";
 import { z } from "zod";
@@ -16,12 +16,11 @@ const envSchema = z.object({
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const sharedRoot = resolve(__dirname, "../../shared")
+
+// relative path from builded (dist) files.
+const sharedRoot = path.join(__dirname, "..")
 
 config({ path: resolve(sharedRoot, ".env") });
-
-console.log(sharedRoot)
-console.log(process.cwd())
 
 const envParsed = envSchema.safeParse(process.env)
 

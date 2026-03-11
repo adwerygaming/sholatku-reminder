@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "exports": {
-    ".": "./dist/index.js",
-    "./*.js": "./dist/*.js",
+    ".": "./dist/*",
     "./*": "./dist/*"
   },
   "scripts": {

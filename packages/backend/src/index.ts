@@ -8,7 +8,7 @@ async function bootstrap(): Promise<void> {
   });
 
   app.enableCors({
-    origin: [env.FRONTEND_URL, "http://localhost:5090"],
+    origin: [env.FRONTEND_URL],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],

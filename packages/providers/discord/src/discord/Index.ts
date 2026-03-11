@@ -4,11 +4,13 @@ import tags from "sholatku-reminder-shared/utils/Tags.js";
 import client from './Client.js';
 import { CommandHandler } from './CommandHandler.js';
 import { DiscordListener } from './Listener.js';
+import { Discovery } from './Discovery.js';
 
 console.log(`[${tags.Discord}] Loaded Discord Index Script.`) 
 
 const commandHandler = new CommandHandler();
 const listener = new DiscordListener();
+const discovery = new Discovery();
 
 client.on(Events.ClientReady, async (bot: Client) => {
   // loads commands
@@ -31,6 +33,7 @@ client.on(Events.ClientReady, async (bot: Client) => {
   console.log('');
 
   listener.listen();
+  await discovery.start();
 });
 
 client.on(Events.InteractionCreate, async interaction => {
