@@ -1,9 +1,9 @@
 import FuzzySearch from 'fuzzy-search';
-import { Knex } from 'knex';
-import { LocationSchema, SubscriptionSchema } from 'sholatku-reminder-shared/types/Database.types.js';
-import { LocationSearchResult } from 'sholatku-reminder-shared/types/Location.types.js';
-import DatabaseClient from '../../database/DatabaseClient.js';
-import { normalizeInput, slugify } from '../helper/Helper.js';
+import type { Knex } from 'knex';
+import DatabaseClient from 'sholatku-reminder-core/src/database/DatabaseClient.js';
+import { normalizeInput, slugify } from 'sholatku-reminder-core/src/sholatku/helper/Helper';
+import type { LocationSchema, SubscriptionSchema } from 'sholatku-reminder-shared/types/Database.types.js';
+import type { LocationSearchResult } from 'sholatku-reminder-shared/types/Location.types.js';
 
 interface LocationFetchResult {
     [province: string]: string[]
@@ -117,7 +117,7 @@ export class Location {
      * @param query - The search string to match against province names.
      * @returns A promise resolving to the best-matching {@link LocationSearchResult}.
      */
-    async searchProvince(query: string): Promise<LocationSearchResult | null> {
+    async searchProvince(query: string): Promise<LocationSearchResult[] | null> {
         // somehow resolve"yogya" to "D.I. Yogyakarta", "jakarta" to "DKI Jakarta", etc
         const userQuery = slugify(query)
 
@@ -132,11 +132,7 @@ export class Location {
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
         const res = searcher.search(userQuery)
 
-        const data = res?.[0] ?? null
-
-        if (!data) return null;
-
-        return data
+        return res
     }
 
     /**
@@ -149,7 +145,7 @@ export class Location {
      * @param query - The search string to match against city names.
      * @returns A promise resolving to the best-matching city result, omitting `databaseKey`.
      */
-    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'> | null> {
+    async searchCity(province: string, query: string): Promise<Omit<LocationSearchResult, 'databaseKey'>[] | null> {
         // province must be on proper format
         const userQuery = slugify(query)
 
@@ -164,10 +160,6 @@ export class Location {
         const searcher = new FuzzySearch(searchObj, ['searchKey']);
         const res = searcher.search(userQuery)
 
-        const data = res?.[0] ?? null
-
-        if (!data) return null
-
-        return data
+        return res
     }
 }

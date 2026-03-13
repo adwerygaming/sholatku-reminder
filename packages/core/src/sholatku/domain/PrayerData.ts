@@ -1,9 +1,9 @@
 import axios from "axios";
-import { Knex } from "knex";
+import type { Knex } from "knex";
 import moment from "moment-timezone";
-import { PrayerDataSchema } from "sholatku-reminder-shared/types/Database.types.js";
-import { BaseLocation } from "sholatku-reminder-shared/types/Location.types.js";
-import { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import type { PrayerDataSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import type { BaseLocation } from "sholatku-reminder-shared/types/Location.types.js";
+import type { APIResponse, PrayerName, PrayerTime, PrayerTimeData } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { convertTimeToMoment } from "../helper/Helper.js";
@@ -73,7 +73,7 @@ export class PrayerData {
             return []
         }
 
-        const cityResult = await location.searchCity(provinceResult.original, city)
+        const cityResult = await location.searchCity(provinceResult?.[0].original, city)
 
         if (!cityResult) {
             console.log(`[${tags.Error}] Fetching prayer data for city "${city}" failed. City not found.`)
@@ -82,8 +82,8 @@ export class PrayerData {
 
         const url = `https://equran.id/api/v2/imsakiyah`
         const body = {
-            provinsi: provinceResult.original,
-            kabkota: cityResult.original
+            provinsi: provinceResult?.[0].original,
+            kabkota: cityResult?.[0].original
         }
 
         console.log(`[${tags.System}] Fetching prayer data for ${body.provinsi}, ${body.kabkota}`)

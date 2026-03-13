@@ -14,6 +14,9 @@ const envSchema = z.object({
 
     FRONTEND_URL: z.string(),
     BACKEND_PORT: z.string(),
+
+    REDIS_HOST: z.string(),
+    REDIS_PORT: z.string()
 })
 
 const envParsed = envSchema.safeParse(process.env)

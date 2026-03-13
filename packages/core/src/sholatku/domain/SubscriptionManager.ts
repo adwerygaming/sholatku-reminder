@@ -1,6 +1,6 @@
-import { Knex } from "knex";
-import { SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
-import { SubscriptionFull } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import type { Knex } from "knex";
+import type { SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import type { SubscriptionFull } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 
 export class SubscriptionManager {

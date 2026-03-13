@@ -1,8 +1,9 @@
-import { Knex } from "knex";
+import type { Knex } from "knex";
 import moment from "moment-timezone";
-import { LocationSchema, SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
-import { SubscriptionFull } from "sholatku-reminder-shared/types/SholatKu.types.js";
-import { DiscordMetadata, SubscriptionProvider, WhatsAppMetadata } from "sholatku-reminder-shared/types/Subscription.types.js";
+import type { LocationSchema, SubscriptionSchema } from "sholatku-reminder-shared/types/Database.types.js";
+import type { SubscriptionFull } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import type { DiscordMetadata, WhatsAppMetadata } from "sholatku-reminder-shared/types/Subscription.types.js";
+import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 import { SubscriptionManager } from "./SubscriptionManager.js";

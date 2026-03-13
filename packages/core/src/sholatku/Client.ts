@@ -1,7 +1,7 @@
-import { redisPublisher } from "sholatku-reminder-shared/redis/RedisClient.js";
 import { PrayerEvent } from "sholatku-reminder-shared/types/SholatKu.types.js";
 import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
+import { redisClient } from "../database/RedisClient.js";
 import { Location } from "./domain/Location.js";
 import { PrayerScheduler } from "./domain/PrayerScheduler.js";
 import { SubscriptionRepository } from "./domain/SubscriptionRepository.js";
@@ -98,7 +98,7 @@ async function check(): Promise<void> {
         if (stateCheck) continue
 
         // if not, sends
-        await redisPublisher.publish(ev.type, JSON.stringify({
+        await redisClient.publish(ev.type, JSON.stringify({
           event: ev,
           location: loc,
           subscription: sub,

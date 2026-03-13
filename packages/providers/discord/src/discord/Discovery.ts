@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
-import { redisClient } from "sholatku-reminder-shared/redis/RedisClient.js";
 import tags from "sholatku-reminder-shared/utils/Tags.js";
+import { redisPublisher } from "../database/RedisClient.js";
 import client from "./Client.js";
 
 export class Discovery {
@@ -22,7 +22,7 @@ export class Discovery {
         }
 
         const data = JSON.stringify(schema)
-        await redisClient.setex(`presence:discord:${botId}`, 70, data)
+        await redisPublisher.setex(`presence:discord:${botId}`, 70, data)
         console.log(`[${tags.System}] Sent a discovery data.`)
     }
 }

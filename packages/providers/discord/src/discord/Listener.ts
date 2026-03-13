@@ -3,10 +3,10 @@
 import { Colors, ContainerBuilder, MessageFlags } from "discord.js"
 import moment from "moment-timezone"
 import { capitalizeWords } from "sholatku-reminder-core/src/sholatku/helper/Helper.js"
-import { redisSubscriber } from "sholatku-reminder-shared/redis/RedisClient.js"
 import { PrayerEvent, PrayerEventPayload, SerializedPrayerEventPayload } from "sholatku-reminder-shared/types/SholatKu.types.js"
 import { SubscriptionProvider } from "sholatku-reminder-shared/types/Subscription.types.js"
 import tags from "sholatku-reminder-shared/utils/Tags.js"
+import { redisClient } from "../database/RedisClient.js"
 import client from "./Client.js"
 
 interface SendMessageProp extends PrayerEventPayload {
@@ -100,9 +100,9 @@ export class DiscordListener {
     listen(): void {
         console.log(`[${tags.Discord}] Discord Listener started listening for events.`)
 
-        void redisSubscriber.subscribe(...Object.values(PrayerEvent))
+        void redisClient.subscribe(...Object.values(PrayerEvent))
 
-        redisSubscriber.on("message", async (channel, rawMessage) => {
+        redisClient.on("message", async (channel, rawMessage) => {
             const raw = JSON.parse(rawMessage) as SerializedPrayerEventPayload
 
             const payload: PrayerEventPayload = {

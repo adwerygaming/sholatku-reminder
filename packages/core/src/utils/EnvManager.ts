@@ -11,6 +11,9 @@ import { z } from "zod";
 const envSchema = z.object({
     NODE_ENV: z.enum(["PROD", "DEV"]).optional(),
     PG_CONNECTION_STRING: z.string(),
+
+    REDIS_HOST: z.string(),
+    REDIS_PORT: z.string()
 })
 
 const __filename = fileURLToPath(import.meta.url);

@@ -33,10 +33,12 @@ export default defineConfig([
   },
 
   globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
+    "**/.next/**",
+    "**/out/**",
+    "**/build/**",
     "next-env.d.ts",
+    "**/components/ui/**",
+    "*.tsx",
     "**/dist/**",
     "**/test/**",
     "**/node_modules/**"

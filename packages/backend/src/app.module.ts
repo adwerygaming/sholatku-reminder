@@ -8,7 +8,6 @@ import { auth } from './Lib/Auth.js';
 @Module({
   imports: [
     APIModule,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     AuthModule.forRoot({ auth })
   ],
   controllers: [AppController],

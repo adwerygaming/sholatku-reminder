@@ -1,6 +1,6 @@
 import Knex from "knex";
-import { DatabaseTables } from "sholatku-reminder-shared/types/Database.types.js";
-import { env } from "../utils/EnvManager.js";
+import { env } from "sholatku-reminder-core/src/utils/EnvManager";
+import type { DatabaseTables } from "sholatku-reminder-shared/types/Database.types.js";
 
 const DatabaseClient = Knex<DatabaseTables>({
   client: 'pg',

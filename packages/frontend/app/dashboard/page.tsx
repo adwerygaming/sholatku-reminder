@@ -1,68 +1,53 @@
 "use client"
 
-import LogOutBtn from "@/components/logout-btn"
-import { APIService } from "@/lib/APIService"
+import LogOutBtn from "@/components/LogoutButton"
 import { authClient } from "@/lib/auth-client"
-import { useEffect, useState } from "react"
-import { DiscordPartialGuild } from "../../../shared/types/Discord.types"
+import { useState } from "react"
+import { LocationSearchResult } from "../../../shared/types/Location.types"
+import SelectGuildSection from "./SelectGuildSection"
+import SelectLocationSection from "./SelectLocationSection"
+import SelectPlatformSection from "./SelectPlatformSection"
 
-interface OverlayProps {
-    message?: string
-}
-
-const api = new APIService()
-
-function Overlay({ message }: OverlayProps) {
-    return (
-        <div className="min-h-screen bg-background flex flex-col items-center justify-center">
-            <h1>Sholatku Dashboard</h1>
-            <p>{message}</p>
-        </div>
-    )
-}
+export type ProviderSelection = "discord" | "whatsapp"
 
 export default function DashboardPage() {
-    const { data: session, isPending } = authClient.useSession()
-    const [guilds, setGuilds] = useState<DiscordPartialGuild[]>()
+    const { data: session } = authClient.useSession()
 
-    useEffect(() => {
-        if (!isPending && !session) {
-            window.location.href = "/login"
-        }
-    }, [session, isPending])
-
-    useEffect(() => {
-        if (!session) return
-
-        (async () => {
-            const guilds = await api.getGuilds()
-            setGuilds(guilds)
-        })()
-    }, [session])
-
-    if (isPending) {
-        return Overlay({ message: "Loading..." })
-    }
+    const [providerSelection, setProviderSelection] = useState<ProviderSelection | null>(null)
+    const [selectedCity, setSelectedCity] = useState<LocationSearchResult | null>(null)
+    const [selectedProvince, setSelectedProvince] = useState<LocationSearchResult | null>(null)
 
     return (
-        <div className="p-8">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-2xl font-bold">Dashboard</h1>
-                <p>{session?.user.name}</p>
-                <p>{session?.user.id}</p>
-                <p>{session?.user.email}</p>
-                
-                <LogOutBtn/>
+        <div className="max-w-5xl mx-auto p-8">
+            <div className="flex flex-col gap-6">
+                <div>
+                    <h1 className="text-2xl font-bold">Dashboard</h1>
+                    <p>{session?.user.name}</p>
+                    <p>{session?.user.id}</p>
+                    <p>{session?.user.email}</p>
+                    <LogOutBtn />
+                </div>
 
-                <p>You have {guilds?.length} guilds</p>
-                {guilds?.map((g) => {
-                    return (
-                        <div key={g.id} className="p-4 border rounded">
-                            <p>{g.name}</p>
-                            <p>{g.id}</p>
-                        </div>
-                    )
-                })}
+                <SelectLocationSection
+                    onProvinceChange={(v) => setSelectedProvince(v)}
+                    onCityChange={(v) => setSelectedCity(v)}
+                />
+
+                {/* <p className="text-sm text-muted-foreground">
+                    Selected:
+                    <span className="font-medium text-foreground">{selectedProvince?.original}</span>,
+                    <span className="font-medium text-foreground">{selectedCity?.original}</span>
+                </p> */}
+
+                {selectedCity && selectedProvince && (
+                    <SelectPlatformSection
+                        onPlatformChange={(v) => setProviderSelection(v)}
+                    />
+                )}
+
+                {providerSelection === "discord" && (
+                    <SelectGuildSection /> 
+                )}
             </div>
         </div>
     )
