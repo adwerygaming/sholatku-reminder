@@ -3,7 +3,10 @@
 import LogOutBtn from "@/components/LogoutButton"
 import { authClient } from "@/lib/auth-client"
 import { useState } from "react"
+import { DiscordChannelRequestResponse } from "sholatku-reminder-shared/types/RPC.types.js"
+import { DiscordPartialGuild } from "../../../shared/types/Discord.types"
 import { LocationSearchResult } from "../../../shared/types/Location.types"
+import SelectGuildChannelSection from "./SelectGuildChannelSection"
 import SelectGuildSection from "./SelectGuildSection"
 import SelectLocationSection from "./SelectLocationSection"
 import SelectPlatformSection from "./SelectPlatformSection"
@@ -14,8 +17,16 @@ export default function DashboardPage() {
     const { data: session } = authClient.useSession()
 
     const [providerSelection, setProviderSelection] = useState<ProviderSelection | null>(null)
-    const [selectedCity, setSelectedCity] = useState<LocationSearchResult | null>(null)
-    const [selectedProvince, setSelectedProvince] = useState<LocationSearchResult | null>(null)
+    const [, setSelectedCity] = useState<LocationSearchResult | null>(null)
+    const [, setSelectedProvince] = useState<LocationSearchResult | null>(null)
+    const [selectedGuild, setSelectedGuild] = useState<DiscordPartialGuild | null>(null)
+    const [selectedGuildChannel, setSelectedGuildChannel] = useState<DiscordChannelRequestResponse | null>(null)
+
+    function handlePlatformSelection(v: ProviderSelection) {
+        setProviderSelection(v)
+        setSelectedGuild(null)
+        setSelectedGuildChannel(null)
+    }
 
     return (
         <div className="max-w-5xl mx-auto p-8">
@@ -39,16 +50,36 @@ export default function DashboardPage() {
                     <span className="font-medium text-foreground">{selectedCity?.original}</span>
                 </p> */}
 
-                {selectedCity && selectedProvince && (
-                    <SelectPlatformSection
-                        onPlatformChange={(v) => setProviderSelection(v)}
-                    />
-                )}
+                <SelectPlatformSection
+                    onPlatformChange={(v) => handlePlatformSelection(v)}
+                />
 
                 {providerSelection === "discord" && (
-                    <SelectGuildSection /> 
+                    <>
+                        <SelectGuildSection
+                            onGuildChange={(v) => {
+                                setSelectedGuild(v)
+                                setSelectedGuildChannel(null)
+                            }}
+                        />
+
+                        <p>
+                            Selected Guild: <span className="font-medium text-foreground">{selectedGuild?.name}</span>
+                        </p>
+
+                        {selectedGuild && (
+                            <SelectGuildChannelSection
+                                selectedGuild={selectedGuild}
+                                onChannelChange={(v) => setSelectedGuildChannel(v)}
+                            />
+                        )}
+
+                        <p>
+                            Selected Channel: <span className="font-medium text-foreground">{selectedGuildChannel?.name}</span>
+                        </p>
+                    </>
                 )}
             </div>
-        </div>
+        </div >
     )
 }

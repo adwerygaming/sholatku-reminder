@@ -5,12 +5,14 @@ import client from './Client.js';
 import { CommandHandler } from './CommandHandler.js';
 import { DiscordListener } from './Listener.js';
 import { Discovery } from './Discovery.js';
+import { RPC } from './RPC.js';
 
 console.log(`[${tags.Discord}] Loaded Discord Index Script.`) 
 
 const commandHandler = new CommandHandler();
 const listener = new DiscordListener();
 const discovery = new Discovery();
+const rpc = new RPC();
 
 client.on(Events.ClientReady, async (bot: Client) => {
   // loads commands
@@ -34,6 +36,7 @@ client.on(Events.ClientReady, async (bot: Client) => {
 
   listener.listen();
   await discovery.start();
+  await rpc.start();
 });
 
 client.on(Events.InteractionCreate, async interaction => {

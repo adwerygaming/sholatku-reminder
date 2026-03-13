@@ -64,6 +64,13 @@ export default function SelectLocationSection({ onProvinceChange, onCityChange }
         })()
     }, [debouncedCityQuery, selectedProvince])
 
+    useEffect(() => {
+        (async () => {
+            updateProvince({ original: 'D.I. Yogyakarta', searchKey: 'yogyakarta' })
+            updateCity({ original: "Kab. Gunungkidul", searchKey: "kabgungkidul"})
+        })()
+    }, [])
+
     return (
         <div className="space-y-3">
             <p className="font-semibold">Choose your Location</p>

@@ -100,9 +100,11 @@ export class DiscordListener {
     listen(): void {
         console.log(`[${tags.Discord}] Discord Listener started listening for events.`)
 
-        void redisClient.subscribe(...Object.values(PrayerEvent))
+        const sub = redisClient.duplicate();
 
-        redisClient.on("message", async (channel, rawMessage) => {
+        void sub.subscribe(...Object.values(PrayerEvent))
+
+        sub.on("message", async (channel, rawMessage) => {
             const raw = JSON.parse(rawMessage) as SerializedPrayerEventPayload
 
             const payload: PrayerEventPayload = {

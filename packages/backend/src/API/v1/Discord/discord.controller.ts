@@ -1,7 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { DiscordPartialGuild } from 'sholatku-reminder-shared/types/Discord.types.js';
+import { DiscordChannelRequestResponse } from 'sholatku-reminder-shared/types/RPC.types.js';
 import { AuthenticatedRequest, DiscordGuard } from '../../../Modules/Discord/discord.guard.js';
 import { DiscordService } from '../../../Modules/Discord/discord.service.js';
-import { DiscordPartialGuild } from 'sholatku-reminder-shared/types/Discord.types.js';
 
 @Controller('api/v1/discord')
 export class DiscordController {
@@ -11,5 +12,11 @@ export class DiscordController {
     @Get('guilds')
     getGuilds(@Req() req: AuthenticatedRequest): Promise<DiscordPartialGuild[]> {
         return this.discordService.fetchAvailableGuilds(req);
+    }
+
+    @UseGuards(DiscordGuard)
+    @Get('guilds/:guildId/channels')
+    getChannels(@Param('guildId') guildId: string): Promise<DiscordChannelRequestResponse[]> {
+        return this.discordService.fetchGuildChannels(guildId);
     }
 }

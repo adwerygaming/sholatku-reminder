@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "sholatku-reminder-shared": "*",
     "@better-auth/client": "^0.0.2-alpha.3",
     "axios": "^1.13.6",
     "better-auth": "^1.5.4",
