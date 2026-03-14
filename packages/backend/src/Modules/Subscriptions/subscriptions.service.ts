@@ -53,7 +53,7 @@ export class SubscriptionsService {
 
                 return res
             } catch (e) {
-                console.error(e);
+                console.error(`[${tags.Error}] createSubscription failed`, e);
                 throw new Error(`Failed to create subscription`);
             }
         } else {

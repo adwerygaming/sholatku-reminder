@@ -62,63 +62,75 @@ async function init(): Promise<void> {
 await init()
 
 async function check(): Promise<void> {
-  // deduped locations
-  const subscriberLocations = await subs.getLocations()
+  try {
+    // deduped locations
+    const subscriberLocations = await subs.getLocations()
 
-  if (subscriberLocations.length === 0) {
-    console.log(`[${tags.Error}] No subscriptions found.`)
-    return
-  }
+    if (subscriberLocations.length === 0) {
+      console.log(`[${tags.Error}] No subscriptions found.`)
+      return
+    }
 
-  // On deduped locations
-  for (const loc of subscriberLocations) {
-    // run a check
-    const scheduler = new PrayerScheduler(loc.id)
-    const check = await scheduler.cycleCheck()
+    // On deduped locations
+    for (const loc of subscriberLocations) {
+      try {
+        // run a check
+        const scheduler = new PrayerScheduler(loc.id)
+        const check = await scheduler.cycleCheck()
 
-    // if there no updates, skip
-    if (!check) continue
+        // if there no updates, skip
+        if (!check) continue
 
-    // get every subscriptions on that location
-    const subscribers = await subs.getByLocation(loc.id)
+        // get every subscriptions on that location
+        const subscribers = await subs.getByLocation(loc.id)
 
-    // on every event of every subs
-    for (const ev of check) {
-      // batch fetch all states for all subs on this date — 1 query instead of N
-      const stateMap = await SubscriptionState.getBatch(
-        subscribers.map(s => s.id),
-        ev.time.toDate()
-      )
+        // on every event of every subs
+        for (const ev of check) {
+          try {
+            // batch fetch all states for all subs on this date — 1 query instead of N
+            const stateMap = await SubscriptionState.getBatch(
+              subscribers.map(s => s.id),
+              ev.time.toDate()
+            )
 
-      for (const sub of subscribers) {
-        const subState = new SubscriptionState(sub.id)
+            for (const sub of subscribers) {
+              const subState = new SubscriptionState(sub.id)
 
-        // check sub state, have i send x event prayer to this sub before?
-        const stateCheck = stateMap.get(`${sub.id}:${ev.eventName}:${ev.type}`)
+              // check sub state, have i send x event prayer to this sub before?
+              const stateCheck = stateMap.get(`${sub.id}:${ev.eventName}:${ev.type}`)
 
-        // oh, i already did, skip
-        if (stateCheck) continue
+              // oh, i already did, skip
+              if (stateCheck) continue
 
-        // if not, sends
-        await redisClient.publish(ev.type, JSON.stringify({
-          event: ev,
-          location: loc,
-          subscription: sub,
-        }))
+              // if not, sends
+              await redisClient.publish(ev.type, JSON.stringify({
+                event: ev,
+                location: loc,
+                subscription: sub,
+              }))
 
-        // skip notification for a prayer
-        if (ev.type === PrayerEvent.NextPrayer) continue
-        console.log(`[${tags.PrayerService}] Publishing event ${ev.eventName} (${ev.type}) to ${subscribers.length} subs.`)
+              // skip notification for a prayer
+              if (ev.type === PrayerEvent.NextPrayer) continue
+              console.log(`[${tags.PrayerService}] Publishing event ${ev.eventName} (${ev.type}) to ${subscribers.length} subs.`)
 
-        // update the state check, marking i have notify a sub of x event prayer
-        await subState.set({
-          prayerName: ev.eventName,
-          prayerType: ev.type,
-          date: ev.time.toDate(),
-          value: true
-        })
+              // update the state check, marking i have notify a sub of x event prayer
+              await subState.set({
+                prayerName: ev.eventName,
+                prayerType: ev.type,
+                date: ev.time.toDate(),
+                value: true
+              })
+            }
+          } catch (e) {
+            console.error(`[${tags.Error}] Failed processing event for location ${loc.id}`, e)
+          }
+        }
+      } catch (e) {
+        console.error(`[${tags.Error}] Failed processing location ${loc.id}`, e)
       }
     }
+  } catch (e) {
+    console.error(`[${tags.Error}] check loop failed`, e)
   }
 }
 
