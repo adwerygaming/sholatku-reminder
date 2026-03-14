@@ -13,7 +13,9 @@ console.log(`[${tags.PrayerService}] Loaded SholatKu Client.`);
 const location = new Location()
 const subs = new SubscriptionRepository()
 
+// For testing purposes only, will be removed later
 async function init(): Promise<void> {
+  return
   const jogja = await location.getByLocation({
     province: "D.I. Yogyakarta",
     city: "Kab. Gunungkidul"

@@ -2,6 +2,7 @@ import type { Knex } from "knex";
 import moment from "moment-timezone";
 import type { LocationPrayerStateSchema } from "sholatku-reminder-shared/types/Database.types.js";
 import type { PrayerEvent, PrayerName } from "sholatku-reminder-shared/types/SholatKu.types.js";
+import tags from "sholatku-reminder-shared/utils/Tags.js";
 import DatabaseClient from "../../database/DatabaseClient.js";
 
 interface GetPrayerState {
@@ -42,19 +43,24 @@ export class PrayerLocationState {
      */
     async get({ prayerName, prayerType }: GetPrayerState): Promise<boolean> {
         const dateIdentifier = this.getDate()
+        try {
+            const res = await this.db()
+                .select("*")
+                .where("locationId", this.locationId)
+                .where("prayerName", prayerName)
+                .where("prayerType", prayerType)
+                .where("forDate", dateIdentifier)
+                .first()
 
-        const res = await this.db()
-            .select("*")
-            .where("locationId", this.locationId)
-            .where("prayerName", prayerName)
-            .where("prayerType", prayerType)
-            .where("forDate", dateIdentifier)
-            .first()
-
-        if (!res) {
-            return false
-        } else {
-            return true
+            if (!res) {
+                return false
+            } else {
+                return true
+            }
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to get prayer state for location ${this.locationId}.`)
+            console.error(e)
+            throw e
         }
     }
 
@@ -64,19 +70,25 @@ export class PrayerLocationState {
      * @param value boolean value for that state
      */
     async set({ prayerName, prayerType, value }: SetPrayerData): Promise<LocationPrayerStateSchema> {
-        const [res] = await this.db()
-            .insert({
-                lastUpdatedAt: moment().toISOString(),
-                locationId: this.locationId,
-                prayerName,
-                prayerType,
-                forDate: this.getDate(),
-                isTriggered: value
-            })
-            .onConflict(["locationId", "prayerName", "prayerType", "forDate"])
-            .merge(["lastUpdatedAt", "isTriggered"])
-            .returning("*")
+        try {
+            const [res] = await this.db()
+                .insert({
+                    lastUpdatedAt: moment().toISOString(),
+                    locationId: this.locationId,
+                    prayerName,
+                    prayerType,
+                    forDate: this.getDate(),
+                    isTriggered: value
+                })
+                .onConflict(["locationId", "prayerName", "prayerType", "forDate"])
+                .merge(["lastUpdatedAt", "isTriggered"])
+                .returning("*")
 
-        return res
+            return res
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to set prayer state for location ${this.locationId}.`)
+            console.error(e)
+            throw e
+        }
     }
 }

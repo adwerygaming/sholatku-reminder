@@ -2,6 +2,7 @@
 
 import { Overlay } from "@/components/Overlay";
 import { authClient } from "@/lib/auth-client";
+import NiceModal from "@ebay/nice-modal-react";
 import { useEffect } from "react";
 
 export default function DashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -18,8 +19,10 @@ export default function DashboardLayout({ children }: Readonly<{ children: React
     }
 
     return (
-        <div>
-            {children}
-        </div>
+        <NiceModal.Provider>
+            <div>
+                {children}
+            </div>
+        </NiceModal.Provider>
     );
 }

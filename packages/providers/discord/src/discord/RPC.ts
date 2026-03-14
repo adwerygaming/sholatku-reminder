@@ -50,8 +50,6 @@ export class RPC {
                         name: c.name,
                     }))
 
-                console.log(textChannels)
-
                 await pub.publish(data.replyTo, JSON.stringify(textChannels))
             }
         })

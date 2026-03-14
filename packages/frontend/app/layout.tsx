@@ -2,7 +2,10 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
-import "./globals.css"; // ignore this error
+
+// @ts-expect-error - idk why this happens, the file clearly exists. 
+// ts is just being ts at this point. ts pmo twin 
+import "./globals.css";
 
 const roboto = Roboto({subsets:['latin'],variable:'--font-sans'});
 
@@ -29,13 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", roboto.variable)} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-         <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
-        {children}
-          </ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

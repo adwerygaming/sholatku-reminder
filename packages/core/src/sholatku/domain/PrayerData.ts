@@ -105,41 +105,47 @@ export class PrayerData {
      */
     async get(): Promise<PrayerTimeData[] | null> {
         // console.log(`[${tags.Debug}] Fetching prayer data FROM CACHE for ${this.city}, ${this.province}`)
-        const res = await this.db()
-            .select("prayerTimes")
-            .where("locationId", this.locationId)
+        try {
+            const res = await this.db()
+                .select("prayerTimes")
+                .where("locationId", this.locationId)
 
-        if (!res || res.length === 0) {
-            // fetch from API
-            const location = new Location()
-            const locationData = await location.getById(this.locationId)
+            if (!res || res.length === 0) {
+                // fetch from API
+                const location = new Location()
+                const locationData = await location.getById(this.locationId)
 
-            if (!locationData) {
-                console.log(`[${tags.Error}] Failed to resolve location for id ${this.locationId}`)
-                return null
+                if (!locationData) {
+                    console.log(`[${tags.Error}] Failed to resolve location for id ${this.locationId}`)
+                    return null
+                }
+
+                const fetched = await this.fetch({
+                    city: locationData.city,
+                    province: locationData.province
+                })
+
+                if (fetched.length === 0) {
+                    console.log(`[${tags.Error}] Failed to fetch prayer data for ${locationData.city}, ${locationData.province}`)
+                    return null
+                }
+
+                await this.set(fetched)
+
+                // should i replace res with fetched data? or just fetch again? race condition? recursive?
+                return await this.get()
             }
 
-            const fetched = await this.fetch({
-                city: locationData.city,
-                province: locationData.province
-            })
+            const mapped = res.map(x => {
+                return x.prayerTimes
+            }).flat()
 
-            if (fetched.length === 0) {
-                console.log(`[${tags.Error}] Failed to fetch prayer data for ${locationData.city}, ${locationData.province}`)
-                return null
-            }
-
-            await this.set(fetched)
-
-            // should i replace res with fetched data? or just fetch again? race condition? recursive?
-            return await this.get()
+            return mapped
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to get prayer data for location ${this.locationId}.`)
+            console.error(e)
+            throw e
         }
-
-        const mapped = res.map(x => {
-            return x.prayerTimes
-        }).flat()
-
-        return mapped
     }
 
     /**
@@ -150,16 +156,22 @@ export class PrayerData {
         // locationId is unique btw
         // JSON.stringify required: pg driver serializes JS arrays as PostgreSQL array literals,
         // which is invalid JSONB syntax. Passing a string lets PostgreSQL cast it to JSONB correctly.
-        const res = await this.db()
-            .insert({
-                createdAt: moment().toISOString(),
-                locationId: this.locationId,
-                prayerTimes: JSON.stringify(data) as unknown as PrayerTimeData[]
-            })
-            .onConflict("locationId")
-            .merge(["prayerTimes", "createdAt"])
-            .returning("*")
+        try {
+            const res = await this.db()
+                .insert({
+                    createdAt: moment().toISOString(),
+                    locationId: this.locationId,
+                    prayerTimes: JSON.stringify(data) as unknown as PrayerTimeData[]
+                })
+                .onConflict("locationId")
+                .merge(["prayerTimes", "createdAt"])
+                .returning("*")
 
-        return res
+            return res
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to upsert prayer data for location ${this.locationId}.`)
+            console.error(e)
+            throw e
+        }
     }
 }

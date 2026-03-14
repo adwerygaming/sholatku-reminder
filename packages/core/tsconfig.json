@@ -7,7 +7,9 @@
     "composite": true,
 
     "paths": {
-      "sholatku-reminder-shared/*": ["../shared/*"]
+      "sholatku-reminder-shared/*": ["../shared/*"],
+      "sholatku-reminder-core/src/*": ["./src/*"],
+      "sholatku-reminder-core/*": ["./src/*"]
     }
   },
   "include": [

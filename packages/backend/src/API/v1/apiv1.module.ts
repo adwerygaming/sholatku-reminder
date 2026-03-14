@@ -3,12 +3,13 @@ https://docs.nestjs.com/modules
 */
 
 import { Module } from '@nestjs/common';
-import { DiscordModule } from './Discord/discord.module.js';
-import { LocationModule } from './Location/location.module.js';
+import { DiscordModule } from '../../Modules/Discord/discord.module.js';
+import { LocationModule } from '../../Modules/Location/location.module.js';
+import { SubscriptionsModule } from '../../Modules/Subscriptions/subscriptions.module.js';
 
 @Module({
-    imports: [DiscordModule, LocationModule],
+    imports: [DiscordModule, LocationModule, SubscriptionsModule],
     controllers: [],
     providers: [],
 })
-export class APIV1Module {}
+export class APIV1Module { }

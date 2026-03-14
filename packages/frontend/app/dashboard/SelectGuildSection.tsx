@@ -29,6 +29,7 @@ export default function SelectGuildSection({ onGuildChange }: SelectGuildSection
     const [guilds, setGuilds] = useState<DiscordPartialGuild[]>()
     const [guildsLoading, setGuildsLoading] = useState(false)
     const [selectedGuildId, setSelectedGuildId] = useState("")
+    const [confirmedGuild, setConfirmedGuild] = useState<DiscordPartialGuild | null>(null)
 
     useEffect(() => {
         if (!session) return;
@@ -44,13 +45,25 @@ export default function SelectGuildSection({ onGuildChange }: SelectGuildSection
     function onSubmit(data: SelectGuildForm) {
         const guild = guilds?.find((g) => g.id === data.guildId) ?? null
         onGuildChange(guild)
+        setConfirmedGuild(guild)
     }
 
     return (
         <div className="space-y-2">
             <div className="flex flex-row items-center justify-between">
-                <p className="font-semibold">{guilds?.length} Available servers to choose from.</p>
-                {guildsLoading && <p>Loading guilds...</p>}
+                <div>
+                    {guildsLoading ? (
+                        <p>Loading guilds...</p>
+                    ) : (
+                        <p className="font-semibold">{guilds?.length} Available servers to choose from.</p>
+                    )}
+                </div>
+
+                <div>
+                    {confirmedGuild && (
+                        <span className="font-medium text-foreground">{confirmedGuild.name}</span>
+                    )}
+                </div>
             </div>
 
             <div>

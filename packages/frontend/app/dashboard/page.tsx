@@ -10,6 +10,9 @@ import SelectGuildChannelSection from "./SelectGuildChannelSection"
 import SelectGuildSection from "./SelectGuildSection"
 import SelectLocationSection from "./SelectLocationSection"
 import SelectPlatformSection from "./SelectPlatformSection"
+import { Button } from "@/components/ui/button"
+import NiceModal from "@ebay/nice-modal-react"
+import ConfirmSubscriptionModal from "@/components/modals/ConfirmSubscriptionModal"
 
 export type ProviderSelection = "discord" | "whatsapp"
 
@@ -17,8 +20,8 @@ export default function DashboardPage() {
     const { data: session } = authClient.useSession()
 
     const [providerSelection, setProviderSelection] = useState<ProviderSelection | null>(null)
-    const [, setSelectedCity] = useState<LocationSearchResult | null>(null)
-    const [, setSelectedProvince] = useState<LocationSearchResult | null>(null)
+    const [selectedCity, setSelectedCity] = useState<LocationSearchResult | null>(null)
+    const [selectedProvince, setSelectedProvince] = useState<LocationSearchResult | null>(null)
     const [selectedGuild, setSelectedGuild] = useState<DiscordPartialGuild | null>(null)
     const [selectedGuildChannel, setSelectedGuildChannel] = useState<DiscordChannelRequestResponse | null>(null)
 
@@ -26,6 +29,21 @@ export default function DashboardPage() {
         setProviderSelection(v)
         setSelectedGuild(null)
         setSelectedGuildChannel(null)
+    }
+
+    function sumbitSubscription() {
+        if (!providerSelection || !selectedCity || !selectedProvince || !selectedGuild || !selectedGuildChannel) {
+            alert("Please fill all required fields")
+            return
+        }
+
+        NiceModal.show(ConfirmSubscriptionModal, {
+            platform: providerSelection,
+            province: selectedProvince.original,
+            city: selectedCity.original,
+            guild: selectedGuild,
+            channel: selectedGuildChannel,
+        })
     }
 
     return (
@@ -63,21 +81,19 @@ export default function DashboardPage() {
                             }}
                         />
 
-                        <p>
-                            Selected Guild: <span className="font-medium text-foreground">{selectedGuild?.name}</span>
-                        </p>
-
                         {selectedGuild && (
                             <SelectGuildChannelSection
                                 selectedGuild={selectedGuild}
                                 onChannelChange={(v) => setSelectedGuildChannel(v)}
                             />
                         )}
-
-                        <p>
-                            Selected Channel: <span className="font-medium text-foreground">{selectedGuildChannel?.name}</span>
-                        </p>
                     </>
+                )}
+
+                {(providerSelection && selectedCity && selectedProvince && selectedGuild && selectedGuildChannel) && (
+                    <Button onClick={() => sumbitSubscription()}>
+                        Save Subscription
+                    </Button>
                 )}
             </div>
         </div >

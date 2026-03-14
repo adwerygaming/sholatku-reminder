@@ -17,18 +17,20 @@ interface DiscoveryDiscord extends DiscoveryBase {
 }
 
 interface ResolveAccessTokenResponse {
+    userId: string
     accessToken: string
+    discordId: string
     user: AuthenticatedRequest['session']['user']
 }
 
 @Injectable()
 export class DiscordService {
-    async resolveAccessToken(req: AuthenticatedRequest): Promise<ResolveAccessTokenResponse> {
+    async resolveUser(req: AuthenticatedRequest): Promise<ResolveAccessTokenResponse> {
         const { user } = req.session;
 
         // resolve betterauth to discord user id
         const [account] = await DatabaseClient.table<AccountSchema>("account")
-            .select("accessToken")
+            .select('id', 'accessToken', 'accountId')
             .where("userId", user.id)
             .andWhere("providerId", "discord")
             .limit(1);
@@ -38,13 +40,15 @@ export class DiscordService {
         console.log(`Resolved access token for user ${user.name}`);
 
         return {
+            userId: user.id,
             accessToken: account.accessToken,
+            discordId: account.accountId,
             user,
         }
     }
 
     async fetchUserGuilds(req: AuthenticatedRequest): Promise<DiscordPartialGuild[]> {
-        const { accessToken, user } = await this.resolveAccessToken(req)
+        const { accessToken, user } = await this.resolveUser(req)
 
         const cacheKey = `guilds:user:${user.id}`;
         const cached = await redisClient.get(cacheKey);

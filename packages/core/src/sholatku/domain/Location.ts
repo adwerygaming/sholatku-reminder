@@ -4,6 +4,7 @@ import DatabaseClient from 'sholatku-reminder-core/src/database/DatabaseClient.j
 import { normalizeInput, slugify } from 'sholatku-reminder-core/src/sholatku/helper/Helper';
 import type { LocationSchema, SubscriptionSchema } from 'sholatku-reminder-shared/types/Database.types.js';
 import type { LocationSearchResult } from 'sholatku-reminder-shared/types/Location.types.js';
+import tags from 'sholatku-reminder-shared/utils/Tags.js';
 
 interface LocationFetchResult {
     [province: string]: string[]
@@ -21,40 +22,58 @@ export class Location {
     }
 
     async getSubscribedLocations(): Promise<LocationSchema[]> {
-        const locationIds = await DatabaseClient<SubscriptionSchema>("subscriptions").distinct("locationId")
-        const mappedLocIds = locationIds.map(x => x.locationId)
+        try {
+            const locationIds = await DatabaseClient<SubscriptionSchema>("subscriptions").distinct("locationId")
+            const mappedLocIds = locationIds.map(x => x.locationId)
 
-        const res = await this.db()
-            .whereIn("id", mappedLocIds)
+            const res = await this.db()
+                .whereIn("id", mappedLocIds)
 
-        return res
+            return res
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to fetch subscribed locations.`)
+            console.error(e)
+            throw e
+        }
     }
 
     async getById(locationId: string): Promise<LocationSchema | null> {
-        const res = await this.db()
-            .select("*")
-            .where("id", locationId)
-            .first()
+        try {
+            const res = await this.db()
+                .select("*")
+                .where("id", locationId)
+                .first()
 
-        if (!res) {
-            return null
+            if (!res) {
+                return null
+            }
+
+            return res
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to get location by id ${locationId}.`)
+            console.error(e)
+            throw e
         }
-
-        return res
     }
 
     async getByLocation({ province, city }: GetByLocationProp): Promise<LocationSchema | null> {
-        const res = await this.db()
-            .select("*")
-            .where("province", province)
-            .where("city", city)
-            .first()
+        try {
+            const res = await this.db()
+                .select("*")
+                .where("province", province)
+                .where("city", city)
+                .first()
 
-        if (!res) {
-            return null
+            if (!res) {
+                return null
+            }
+
+            return res
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to get location for ${province}, ${city}.`)
+            console.error(e)
+            throw e
         }
-
-        return res
     }
 
     /**
@@ -64,24 +83,30 @@ export class Location {
      * @returns An array of objects mapping province keys to their city arrays.
      */
     async fetch(): Promise<LocationFetchResult[]> {
-        const data = await this.db().select('province', 'city')
+        try {
+            const data = await this.db().select('province', 'city')
 
-        const sortedData = data.reduce((acc: LocationFetchResult[], curr) => {
-            const provinceKey = normalizeInput(curr.province)
-            const cityValue = normalizeInput(curr.city)
+            const sortedData = data.reduce((acc: LocationFetchResult[], curr) => {
+                const provinceKey = normalizeInput(curr.province)
+                const cityValue = normalizeInput(curr.city)
 
-            const existingProvince = acc.find(x => Object.keys(x)[0] === provinceKey)
+                const existingProvince = acc.find(x => Object.keys(x)[0] === provinceKey)
 
-            if (existingProvince) {
-                existingProvince[provinceKey].push(cityValue)
-            } else {
-                acc.push({ [provinceKey]: [cityValue] })
-            }
+                if (existingProvince) {
+                    existingProvince[provinceKey].push(cityValue)
+                } else {
+                    acc.push({ [provinceKey]: [cityValue] })
+                }
 
-            return acc
-        }, [])
+                return acc
+            }, [])
 
-        return sortedData
+            return sortedData
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to fetch locations data.`)
+            console.error(e)
+            throw e
+        }
     }
 
     /**
@@ -89,9 +114,15 @@ export class Location {
      * @returns A promise resolving to an array of province identifiers.
      */
     async getProvinces(): Promise<string[]> {
-        const provinces = await this.db().distinct('province')
-        const sortedProvinces = provinces.map(x => x.province)
-        return sortedProvinces
+        try {
+            const provinces = await this.db().distinct('province')
+            const sortedProvinces = provinces.map(x => x.province)
+            return sortedProvinces
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to fetch provinces.`)
+            console.error(e)
+            throw e
+        }
     }
 
     /**
@@ -101,10 +132,15 @@ export class Location {
      */
     async getCitiesByProvince(province: string): Promise<string[]> {
         //! province must be on proper format
-
-        const cities = await this.db().where('province', province)
-        const sortedCities = cities.map(x => x.city)
-        return sortedCities
+        try {
+            const cities = await this.db().where('province', province)
+            const sortedCities = cities.map(x => x.city)
+            return sortedCities
+        } catch (e) {
+            console.log(`[${tags.Error}] Failed to fetch cities for province ${province}.`)
+            console.error(e)
+            throw e
+        }
     }
 
     /**
