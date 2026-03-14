@@ -8,7 +8,7 @@
 </div>
 
 > [!CAUTION]
-> This `dev` branch is having different system from `main` branch, and it's still in development. do not use it yet. ok?
+> This branch is having different system from `main-legacy` branch. Explaination about the new system can be found in [How it works](#how-it-works) section below.
 
 ## Showcase
 This is an example of how the prayer reminder system can be used to send prayer time notifications to a Discord channel.
