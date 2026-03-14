@@ -1,27 +1,46 @@
-import js from "@eslint/js";
-import importPlugin from 'eslint-plugin-import';
-import { defineConfig } from "eslint/config";
-import globals from "globals";
+import eslint from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
+import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
- 
 export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
-  tseslint.configs.recommended,
+  eslint.configs.recommended,
+  tseslint.configs.recommendedTypeChecked,
 
   {
-    plugins: { import: importPlugin },
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+
+  {
+    plugins: { "@stylistic": stylistic },
     rules: {
+      // "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/explicit-function-return-type": "error",
       "@typescript-eslint/explicit-module-boundary-types": "error",
       "@typescript-eslint/no-inferrable-types": "error",
       "@typescript-eslint/no-non-null-assertion": "error",
+      "@stylistic/semi-style": "error",
     }
   },
 
-  {
-    ignores: ["dist", "build", "node_modules"]
-  }
+  globalIgnores([
+    "**/.next/**",
+    "**/out/**",
+    "**/build/**",
+    "next-env.d.ts",
+    "**/components/ui/**",
+    "*.tsx",
+    "**/dist/**",
+    "**/test/**",
+    "**/node_modules/**"
+  ]),
 ]);

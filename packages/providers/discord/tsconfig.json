@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "sholatku-reminder-core": [
+        "../core/src/index.ts"
+      ],
+      "sholatku-reminder-core/src/*": [
+        "../core/src/*"
+      ],
+      "sholatku-reminder-shared/*": [
+        "../shared/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+  ],
+  "exclude": [
+    "coverage",
+    "dist",
+    "docs",
+    "node_modules"
+  ],
+  "references": [
+    {
+      "path": "../../core"
+    },
+    {
+      "path": "../../shared"
+    }
+  ]
+}

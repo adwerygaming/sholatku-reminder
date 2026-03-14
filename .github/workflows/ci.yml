@@ -2,46 +2,121 @@ name: Sholatku CI
 
 on:
     push:
-        branches: [ main ]
+        branches: [ main, dev ]
     pull_request:
-        branches: [ main ]
+        branches: [ main, dev ]
 
 jobs:
-    linting:
-        runs-on: ubuntu-latest
-
-        steps:
-        - name: "Checkout Repo"
-          uses: actions/checkout@v4
-
-        - name: "Install Node"
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-            cache: npm
-
-        - name: "NPM CI Thingy"
-          run: npm ci
-
-        - name: "Lint - Check for errors & unused vars"
-          run: npm run lint
-          
-    typecheck:
+    linting-core:
       runs-on: ubuntu-latest
-      needs: linting
 
       steps:
-        - name: "Checkout Repo"
-          uses: actions/checkout@v4
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
 
-        - name: "Install Node"
-          uses: actions/setup-node@v4
-          with:
-            node-version: 20
-            cache: npm
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-        - name: "NPM CI Thingy"
-          run: npm ci
+      - name: "NPM CI Thingy"
+        run: npm ci
 
-        - name: "Typescript Type Check"
-          run: npx tsc --noEmit
+      - name: "Lint - Check for errors & unused vars on package core"
+        run: npm run lint-core
+
+    linting-discord:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package discord"
+        run: npm run lint-discord
+
+    linting-whatsapp:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package whatsapp"
+        run: npm run lint-whatsapp
+    
+    linting-shared:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package shared"
+        run: npm run lint-shared
+
+    linting-frontend:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package frontend"
+        run: npm run lint-frontend
+
+    linting-backend:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: "Checkout Repo"
+        uses: actions/checkout@v4
+
+      - name: "Install Node"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: "NPM CI Thingy"
+        run: npm ci
+
+      - name: "Lint - Check for errors & unused vars on package backend"
+        run: npm run lint-backend

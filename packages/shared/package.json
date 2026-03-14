@@ -1,0 +1,30 @@
+{
+  "name": "sholatku-reminder-shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/*",
+    "./*": "./dist/*"
+  },
+  "scripts": {
+    "build": "tsup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@keyv/redis": "^5.1.6",
+    "cacheable": "^2.3.3",
+    "dotenv": "^17.3.1",
+    "gradient-string": "^3.0.0",
+    "ioredis": "^5.9.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
